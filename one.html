@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Petrol Expense Tracker - Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    body { display: flex; height: 100vh; background:#f4f6fa; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      background: linear-gradient(180deg, #d946ef, #9333ea);
+      color: #fff;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .sidebar h2 { font-size: 18px; margin-bottom: 10px; }
+    .nav-link { padding: 10px; border-radius: 6px; cursor: pointer; }
+    .nav-link:hover { background: rgba(255,255,255,0.1); }
+    .nav-link.active { background: rgba(255,255,255,0.2); font-weight:bold; }
+
+    /* Content */
+    .content { flex: 1; padding: 20px; overflow-y: auto; }
+    .toolbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:10px; }
+    .btn { background:#2563eb; color:#fff; border:none; padding:10px 16px; border-radius:8px; font-weight:600; cursor:pointer; }
+    .btn.export { background:#16a34a; }
+
+    /* Dashboard */
+    .dashboard { display:grid; grid-template-columns: repeat(5, 1fr); gap:12px; margin-bottom:20px; }
+    .card { background:#fff; border-radius:12px; padding:16px; text-align:center; box-shadow:0 4px 10px rgba(0,0,0,0.05); }
+    .card h3 { font-size:14px; color:#666; margin-bottom:6px; }
+    .card p { font-size:18px; font-weight:bold; color:#111; }
+
+    /* Table */
+    .table-card { background:#fff; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.05); overflow:hidden; }
+    table { width:100%; border-collapse:collapse; }
+    thead { background:#f3f4f6; }
+    thead th { text-align:left; padding:12px; font-size:13px; color:#555; }
+    tbody td { padding:14px 12px; border-bottom:1px solid #eee; font-size:14px; color:#333; }
+    tbody tr:hover { background:#f9f9ff; }
+
+    .badge { display:inline-block; padding:4px 8px; border-radius:8px; font-size:12px; background:#eef2ff; color:#4338ca; }
+    .rating-up { color:#16a34a; font-weight:600; }
+    .actions { text-align:right; }
+    .actions button { border:none; background:none; cursor:pointer; font-size:16px; margin:0 4px; }
+
+    /* Form */
+    .form-card { background:#fff; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.05); padding:16px; margin-bottom:16px; }
+    .form-card input { margin:6px 0; padding:8px; width:100%; border:1px solid #ddd; border-radius:6px; }
+    .form-card button { margin-top:10px; background:#16a34a; color:#fff; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>🚗 Tracker</h2>
+    <div class="nav-link active" onclick="showPage('dashboard', this)">Dashboard</div>
+    <div class="nav-link" onclick="showPage('addEntry', this)">Add Entry</div>
+    <div class="nav-link" onclick="showPage('reports', this)">Reports</div>
+    <div class="nav-link" onclick="showPage('settings', this)">Settings</div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content">
+    <!-- Dashboard Page -->
+    <div id="dashboard" class="page">
+      <h2>Petrol Expense Tracker</h2>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div><b>All Entries:</b> <span id="entryCount">0</span></div>
+        <div>
+          <button class="btn" onclick="showPage('addEntry', document.querySelectorAll('.nav-link')[1])">+ Add new entry</button>
+          <button class="btn export" onclick="exportExcel()">⬇ Export to Excel</button>
+        </div>
+      </div>
+
+      <!-- Dashboard Cards -->
+      <div class="dashboard">
+        <div class="card"><h3>Total Paid</h3><p id="dashPaid">₹0</p></div>
+        <div class="card"><h3>Total Litres</h3><p id="dashLitres">0 L</p></div>
+        <div class="card"><h3>Avg Mileage</h3><p id="dashMileage">0 km/L</p></div>
+        <div class="card"><h3>Fuel Additives</h3><p id="dashAdditives">₹0</p></div>
+        <div class="card"><h3>Avg Rate</h3><p id="dashRate">₹0</p></div>
+      </div>
+
+      <!-- Chart -->
+      <canvas id="fuelChart" height="100"></canvas>
+
+      <!-- Table -->
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Amount Paid</th>
+              <th>Additives</th>
+              <th>Rate/Litre</th>
+              <th>Litres</th>
+              <th>Total</th>
+              <th>Calc Rate</th>
+              <th>Mileage</th>
+              <th class="actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Add Entry Page -->
+    <div id="addEntry" class="page" style="display:none;">
+      <h2>Add Entry</h2>
+      <div class="form-card">
+        <input type="hidden" id="editIndex" />
+        <input type="date" id="date" placeholder="Date" />
+        <input type="number" id="amount" placeholder="Amount Paid (₹)" />
+        <input type="number" id="rate" placeholder="Rate Per Litre (₹)" />
+        <input type="number" id="additives" placeholder="Fuel Additives (₹)" />
+        <input type="number" id="startKm" placeholder="Start KM" />
+        <input type="number" id="endKm" placeholder="End KM" />
+        <button onclick="saveEntry()">Save Entry</button>
+      </div>
+    </div>
+
+    <!-- Reports Page -->
+    <div id="reports" class="page" style="display:none;">
+      <h2>Reports</h2>
+      <canvas id="mileageChart" height="100"></canvas>
+    </div>
+
+    <!-- Settings Page -->
+    <div id="settings" class="page" style="display:none;">
+      <h2>Settings</h2>
+      <p>Here you can manage preferences, export/import data, reset storage.</p>
+    </div>
+  </div>
+
+<script>
+  let entries = [];
+  let chart, mileageChart;
+
+  // Load from localStorage
+  window.onload = function() {
+    const saved = localStorage.getItem("fuelEntries");
+    if (saved) {
+      entries = JSON.parse(saved);
+      renderTable();
+    }
+  };
+
+  // Navigation
+  function showPage(pageId, el) {
+    document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+    document.getElementById(pageId).style.display = 'block';
+    document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+    el.classList.add('active');
+    if(pageId==="reports"){ drawMileageChart(); }
+  }
+
+  // Save Entry
+  function saveEntry(){
+    const editIndex = document.getElementById("editIndex").value;
+    const date = document.getElementById("date").value;
+    const amount = parseFloat(document.getElementById("amount").value) || 0;
+    const rate = parseFloat(document.getElementById("rate").value) || 0;
+    const additives = parseFloat(document.getElementById("additives").value) || 0;
+    const startKm = parseFloat(document.getElementById("startKm").value) || 0;
+    const endKm = parseFloat(document.getElementById("endKm").value) || 0;
+
+    const litres = rate > 0 ? (amount / rate).toFixed(2) : 0;
+    const total = (amount - additives).toFixed(2);
+    const calcRate = (litres > 0 ? (total / litres).toFixed(2) : 0);
+    const mileage = (endKm > startKm && litres > 0 ? ((endKm - startKm) / litres).toFixed(2) : 0);
+
+    const entry = { date, amount, rate, additives, litres, total, calcRate, mileage };
+
+    if (editIndex) {
+      if(confirm("Do you want to update this entry?")){ entries[editIndex] = entry; }
+    } else {
+      entries.push(entry);
+    }
+
+    saveToLocal();
+    renderTable();
+    showPage('dashboard', document.querySelectorAll('.nav-link')[0]);
+    document.getElementById("editIndex").value = "";
+  }
+
+  // Render Table
+  function renderTable(){
+    const tbody = document.getElementById("tableBody");
+    tbody.innerHTML = "";
+    entries.forEach((e, i) => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${e.date}</td>
+          <td>₹${e.amount}</td>
+          <td>₹${e.additives}</td>
+          <td><span class="badge">₹${e.rate}</span></td>
+          <td>${e.litres}</td>
+          <td>₹${e.total}</td>
+          <td><span class="badge">₹${e.calcRate}</span></td>
+          <td><span class="rating-up">${e.mileage}</span></td>
+          <td class="actions">
+            <button onclick="editEntry(${i})">✏️</button>
+            <button onclick="deleteEntry(${i})">🗑️</button>
+          </td>
+        </tr>`;
+    });
+    document.getElementById("entryCount").innerText = entries.length;
+    updateDashboard();
+  }
+
+  function deleteEntry(index){
+    if(confirm("Are you sure you want to delete this entry?")){
+      entries.splice(index, 1);
+      saveToLocal();
+      renderTable();
+    }
+  }
+
+  function editEntry(index){
+    const e = entries[index];
+    document.getElementById("date").value = e.date;
+    document.getElementById("amount").value = e.amount;
+    document.getElementById("rate").value = e.rate;
+    document.getElementById("additives").value = e.additives;
+    document.getElementById("startKm").value = "";
+    document.getElementById("endKm").value = "";
+    document.getElementById("editIndex").value = index;
+    showPage('addEntry', document.querySelectorAll('.nav-link')[1]);
+  }
+
+  function saveToLocal(){ localStorage.setItem("fuelEntries", JSON.stringify(entries)); }
+
+  // Dashboard
+  function updateDashboard(){
+    if(entries.length === 0) return;
+    let totalPaid = entries.reduce((a,b)=>a+Number(b.amount),0);
+    let totalLitres = entries.reduce((a,b)=>a+Number(b.litres),0);
+    let totalAdditives = entries.reduce((a,b)=>a+Number(b.additives),0);
+    let avgMileage = (entries.reduce((a,b)=>a+Number(b.mileage),0)/entries.length).toFixed(2);
+    let avgRate = (entries.reduce((a,b)=>a+Number(b.calcRate),0)/entries.length).toFixed(2);
+
+    document.getElementById("dashPaid").innerText = "₹" + totalPaid.toFixed(2);
+    document.getElementById("dashLitres").innerText = totalLitres.toFixed(2) + " L";
+    document.getElementById("dashMileage").innerText = avgMileage + " km/L";
+    document.getElementById("dashAdditives").innerText = "₹" + totalAdditives.toFixed(2);
+    document.getElementById("dashRate").innerText = "₹" + avgRate;
+    drawChart();
+  }
+
+  // Chart.js
+  function drawChart(){
+    const ctx = document.getElementById("fuelChart").getContext("2d");
+    if(chart) chart.destroy();
+    chart = new Chart(ctx,{
+      type:"line",
+      data:{
+        labels: entries.map(e=>e.date),
+        datasets:[
+          { label:"Amount Paid (₹)", data: entries.map(e=>e.amount), borderColor:"#2563eb", fill:false },
+          { label:"Litres Filled", data: entries.map(e=>e.litres), borderColor:"#16a34a", fill:false }
+        ]
+      },
+      options:{ responsive:true, plugins:{ legend:{ position:"top"} } }
+    });
+  }
+
+  function drawMileageChart(){
+    const ctx = document.getElementById("mileageChart").getContext("2d");
+    if(mileageChart) mileageChart.destroy();
+    mileageChart = new Chart(ctx,{
+      type:"bar",
+      data:{
+        labels: entries.map(e=>e.date),
+        datasets:[
+          { label:"Mileage (km/L)", data: entries.map(e=>e.mileage), backgroundColor:"#9333ea" }
+        ]
+      },
+      options:{ responsive:true, plugins:{ legend:{ position:"top"} } }
+    });
+  }
+
+  // Export
+  function exportExcel() {
+    if (entries.length === 0) { alert("No data to export!"); return; }
+    const worksheet = XLSX.utils.json_to_sheet(entries);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Petrol Expenses");
+    XLSX.writeFile(workbook, "Petrol_Expenses.xlsx");
+  }
+</script>
+</body>
+</html>
