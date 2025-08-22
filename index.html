@@ -1,277 +1,485 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Petrol Expense Tracker</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-:root { --yellow:#ffcc00; --bg:#f9f9f9; }
-body {margin:0;font-family:Arial, sans-serif;background:var(--bg);}
-h2,h3 {margin:0 0 1rem 0;}
-.page {padding:1rem;}
-button {cursor:pointer;}
-
-/* Sidebar (desktop) */
-.sidebar {
-  position:fixed;top:0;left:0;width:200px;height:100%;
-  background:var(--yellow);padding:1rem;display:flex;flex-direction:column;
-}
-.sidebar h2 {font-size:1.2rem;margin-bottom:1rem;}
-.sidebar button {background:none;border:none;padding:0.5rem;text-align:left;font-weight:bold;}
-
-/* Content */
-.content {margin-left:200px;padding:1rem;}
-
-/* Bottom Nav (mobile) */
-.bottom-nav {
-  display:none;position:fixed;bottom:0;left:0;width:100%;
-  background:#fff;border-top:1px solid #ddd;
-  display:flex;justify-content:space-around;padding:0.5rem 0;
-}
-.bottom-nav button {background:none;border:none;font-weight:bold;}
-
-/* Add Form */
-.add-form {
-  display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-top:1rem;
-}
-.add-form label {font-weight:bold;margin-bottom:0.2rem;display:block;}
-.add-form input {
-  width:100%;padding:0.6rem;border:1px solid #ccc;border-radius:6px;font-size:1rem;
-}
-.add-form button {
-  grid-column: span 2;padding:0.8rem;background:var(--yellow);
-  border:none;border-radius:6px;font-weight:bold;
-}
-.edit-badge {
-  background:#fff9c4;color:#444;padding:0.4rem 0.8rem;border-radius:6px;
-  margin-bottom:1rem;font-size:0.9rem;font-weight:bold;display:inline-block;
-}
-
-/* History Table */
-.table-container {margin-top:1rem;overflow-x:auto;}
-table {width:100%;border-collapse:collapse;min-width:500px;}
-th,td {border:1px solid #ddd;padding:0.6rem;text-align:center;}
-th {background:var(--yellow);}
-.editing {background:#fff9c4 !important;}
-
-/* Mobile History Cards */
-@media(max-width:768px){
-  .sidebar {display:none;}
-  .content {margin-left:0;padding-bottom:4rem;}
-  .add-form {grid-template-columns:1fr;}
-  .add-form button {grid-column:span 1;}
-  th,td {padding:0.4rem;font-size:0.85rem;}
-  .table-container {display:none;}
-  .history-cards {display:flex;flex-direction:column;gap:1rem;margin-top:1rem;}
-  .history-card {
-    background:#fff;border-radius:8px;padding:1rem;
-    box-shadow:0 2px 5px rgba(0,0,0,0.05);
-  }
-  .history-card p {margin:0.2rem 0;font-size:0.9rem;}
-  .bottom-nav {display:flex;}
-}
-@media(min-width:769px){ .history-cards {display:none;} }
-
-/* Reports */
-.reports-grid {
-  display:grid;grid-template-columns:repeat(2,1fr);
-  gap:1rem;margin-top:1rem;
-}
-.report-card {
-  background:#fff;padding:1rem;border-radius:8px;
-  box-shadow:0 2px 5px rgba(0,0,0,0.05);
-}
-@media(max-width:768px){ .reports-grid{grid-template-columns:1fr;} }
-</style>
+  <title>Petrol Tracker Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --yellow: #FFD600;
+      --black: #222;
+      --gray-bg: #f4f5f7;
+      --white: #fff;
+    }
+    body {
+      margin: 0;
+      background: var(--gray-bg);
+      font-family: 'Montserrat', Segoe UI, Arial, sans-serif;
+      color: var(--black);
+    }
+    .navbar {
+      display: flex;
+      align-items: center;
+      background: var(--white);
+      padding: 0 24px;
+      box-shadow: 0 2px 8px #dedede40;
+      height: 60px;
+    }
+    .nav-logo {
+      font-weight: 700;
+      color: var(--yellow);
+      font-size: 2.1rem;
+      margin-right: 32px;
+      letter-spacing: 1px;
+    }
+    .nav-menu {
+      display: flex;
+      gap: 28px;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .nav-menu span {
+      cursor: pointer;
+      transition: color 0.12s, border-bottom 0.12s;
+    }
+    .nav-menu .active {
+      color: var(--yellow);
+      border-bottom: 2.5px solid var(--yellow);
+    }
+    .nav-end {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .nav-profile {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #FFD60022;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--yellow);
+      font-size: 1.2em;
+    }
+    .dashboard-container { display: block; }
+    /* DASHBOARD GRID */
+    .dash-grid {
+      max-width: 1190px;
+      margin: 36px auto;
+      padding: 0 16px;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 28px;
+    }
+    .main-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 14px;
+    }
+    .card {
+      background: var(--white);
+      border-radius: 14px;
+      box-shadow: 0 2px 8px #e9ede940;
+      padding: 20px 14px 20px 20px;
+      min-height: 130px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .card-title {
+      font-size: 1.13em;
+      font-weight: 600;
+      margin-bottom: 7px;
+      color: #222;
+    }
+    .big-number {
+      font-size: 2.07em;
+      font-weight: 700;
+      color: var(--yellow);
+    }
+    .dash-charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 23px;
+      margin-top: 18px;
+    }
+    .side-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .side-box {
+      background: var(--white);
+      border-radius: 14px;
+      padding: 18px 15px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 1em;
+      box-shadow: 0 2px 8px #e9ede940;
+    }
+    .side-box-icon {
+      background: #FFD60055;
+      color: var(--yellow);
+      font-size: 1.6em;
+      border-radius: 8px;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* CRUD SECTION STYLE */
+    .expenses-panel { display: none; max-width: 960px; margin: 38px auto; padding: 0 8px;}
+    .expenses-panel.show { display: block;}
+    .expenses-panel h2 { font-size: 1.2em; color: var(--black); }
+    .exp-form-row {
+      display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0;
+    }
+    .exp-form-row input, .exp-form-row button {
+      padding: 10px;
+      border: 1px solid #FFD60055;
+      border-radius: 7px;
+      font-family: inherit;
+      font-size: 1rem;
+      min-width: 110px;
+    }
+    .exp-form-row button {
+      background: var(--yellow);
+      color: var(--black);
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      min-width: 110px;
+      transition: background 0.14s;
+    }
+    .exp-form-row button:hover { background: #ffe84b; }
+    .exp-table-container { margin-top: 21px; overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.96em;
+      background: #fff;
+      border-radius: 9px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px #e9ede940;
+    }
+    th, td {
+      padding: 8px 4px;
+      text-align: center;
+      border-bottom: 1px solid #f3e294;
+    }
+    th { background: #FFF9E2; color: #222;}
+    .act-btn {
+      background: var(--yellow);
+      color: var(--black);
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      padding: 4px 10px;
+      cursor: pointer;
+    }
+    .act-btn.delete { background: #ef476f; color: #fff;}
+    .act-btn:hover { opacity: 0.83;}
+    @media (max-width: 1024px) {
+      .dash-charts { grid-template-columns: 1fr; }
+      .dash-grid { grid-template-columns: 1fr;}
+    }
+    @media (max-width: 600px) {
+      .dash-grid { padding: 0 2px;}
+      .main-cards { gap: 9px;}
+      .side-cards { flex-direction: column; gap: 9px;}
+      .exp-form-row input, .exp-form-row button { min-width: 90px; font-size:0.93em;}
+      th, td { font-size: 0.90em;}
+    }
+  </style>
 </head>
 <body>
-
-<!-- Sidebar -->
-<div class="sidebar">
-  <h2>Tracker</h2>
-  <button onclick="showPage('home')">🏠 Home</button>
-  <button onclick="showPage('add')">➕ Add Entry</button>
-  <button onclick="showPage('history')">📑 History</button>
-  <button onclick="showPage('reports')">📊 Reports</button>
-</div>
-
-<!-- Content -->
-<div class="content">
-
-  <!-- Home -->
-  <div id="home" class="page">
-    <h3>Welcome to Petrol Expense Tracker</h3>
-    <p>Use the menu to add new entries, view history, and check reports.</p>
+  <!-- TOP NAV -->
+  <div class="navbar">
+    <span class="nav-logo">&#9679;&#9679;</span>
+    <div class="nav-menu">
+      <span id="tab-dashboard" class="active">Dashboard</span>
+      <span id="tab-expenses">Expenses</span>
+    </div>
+    <div class="nav-end">
+      <span title="Notifications">&#128276;</span>
+      <span class="nav-profile">P</span>
+    </div>
   </div>
-
-  <!-- Add Entry -->
-  <div id="add" class="page" style="display:none;">
-    <h3 id="addEntryTitle">Add New Entry</h3>
-    <div id="editBadge" style="display:none;" class="edit-badge">✏️ Editing existing entry</div>
-    <form id="entryForm" class="add-form" onsubmit="event.preventDefault();addEntry();">
-      <div><label>Date</label><input type="date" id="date" required></div>
-      <div><label>Amount (₹)</label><input type="number" id="amount" step="0.01" required></div>
-      <div><label>Litres</label><input type="number" id="litres" step="0.01" required></div>
-      <div><label>Additives (₹)</label><input type="number" id="additives" step="0.01" value="0"></div>
-      <div><label>Start KM</label><input type="number" id="startKm"></div>
-      <div><label>End KM</label><input type="number" id="endKm"></div>
-      <button type="submit">Save Entry</button>
-      <button type="button" id="cancelEditBtn" style="display:none;background:#ccc;">Cancel Edit</button>
+  <!-- DASHBOARD -->
+  <div class="dashboard-container" id="dashboard-container">
+    <div class="dash-grid">
+      <div>
+        <div class="main-cards">
+          <div class="card">
+            <div class="card-title">Total Petrol Spent</div>
+            <div class="big-number" id="dash-total">₹ 0.00</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Mileage (Avg)</div>
+            <div class="big-number" id="dash-mileage">0 km/L</div>
+          </div>
+        </div>
+        <div class="dash-charts">
+          <div class="card">
+            <div class="card-title">Fuel Spend By Month</div>
+            <canvas id="lineChart" height="110"></canvas>
+          </div>
+          <div class="card">
+            <div class="card-title">Fuel Types (Pie Example)</div>
+            <canvas id="pieChart" height="110"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="side-cards">
+        <div class="side-box">
+          <span class="side-box-icon">&#128663;</span>
+          <span id="dash-fuelups"><b>0</b> Fuel ups</span>
+        </div>
+        <div class="side-box">
+          <span class="side-box-icon">&#128200;</span>
+          <span id="dash-maxamount"><b>₹ 0</b> Max per fuel</span>
+        </div>
+        <div class="side-box">
+          <span class="side-box-icon">&#128202;</span>
+          <span id="dash-maxdist"><b>0 km</b> Longest drive</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- CRUD PANEL -->
+  <div class="expenses-panel" id="expenses-panel">
+    <h2>Add/Manage Petrol Expenses</h2>
+    <form id="expense-form" autocomplete="off">
+      <div class="exp-form-row">
+        <input type="date" id="date" required>
+        <input type="number" id="amount" placeholder="Amount Paid (₹)" required>
+        <input type="number" id="rate" placeholder="Rate/Litre (₹)" step="0.01" required>
+        <input type="number" id="litres" placeholder="Litres" step="0.01" required>
+        <input type="number" id="total" placeholder="Total (₹)" step="0.01" required>
+        <input type="number" id="rate2" placeholder="Rate2 (₹)" step="0.01">
+        <input type="number" id="fuel" placeholder="Additives" min="0">
+        <input type="number" id="startKM" placeholder="Start KM" step="0.1">
+        <input type="number" id="endKM" placeholder="End KM" step="0.1">
+        <input type="number" id="mileage" placeholder="Mileage" step="0.1">
+        <button type="submit" id="add-btn">Add</button>
+        <button type="button" id="update-btn" style="display:none;">Update</button>
+      </div>
     </form>
-  </div>
-
-  <!-- History -->
-  <div id="history" class="page" style="display:none;">
-    <h3>History</h3>
-    <div class="table-container">
-      <table>
+    <div class="exp-table-container">
+      <table id="expense-table">
         <thead>
-          <tr><th>Date</th><th>Amount</th><th>Litres</th><th>Additives</th><th>Start KM</th><th>End KM</th><th>Actions</th></tr>
+          <tr>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Rate/Ltr</th>
+            <th>Litres</th>
+            <th>Total</th>
+            <th>Rate2</th>
+            <th>Additives</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Mileage</th>
+            <th>Edit</th>
+            <th>Del</th>
+          </tr>
         </thead>
-        <tbody id="historyTable"></tbody>
+        <tbody></tbody>
       </table>
     </div>
-    <div class="history-cards" id="historyCards"></div>
   </div>
+  <script>
+    // Tab navigation
+    const tabDashboard = document.getElementById('tab-dashboard');
+    const tabExpenses = document.getElementById('tab-expenses');
+    const dashContainer = document.getElementById('dashboard-container');
+    const expPanel = document.getElementById('expenses-panel');
+    tabDashboard.onclick = () => {
+      tabDashboard.classList.add('active');
+      tabExpenses.classList.remove('active');
+      dashContainer.style.display = 'block';
+      expPanel.style.display = 'none';
+    };
+    tabExpenses.onclick = () => {
+      tabExpenses.classList.add('active');
+      tabDashboard.classList.remove('active');
+      dashContainer.style.display = 'none';
+      expPanel.style.display = 'block';
+    };
+    // Expense CRUD logic + dashboard stat update
+    let expenses = JSON.parse(localStorage.getItem('petrolExpenses')) || [];
+    let editIndex = -1;
+    const expenseForm = document.getElementById('expense-form');
+    const addBtn = document.getElementById('add-btn');
+    const updateBtn = document.getElementById('update-btn');
+    // Inputs
+    const date = document.getElementById('date');
+    const amount = document.getElementById('amount');
+    const rate = document.getElementById('rate');
+    const litres = document.getElementById('litres');
+    const total = document.getElementById('total');
+    const rate2 = document.getElementById('rate2');
+    const fuel = document.getElementById('fuel');
+    const startKM = document.getElementById('startKM');
+    const endKM = document.getElementById('endKM');
+    const mileage = document.getElementById('mileage');
+    // Dashboard stat elements
+    const dashTotal = document.getElementById('dash-total');
+    const dashMileage = document.getElementById('dash-mileage');
+    const dashFuelups = document.getElementById('dash-fuelups');
+    const dashMaxAmount = document.getElementById('dash-maxamount');
+    const dashMaxDist = document.getElementById('dash-maxdist');
+    // Chart.js charts
+    let lineChart, pieChart;
+    function updateDashboard() {
+      let total = 0, msum = 0, maxAmount = 0, maxDist = 0, mileageCount = 0;
+      expenses.forEach(e => {
+        total += Number(e.amount);
+        if(+e.mileage) { msum += Number(e.mileage); mileageCount++; }
+        if(+e.amount > maxAmount) maxAmount=+e.amount;
+        let dist = Number(e.endKM)-Number(e.startKM);
+        if(dist > maxDist) maxDist = dist;
+      });
+      dashTotal.textContent = `₹ ${total.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+      dashMileage.textContent = mileageCount ? (msum/mileageCount).toFixed(1)+' km/L' : '0 km/L';
+      dashFuelups.innerHTML = `<b>${expenses.length}</b> Fuel ups`;
+      dashMaxAmount.innerHTML = `<b>₹ ${maxAmount.toLocaleString()}</b> Max per fuel`;
+      dashMaxDist.innerHTML = `<b>${maxDist} km</b> Longest drive`;
 
-  <!-- Reports -->
-  <div id="reports" class="page" style="display:none;">
-    <h3>Reports</h3>
-    <div class="reports-grid">
-      <div class="report-card"><h4>Trend (Amount & Litres)</h4><canvas id="trendChart"></canvas></div>
-      <div class="report-card"><h4>Mileage Trend</h4><canvas id="mileageChart"></canvas></div>
-      <div class="report-card"><h4>Expense Breakdown</h4><canvas id="breakdownChart"></canvas></div>
-      <div class="report-card"><h4>Summary</h4><ul id="reportSummary"></ul></div>
-    </div>
-  </div>
-</div>
-
-<!-- Bottom Nav -->
-<div class="bottom-nav">
-  <button onclick="showPage('home')">🏠</button>
-  <button onclick="showPage('add')">➕</button>
-  <button onclick="showPage('history')">📑</button>
-  <button onclick="showPage('reports')">📊</button>
-</div>
-
-<script>
-let entries = JSON.parse(localStorage.getItem("entries")||"[]");
-let editIndex = null;
-
-function showPage(id){
-  document.querySelectorAll(".page").forEach(p=>p.style.display="none");
-  document.getElementById(id).style.display="block";
-  if(id==="history") renderHistory();
-  if(id==="reports") renderReports();
-}
-
-function addEntry(){
-  let e = {
-    date:document.getElementById("date").value,
-    amount:+document.getElementById("amount").value,
-    additives:+document.getElementById("additives").value,
-    litres:+document.getElementById("litres").value,
-    startKm:+document.getElementById("startKm").value || null,
-    endKm:+document.getElementById("endKm").value || null
-  };
-  if(editIndex!==null){
-    entries[editIndex]=e; editIndex=null; alert("Entry Updated!");
-  } else { entries.push(e); alert("Entry Added!"); }
-  localStorage.setItem("entries",JSON.stringify(entries));
-  document.getElementById("entryForm").reset();
-  document.getElementById("addEntryTitle").innerText="Add New Entry";
-  document.getElementById("cancelEditBtn").style.display="none";
-  document.getElementById("editBadge").style.display="none";
-  renderHistory(); showPage("history");
-}
-
-function editEntry(i){
-  let e=entries[i];
-  document.getElementById("date").value=e.date;
-  document.getElementById("amount").value=e.amount;
-  document.getElementById("additives").value=e.additives;
-  document.getElementById("litres").value=e.litres;
-  document.getElementById("startKm").value=e.startKm||"";
-  document.getElementById("endKm").value=e.endKm||"";
-  editIndex=i;
-  document.getElementById("addEntryTitle").innerText="Edit Entry";
-  document.getElementById("cancelEditBtn").style.display="inline-block";
-  document.getElementById("editBadge").style.display="inline-block";
-  renderHistory();
-  showPage("add");
-}
-
-document.getElementById("cancelEditBtn").addEventListener("click",()=>{
-  editIndex=null;
-  document.getElementById("entryForm").reset();
-  document.getElementById("addEntryTitle").innerText="Add New Entry";
-  document.getElementById("cancelEditBtn").style.display="none";
-  document.getElementById("editBadge").style.display="none";
-  showPage("history");
-});
-
-function deleteEntry(i){
-  if(confirm("Are you sure you want to delete this entry?")){
-    entries.splice(i,1);
-    localStorage.setItem("entries",JSON.stringify(entries));
-    renderHistory();
-    alert("Entry Deleted!");
-  }
-}
-
-function renderHistory(){
-  let tbody=document.getElementById("historyTable");
-  let cards=document.getElementById("historyCards");
-  tbody.innerHTML=""; cards.innerHTML="";
-  entries.forEach((e,i)=>{
-    let tr=document.createElement("tr");
-    if(editIndex===i) tr.classList.add("editing");
-    tr.innerHTML=`<td>${e.date}</td><td>₹${e.amount}</td><td>${e.litres} L</td>
-      <td>₹${e.additives}</td><td>${e.startKm||"-"}</td><td>${e.endKm||"-"}</td>
-      <td><button onclick="editEntry(${i})">Edit</button>
-      <button onclick="deleteEntry(${i})">Delete</button></td>`;
-    tbody.appendChild(tr);
-
-    let card=document.createElement("div");
-    card.className="history-card";
-    if(editIndex===i) card.classList.add("editing");
-    card.innerHTML=`<p><b>Date:</b> ${e.date}</p><p><b>Amount:</b> ₹${e.amount}</p>
-      <p><b>Litres:</b> ${e.litres} L</p><p><b>Additives:</b> ₹${e.additives}</p>
-      <p><b>Start KM:</b> ${e.startKm||"-"}</p><p><b>End KM:</b> ${e.endKm||"-"}</p>
-      <button onclick="editEntry(${i})">Edit</button>
-      <button onclick="deleteEntry(${i})">Delete</button>`;
-    cards.appendChild(card);
-  });
-}
-
-function renderReports(){
-  let ctx1=document.getElementById("trendChart"), ctx2=document.getElementById("mileageChart"), ctx3=document.getElementById("breakdownChart");
-  if(!entries.length) return;
-  let labels=entries.map(e=>e.date);
-  let amounts=entries.map(e=>e.amount);
-  let litres=entries.map(e=>e.litres);
-  let mileage=entries.map(e=>(e.endKm&&e.startKm)?((e.endKm-e.startKm)/e.litres).toFixed(1):null);
-
-  new Chart(ctx1,{type:'line',data:{labels,datasets:[
-    {label:"Amount",data:amounts,borderColor:"red"},
-    {label:"Litres",data:litres,borderColor:"blue"}
-  ]}});
-  new Chart(ctx2,{type:'line',data:{labels,datasets:[
-    {label:"Mileage (KM/L)",data:mileage,borderColor:"green"}
-  ]}});
-  new Chart(ctx3,{type:'pie',data:{labels:["Fuel","Additives"],datasets:[{
-    data:[amounts.reduce((a,b)=>a+b,0), entries.reduce((a,b)=>a+b.additives,0)],
-    backgroundColor:["#ffcc00","#999"]
-  }]}});
-
-  let summary=document.getElementById("reportSummary");
-  summary.innerHTML="";
-  summary.innerHTML+=`<li>Total Spent: ₹${amounts.reduce((a,b)=>a+b,0)}</li>`;
-  summary.innerHTML+=`<li>Total Litres: ${litres.reduce((a,b)=>a+b,0)} L</li>`;
-  let avgRate=(amounts.reduce((a,b)=>a+b,0)/litres.reduce((a,b)=>a+b,1)).toFixed(2);
-  summary.innerHTML+=`<li>Avg Rate: ₹${avgRate}/L</li>`;
-}
-</script>
+      // Chart: Monthly Spend
+      let byMonth = {};
+      let months = [], amounts = [];
+      for (let e of expenses) {
+        if (!e.date) continue;
+        let ym = e.date.slice(0,7);
+        if (!byMonth[ym]) byMonth[ym]=0;
+        byMonth[ym] += Number(e.amount);
+      }
+      months = Object.keys(byMonth).sort();
+      amounts = months.map(m => byMonth[m]);
+      if(lineChart) lineChart.destroy();
+      lineChart = new Chart(document.getElementById('lineChart').getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: months.length ? months : ['No Data'],
+          datasets: [{
+            label: 'Petrol Spend',
+            data: months.length ? amounts : [0],
+            borderColor: '#FFD600',
+            backgroundColor: 'rgba(255,214,0,0.09)',
+            borderWidth: 3,
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: {display:false}, tooltip: {enabled:true}},
+          scales: { y: {beginAtZero: true, grid:{color:'#eee'}}, x:{grid:{display:false}} }
+        }
+      });
+      // Pie: Fuel companies add demo logic -- you can customize for your data!
+      let brands = {};
+      for(let e of expenses)
+        brands[e.rate2||'Other'] = (brands[e.rate2||'Other']||0)+1;
+      let pieLabels = Object.keys(brands);
+      let pieData = pieLabels.map(l=>brands[l]);
+      let pieColors = pieLabels.map((_,i)=> ['#FFD600','#222','#AAA','#888','#333'][i%5]);
+      if (pieChart) pieChart.destroy();
+      pieChart = new Chart(document.getElementById('pieChart').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+          labels: pieLabels.length?pieLabels:['N/A'],
+          datasets: [{
+            data: pieData.length?pieData:[1],
+            backgroundColor: pieColors.length?pieColors:['#e0e0e0'],
+            borderWidth:1
+          }]
+        },
+        options: {responsive:true, plugins:{legend:{position:'bottom'}}}
+      });
+    }
+    function renderTable() {
+      const tbody = document.querySelector('#expense-table tbody');
+      tbody.innerHTML = '';
+      expenses.forEach((exp, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${exp.date||''}</td>
+          <td>${exp.amount||''}</td>
+          <td>${exp.rate||''}</td>
+          <td>${exp.litres||''}</td>
+          <td>${exp.total||''}</td>
+          <td>${exp.rate2||''}</td>
+          <td>${exp.fuel||''}</td>
+          <td>${exp.startKM||''}</td>
+          <td>${exp.endKM||''}</td>
+          <td>${exp.mileage||''}</td>
+          <td><button class="act-btn" onclick="editExpense(${i})">Edit</button></td>
+          <td><button class="act-btn delete" onclick="deleteExpense(${i})">Del</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+      localStorage.setItem('petrolExpenses', JSON.stringify(expenses));
+      updateDashboard();
+    }
+    expenseForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      const exp = {
+        date: date.value,
+        amount: amount.value,
+        rate: rate.value,
+        litres: litres.value,
+        total: total.value,
+        rate2: rate2.value,
+        fuel: fuel.value,
+        startKM: startKM.value,
+        endKM: endKM.value,
+        mileage: mileage.value
+      };
+      if(editIndex === -1){
+        expenses.push(exp);
+      } else {
+        expenses[editIndex] = exp;
+        editIndex = -1;
+        addBtn.style.display = 'inline';
+        updateBtn.style.display = 'none';
+      }
+      renderTable();
+      expenseForm.reset();
+    });
+    window.editExpense = function(index){
+      let exp = expenses[index];
+      date.value = exp.date||'';
+      amount.value = exp.amount||'';
+      rate.value = exp.rate||'';
+      litres.value = exp.litres||'';
+      total.value = exp.total||'';
+      rate2.value = exp.rate2||'';
+      fuel.value = exp.fuel||'';
+      startKM.value = exp.startKM||'';
+      endKM.value = exp.endKM||'';
+      mileage.value = exp.mileage||'';
+      editIndex = index;
+      addBtn.style.display = 'none';
+      updateBtn.style.display = 'inline';
+    }
+    updateBtn.addEventListener('click', function(){
+      expenseForm.requestSubmit();
+    });
+    window.deleteExpense = function(index){
+      if(confirm("Delete this entry?")) {
+        expenses.splice(index, 1);
+        renderTable();
+      }
+    }
+    // Initial table and dashboard
+    renderTable();
+  </script>
 </body>
 </html>
