@@ -1,199 +1,798 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Petrol Expense Tracker</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <style>
-    body { display:flex; min-height:100vh; overflow-x:hidden; background:#f8f9fa; }
-    /* Sidebar */
-    #sidebar { width:240px; background:linear-gradient(180deg,#a832d6,#6a1b9a); color:white; transition:.3s; }
-    #sidebar h4 { padding:15px; }
-    #sidebar a { color:white; padding:12px 20px; display:block; text-decoration:none; }
-    #sidebar a.active { background:rgba(255,255,255,0.2); border-radius:6px; }
-    #sidebar.collapsed { margin-left:-240px; }
-    /* Content */
-    #content { flex:1; padding:20px; }
-    #menu-btn { display:none; background:#6a1b9a; border:none; color:white; padding:8px 12px; margin-bottom:10px; border-radius:6px; }
-    .card { border-radius:12px; text-align:center; margin-bottom:10px; }
-    .table-responsive { margin-top:20px; }
-    @media(max-width:768px){
-      #menu-btn{display:inline-block;}
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Petrol Expense Tracker</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+  :root{
+    --brand:#ffd644; --brand-dark:#f0c400;
+  }
+  body{ background:#fbfbfb; }
+  .app-nav{ background:#fff; border-bottom:1px solid #eee; }
+  .brand-dot{ width:12px;height:12px;border-radius:50%;display:inline-block;background:var(--brand);box-shadow:10px 0 0 0 #000; margin-right:.5rem; }
+  .nav-link{ font-weight:600; }
+  .nav-link.active{ background:var(--brand); border-radius:.6rem; }
+  .section{ display:none; }
+  .section.active{ display:block; }
+  .stat-card{ background:#fff;border:1px solid #eee;border-radius:1rem;padding:1rem; }
+  .stat-title{font-size:.9rem;color:#666;margin-bottom:.25rem}
+  .stat-value{font-weight:800;font-size:1.25rem}
+  .chip{ background:var(--brand); padding:.2rem .6rem; border-radius:.6rem; font-weight:700; color:#000; }
+  .btn-brand{ background:var(--brand); border-color:var(--brand-dark); color:#000; font-weight:700; }
+  .btn-brand:hover{ background:var(--brand-dark); border-color:var(--brand-dark); color:#000; }
+  .sortable{ cursor:pointer; } .sortable:hover{ text-decoration:underline; }
+  .table thead th{ white-space:nowrap; }
+  .badge-station{ background:#111; }
+  .mileage-low{ color:#dc3545; font-weight:700; }      /* <15 */
+  .mileage-mid{ color:#fd7e14; font-weight:700; }     /* 15-18 */
+  .mileage-high{ color:#28a745; font-weight:700; }    /* >18 */
+  .hidden{display:none!important}
+
+  /* Login */
+  #loginWrap{ min-height:100vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(145deg,#fff, #fff4c9); }
+  #loginCard{ max-width:420px; width:100%; }
+
+  /* Bottom nav (mobile) */
+  .bottom-nav{
+    position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #eee; display:none; z-index:1030;
+  }
+  .bottom-nav .bn-link{ flex:1; text-align:center; padding:.5rem 0; font-weight:700; }
+  .bottom-nav .active{ background:var(--brand); }
+
+  @media (max-width: 767px){
+    .bottom-nav{ display:flex; }
+    .content-wrap{ padding-bottom:56px; } /* space for bottom nav */
+  }
+
+  /* Dark mode */
+  :root[data-theme="dark"] body,
+  [data-bs-theme="dark"] body{ background:#0f1113; }
+  [data-bs-theme="dark"] .app-nav{ background:#121417; border-color:#222; }
+  [data-bs-theme="dark"] .stat-card{ background:#121417; border-color:#222; }
+  [data-bs-theme="dark"] .stat-title{ color:#aaa; }
+  [data-bs-theme="dark"] .table{ color:#eaeaea; }
+</style>
 </head>
 <body>
 
-  <!-- Sidebar -->
-  <div id="sidebar">
-    <h4>📊 Tracker</h4>
-    <a href="#" class="active" onclick="showPage('dashboard')">Dashboard</a>
-    <a href="#" onclick="showPage('addEntry')">Add Entry</a>
-    <a href="#" onclick="showPage('history')">History</a>
-    <a href="#" onclick="showPage('reports')">Reports</a>
-    <a href="#" onclick="showPage('settings')">Settings</a>
-  </div>
-
-  <!-- Content -->
-  <div id="content">
-    <button id="menu-btn">☰ Menu</button>
-    <h2>Petrol Expense Tracker</h2>
-
-    <!-- Dashboard -->
-    <div id="dashboard">
-      <div class="row g-2">
-        <div class="col-md-2 col-6"><div class="card p-3"><h6>Total Paid</h6><p id="totalPaid">₹0</p></div></div>
-        <div class="col-md-2 col-6"><div class="card p-3"><h6>Total Litres</h6><p id="totalLitres">0 L</p></div></div>
-        <div class="col-md-2 col-6"><div class="card p-3"><h6>Avg Mileage</h6><p id="avgMileage">0 km/L</p></div></div>
-        <div class="col-md-2 col-6"><div class="card p-3"><h6>Additives</h6><p id="totalAdditives">₹0</p></div></div>
-        <div class="col-md-2 col-6"><div class="card p-3"><h6>Avg Rate</h6><p id="avgRate">₹0</p></div></div>
+<!-- ============== LOGIN SCREEN (local only) ============== -->
+<div id="loginWrap">
+  <div id="loginCard" class="card shadow border-0">
+    <div class="card-body p-4">
+      <div class="d-flex align-items-center mb-3">
+        <span class="brand-dot"></span>
+        <h4 class="m-0">Petrol Tracker — Login</h4>
       </div>
-      <canvas id="expenseChart" height="100"></canvas>
-    </div>
-
-    <!-- Add Entry -->
-    <div id="addEntry" style="display:none;">
-      <h4>Add New Entry</h4>
-      <form id="entryForm">
-        <div class="row g-2">
-          <div class="col-md-3"><input type="date" id="date" class="form-control" required></div>
-          <div class="col-md-2"><input type="number" id="amount" class="form-control" placeholder="Amount Paid" required></div>
-          <div class="col-md-2"><input type="number" id="additives" class="form-control" placeholder="Additives" value="0"></div>
-          <div class="col-md-2"><input type="number" id="rate" class="form-control" placeholder="Rate/Litre" required></div>
-          <div class="col-md-2"><input type="number" id="startKm" class="form-control" placeholder="Start KM"></div>
-          <div class="col-md-2"><input type="number" id="endKm" class="form-control" placeholder="End KM"></div>
-          <div class="col-md-12"><button class="btn btn-primary mt-2">Add Entry</button></div>
+      <div class="alert alert-warning small">Local-only login. Your data stays in your browser per username.</div>
+      <form id="loginForm" class="row g-3">
+        <div class="col-12">
+          <label class="form-label">Username</label>
+          <input id="loginUser" class="form-control" placeholder="e.g. prasad" required>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Password</label>
+          <input id="loginPass" type="password" class="form-control" placeholder="Set or enter your password" required>
+        </div>
+        <div class="col-12">
+          <button class="btn btn-brand w-100">Enter</button>
         </div>
       </form>
+      <div class="text-center mt-3">
+        <button id="demoBtn" class="btn btn-sm btn-outline-secondary">Load Demo Data</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============== APP ============== -->
+<nav class="navbar navbar-expand-lg app-nav sticky-top hidden" id="topNav">
+  <div class="container-fluid px-3">
+    <a class="navbar-brand fw-bold" href="#"><span class="brand-dot"></span><span id="brandUser">Petrol Tracker</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain"><span class="navbar-toggler-icon"></span></button>
+    <div id="navMain" class="collapse navbar-collapse">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-2">
+        <li class="nav-item"><a class="nav-link px-3 active" data-section="dashboard" href="#">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link px-3" data-section="add" href="#">Add Entry</a></li>
+        <li class="nav-item"><a class="nav-link px-3" data-section="history" href="#">History</a></li>
+        <li class="nav-item"><a class="nav-link px-3" data-section="reports" href="#">Reports</a></li>
+        <li class="nav-item"><a class="nav-link px-3" data-section="settings" href="#">Settings</a></li>
+      </ul>
+      <div class="d-flex gap-2 align-items-center">
+        <button id="themeToggle" class="btn btn-outline-secondary">Dark</button>
+        <button id="exportBtn" class="btn btn-outline-dark">Export</button>
+        <button class="btn btn-warning" id="logoutBtn">Logout</button>
+        <button class="btn btn-brand" data-section="add">+ Add Entry</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid p-3 p-md-4 content-wrap hidden" id="appWrap">
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="section active">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+      <h3 class="m-0">Dashboard</h3>
+      <span id="entryCount" class="chip">0 Entries</span>
     </div>
 
-    <!-- History Page -->
-    <div id="history" style="display:none;">
-      <h4>Fuel History</h4>
-      <div class="table-responsive">
-        <table class="table table-bordered mt-3">
-          <thead class="table-light">
-            <tr>
-              <th>Date</th><th>Amount Paid</th><th>Additives</th><th>Rate/Litre</th>
-              <th>Litres</th><th>Total</th><th>Calc Rate</th><th>Mileage</th><th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="historyTable"></tbody>
-        </table>
+    <div class="row stat-grid g-3">
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-title">Total Paid</div><div class="stat-value" id="cardTotalPaid">₹0.00</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-title">Total Litres</div><div class="stat-value" id="cardTotalLitres">0.00 L</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-title">Avg Mileage</div><div class="stat-value" id="cardAvgMileage">0.0 km/L</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-title">Fuel Additives</div><div class="stat-value" id="cardAdditives">₹0.00</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-title">Avg Rate</div><div class="stat-value" id="cardAvgRate">₹0.00</div></div></div>
+    </div>
+
+    <div class="row g-3 mt-1">
+      <div class="col-12 col-xl-6">
+        <div class="stat-card">
+          <h6 class="m-0 mb-2">Amount & Litres Trend</h6>
+          <canvas id="lineTrend" height="240"></canvas>
+        </div>
+      </div>
+      <div class="col-12 col-xl-6">
+        <div class="stat-card">
+          <h6 class="m-0 mb-2">Fuel vs Additives</h6>
+          <canvas id="donutSummary" height="240"></canvas>
+        </div>
+      </div>
+      <div class="col-12 col-xl-6">
+        <div class="stat-card">
+          <h6 class="m-0 mb-2">Mileage Trend</h6>
+          <canvas id="lineMileageDash" height="240"></canvas>
+        </div>
+      </div>
+      <div class="col-12 col-xl-6">
+        <div class="stat-card">
+          <h6 class="m-0 mb-2">Cumulative Spend</h6>
+          <canvas id="lineCumulative" height="240"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADD ENTRY -->
+  <section id="add" class="section">
+    <h3 class="mb-3">Add Entry</h3>
+    <form id="entryForm" class="row g-3">
+      <div class="col-12 col-md-3"><label class="form-label">Date</label><input type="date" id="date" class="form-control" required></div>
+      <div class="col-6 col-md-3"><label class="form-label">Amount Paid (₹)</label><input type="number" step="0.01" id="amount" class="form-control" required></div>
+      <div class="col-6 col-md-3"><label class="form-label">Additives (₹)</label><input type="number" step="0.01" id="additives" class="form-control" value="0"></div>
+      <div class="col-6 col-md-3"><label class="form-label">Rate / Litre (₹)</label><input type="number" step="0.01" id="rate" class="form-control" required></div>
+      <div class="col-6 col-md-3"><label class="form-label">Start KM</label><input type="number" step="0.1" id="startKm" class="form-control"></div>
+      <div class="col-6 col-md-3"><label class="form-label">End KM</label><input type="number" step="0.1" id="endKm" class="form-control"></div>
+
+      <!-- Station -->
+      <div class="col-12 col-md-3">
+        <label class="form-label">Fuel Station</label>
+        <select id="station" class="form-select">
+          <option value="IOCL">IOCL</option>
+          <option value="BPCL">BPCL</option>
+          <option value="HPCL">HPCL</option>
+          <option value="Shell">Shell</option>
+          <option value="Reliance">Reliance</option>
+          <option value="Other">Other…</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-3" id="stationOtherWrap" style="display:none">
+        <label class="form-label">Other Station</label>
+        <input id="stationOther" class="form-control" placeholder="Type station name">
+      </div>
+
+      <!-- preview -->
+      <div class="col-12">
+        <div class="alert alert-light border d-flex flex-wrap gap-3 align-items-center mb-0">
+          <span class="fw-semibold">Preview:</span>
+          <span id="pvLitres" class="badge text-bg-warning">Litres: 0.00</span>
+          <span id="pvNet" class="badge text-bg-warning">Net: ₹0.00</span>
+          <span id="pvRate" class="badge text-bg-warning">Effective Rate: ₹0.00/L</span>
+          <span id="pvMileage" class="badge text-bg-warning">Mileage: 0.0 km/L</span>
+        </div>
+      </div>
+      <div class="col-12"><button class="btn btn-brand">Save Entry</button></div>
+    </form>
+  </section>
+
+  <!-- HISTORY -->
+  <section id="history" class="section">
+    <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-2">
+      <h3 class="m-0">History</h3>
+      <div class="d-flex flex-wrap gap-2 align-items-center">
+        <input id="search" class="form-control" style="max-width:200px" placeholder="🔍 Search">
+        <input id="dateFrom" type="date" class="form-control" title="From">
+        <input id="dateTo" type="date" class="form-control" title="To">
+        <select id="stationFilter" class="form-select" style="max-width:160px">
+          <option value="">All Stations</option>
+          <option>IOCL</option><option>BPCL</option><option>HPCL</option><option>Shell</option><option>Reliance</option>
+        </select>
+        <button id="btnResetFilters" class="btn btn-outline-secondary">Reset</button>
       </div>
     </div>
 
-    <!-- Reports -->
-    <div id="reports" style="display:none;">
-      <h4>Reports</h4>
-      <p>More charts & analysis coming soon.</p>
+    <div class="table-responsive stat-card">
+      <table class="table align-middle">
+        <thead class="table-light">
+          <tr>
+            <th class="sortable" data-sort="date">Date</th>
+            <th class="sortable" data-sort="station">Station</th>
+            <th class="sortable" data-sort="amount">Amount (₹)</th>
+            <th class="sortable" data-sort="additives">Additives (₹)</th>
+            <th class="sortable" data-sort="rate">Rate/L (₹)</th>
+            <th class="sortable" data-sort="litres">Litres</th>
+            <th class="sortable" data-sort="total">Net (₹)</th>
+            <th class="sortable" data-sort="calcRate">Eff. Rate (₹)</th>
+            <th class="sortable" data-sort="mileage">Mileage</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="d-flex justify-content-between align-items-center mt-2">
+        <div><span id="pageInfo" class="small text-muted"></span></div>
+        <div class="btn-group">
+          <button id="prevPage" class="btn btn-outline-secondary btn-sm">Prev</button>
+          <button id="nextPage" class="btn btn-outline-secondary btn-sm">Next</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REPORTS -->
+  <section id="reports" class="section">
+    <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-2">
+      <h3 class="m-0">Reports</h3>
+      <div class="d-flex flex-wrap gap-2">
+        <button id="btnExportReport" class="btn btn-outline-dark">Export Report</button>
+      </div>
     </div>
 
-    <!-- Settings -->
-    <div id="settings" style="display:none;">
-      <h4>Settings</h4>
-      <button class="btn btn-danger" onclick="clearAll()">Clear All Data</button>
-      <button class="btn btn-success" onclick="exportToExcel()">⬇ Export to Excel</button>
+    <div id="monthCards" class="row g-3 mb-3"></div>
+
+    <div class="row g-3">
+      <div class="col-12 col-xl-6"><div class="stat-card"><h6 class="m-0 mb-2">Monthly Amount vs Litres</h6><canvas id="barMonthly" height="260"></canvas></div></div>
+      <div class="col-12 col-xl-6"><div class="stat-card"><h6 class="m-0 mb-2">Monthly Avg Mileage</h6><canvas id="lineMileage" height="260"></canvas></div></div>
+      <div class="col-12 col-xl-6"><div class="stat-card"><h6 class="m-0 mb-2">Station-wise Expenses</h6><canvas id="barStationSpend" height="260"></canvas></div></div>
+      <div class="col-12 col-xl-6"><div class="stat-card"><h6 class="m-0 mb-2">Station-wise Avg Mileage</h6><canvas id="barStationMileage" height="260"></canvas></div></div>
     </div>
-  </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="settings" class="section">
+    <h3 class="mb-3">Settings</h3>
+    <div class="stat-card d-flex flex-wrap gap-2 align-items-center">
+      <input id="fileImport" type="file" accept=".xlsx,.xls,.csv" class="form-control" style="max-width:300px">
+      <button class="btn btn-outline-dark" id="btnImport">Import CSV/XLSX</button>
+      <button class="btn btn-outline-dark" id="btnExport2">Export to Excel</button>
+      <button class="btn btn-outline-danger" id="btnClearAll">Clear ALL Data</button>
+      <button class="btn btn-warning ms-auto" id="logoutBtn2">Logout</button>
+    </div>
+  </section>
+
+</div>
+
+<!-- Bottom nav (mobile) -->
+<div class="bottom-nav hidden" id="bottomNav">
+  <a class="bn-link active" data-section="dashboard" href="#">Dashboard</a>
+  <a class="bn-link" data-section="add" href="#">Add</a>
+  <a class="bn-link" data-section="history" href="#">History</a>
+  <a class="bn-link" data-section="reports" href="#">Reports</a>
+  <a class="bn-link" data-section="settings" href="#">Settings</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  let entries = JSON.parse(localStorage.getItem("entries")) || [];
-  const ctx = document.getElementById('expenseChart').getContext('2d');
-  let expenseChart = new Chart(ctx,{
-    type:'line',
-    data:{labels:[],datasets:[
-      {label:'Amount Paid (₹)', data:[], borderColor:'blue', fill:false},
-      {label:'Litres Filled', data:[], borderColor:'green', fill:false}
-    ]}
-  });
+/* ===================== LOGIN (local only) ===================== */
+let currentUser = null;
+function userKey(){ return currentUser ? 'petrol_entries_' + currentUser : 'petrol_entries_default'; }
+function usersKey(){ return 'petrol_users'; } // store {username: password}
+function loadEntries(){ return JSON.parse(localStorage.getItem(userKey()) || '[]'); }
+function saveEntries(list){ localStorage.setItem(userKey(), JSON.stringify(list)); }
 
-  function showPage(page){
-    document.querySelectorAll("#content > div").forEach(div=>div.style.display="none");
-    document.getElementById(page).style.display="block";
-    document.querySelectorAll("#sidebar a").forEach(a=>a.classList.remove("active"));
-    document.querySelector(`#sidebar a[onclick*='${page}']`).classList.add("active");
-    if(page==="history") renderHistory();
+document.getElementById('loginForm').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  if(!u||!p) return;
+
+  const users = JSON.parse(localStorage.getItem(usersKey())||'{}');
+  if(!users[u]){ // first time register
+    users[u] = btoa(p); // simple obfuscation
+    localStorage.setItem(usersKey(), JSON.stringify(users));
+  } else {
+    if(users[u] !== btoa(p)){ alert('Wrong password for ' + u); return; }
   }
-  document.getElementById("menu-btn").onclick=()=>document.getElementById("sidebar").classList.toggle("collapsed");
+  currentUser = u;
+  document.getElementById('brandUser').textContent = 'Petrol Tracker — ' + u;
+  entries = loadEntries();
+  enterApp();
+});
 
-  document.getElementById("entryForm").addEventListener("submit", function(e){
+document.getElementById('demoBtn').addEventListener('click', ()=>{
+  document.getElementById('loginUser').value = 'demo';
+  document.getElementById('loginPass').value = 'demo';
+});
+
+function enterApp(){
+  document.getElementById('loginWrap').classList.add('hidden');
+  document.getElementById('topNav').classList.remove('hidden');
+  document.getElementById('appWrap').classList.remove('hidden');
+  document.getElementById('bottomNav').classList.remove('hidden');
+  applyTheme();
+  renderAll();
+}
+function logout(){
+  currentUser = null;
+  document.getElementById('loginWrap').classList.remove('hidden');
+  document.getElementById('topNav').classList.add('hidden');
+  document.getElementById('appWrap').classList.add('hidden');
+  document.getElementById('bottomNav').classList.add('hidden');
+}
+document.getElementById('logoutBtn').addEventListener('click', logout);
+document.getElementById('logoutBtn2').addEventListener('click', logout);
+
+/* ===================== Data & Helpers ===================== */
+let entries = [];
+const fmtMoney = n => '₹' + (isFinite(n) ? Number(n).toFixed(2) : '0.00');
+const fmtL = n => (isFinite(n) ? Number(n).toFixed(2) : '0.00') + ' L';
+const fmtNum = n => (isFinite(n) ? Number(n).toFixed(2) : '0.00');
+const asDate = s => s ? new Date(s + 'T00:00:00') : null;
+const keyMonth = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+function persist(){ saveEntries(entries); }
+
+function stationBadge(s){
+  const map = {IOCL:'🟠', BPCL:'🔵', HPCL:'🔷', Shell:'🟡', Reliance:'⚫️'};
+  const icon = map[s] || '⛽';
+  return `<span class="badge text-bg-dark">${icon} ${s}</span>`;
+}
+function mileageClass(m){
+  if(m>18) return 'mileage-high';
+  if(m>=15) return 'mileage-mid';
+  return 'mileage-low';
+}
+
+/* ===================== Navigation (Top + Bottom) ===================== */
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('.nav-link, .btn[data-section], .bn-link');
+
+function showSection(id){
+  sections.forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+
+  document.querySelectorAll('.nav-link').forEach(a=>a.classList.remove('active'));
+  const activeTop = document.querySelector(`.nav-link[data-section="${id}"]`);
+  if(activeTop) activeTop.classList.add('active');
+
+  document.querySelectorAll('.bn-link').forEach(a=>a.classList.remove('active'));
+  const activeBottom = document.querySelector(`.bn-link[data-section="${id}"]`);
+  if(activeBottom) activeBottom.classList.add('active');
+
+  if(id==='history') renderHistory();
+  if(id==='reports') renderReports();
+}
+navLinks.forEach(el=>{
+  el.addEventListener('click',e=>{
     e.preventDefault();
-    let entry={
-      id:Date.now(),
-      date:date.value,
-      amount:+amount.value,
-      additives:+additives.value,
-      rate:+rate.value,
-      litres:(+amount.value-+additives.value)/+rate.value,
-      total:+amount.value-+additives.value,
-      mileage:endKm.value&&startKm.value? (endKm.value-startKm.value)/((+amount.value-+additives.value)/+rate.value):0
-    };
-    entries.push(entry);
-    localStorage.setItem("entries",JSON.stringify(entries));
-    this.reset(); showPage('dashboard'); render();
+    showSection(el.dataset.section);
+  });
+});
+
+/* ===================== Dashboard ===================== */
+let chartTrend, chartDonut, chartMileage, chartCumulative;
+function renderDashboard(){
+  document.getElementById('entryCount').textContent = `${entries.length} ${entries.length===1?'Entry':'Entries'}`;
+
+  let totalPaid=0,totalLitres=0,totalAdd=0,avgMileage=0;
+  const labels = [], amounts=[], litresArr=[], mileArr=[], cumul=[];
+  let running=0;
+
+  entries.forEach(e=>{
+    totalPaid += e.amount;
+    totalLitres += e.litres;
+    totalAdd += e.additives;
+    avgMileage += e.mileage||0;
+
+    labels.push(e.date);
+    amounts.push(e.amount);
+    litresArr.push(Number(e.litres.toFixed(2)));
+    mileArr.push(Number((e.mileage||0).toFixed(2)));
+    running += e.amount;
+    cumul.push(Number(running.toFixed(2)));
   });
 
-  function render(){
-    let totalPaid=0,totalLitres=0,totalAdditives=0,totalMileage=0;
-    entries.forEach(e=>{ totalPaid+=e.amount; totalLitres+=e.litres; totalAdditives+=e.additives; totalMileage+=e.mileage; });
-    document.getElementById("totalPaid").innerText="₹"+totalPaid.toFixed(2);
-    document.getElementById("totalLitres").innerText=totalLitres.toFixed(2)+" L";
-    document.getElementById("totalAdditives").innerText="₹"+totalAdditives.toFixed(2);
-    document.getElementById("avgMileage").innerText=(entries.length?(totalMileage/entries.length).toFixed(1):0)+" km/L";
-    document.getElementById("avgRate").innerText=entries.length?"₹"+(totalPaid/totalLitres).toFixed(2):"₹0";
-    expenseChart.data.labels=entries.map(e=>e.date);
-    expenseChart.data.datasets[0].data=entries.map(e=>e.amount);
-    expenseChart.data.datasets[1].data=entries.map(e=>e.litres.toFixed(2));
-    expenseChart.update();
-  }
+  document.getElementById('cardTotalPaid').textContent = fmtMoney(totalPaid);
+  document.getElementById('cardTotalLitres').textContent = fmtL(totalLitres);
+  document.getElementById('cardAdditives').textContent = fmtMoney(totalAdd);
+  document.getElementById('cardAvgMileage').textContent = (entries.length ? (avgMileage/entries.length).toFixed(1) : '0.0') + ' km/L';
+  document.getElementById('cardAvgRate').textContent = totalLitres>0 ? fmtMoney(totalPaid/totalLitres) : '₹0.00';
 
-  function renderHistory(){
-    let table=document.getElementById("historyTable"); table.innerHTML="";
-    entries.forEach(e=>{
-      table.innerHTML+=`
-        <tr>
-          <td>${e.date}</td><td>₹${e.amount}</td><td>₹${e.additives}</td><td>₹${e.rate}</td>
-          <td>${e.litres.toFixed(2)}</td><td>₹${e.total.toFixed(2)}</td>
-          <td>₹${(e.total/e.litres).toFixed(2)}</td><td>${e.mileage.toFixed(1)}</td>
-          <td>
-            <button class="btn btn-sm btn-warning" onclick="editEntry(${e.id})">✏️</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteEntry(${e.id})">🗑️</button>
-          </td>
-        </tr>`;
+  // Trend
+  const tctx = document.getElementById('lineTrend');
+  if(chartTrend) chartTrend.destroy();
+  chartTrend = new Chart(tctx,{ type:'line', data:{
+    labels, datasets:[
+      {label:'Amount (₹)', data:amounts, borderColor:'#f0c400', backgroundColor:'rgba(240,196,0,.15)', tension:.3, fill:true},
+      {label:'Litres', data:litresArr, borderColor:'#9e9e9e', backgroundColor:'rgba(0,0,0,.08)', tension:.3, fill:true}
+    ]}, options:{responsive:true, maintainAspectRatio:false}});
+
+  // Donut
+  const dctx = document.getElementById('donutSummary');
+  const fuelCost = Math.max(totalPaid-totalAdd, 0);
+  if(chartDonut) chartDonut.destroy();
+  chartDonut = new Chart(dctx,{ type:'doughnut', data:{
+    labels:['Fuel (net)','Additives'],
+    datasets:[{ data:[fuelCost,totalAdd], backgroundColor:['#ffd644','#eaeaea'], borderWidth:0 }]
+  }, options:{ plugins:{legend:{position:'bottom'}}, cutout:'58%' }});
+
+  // Mileage trend
+  const mctx = document.getElementById('lineMileageDash');
+  if(chartMileage) chartMileage.destroy();
+  chartMileage = new Chart(mctx,{ type:'line', data:{
+    labels, datasets:[{ label:'Mileage', data:mileArr, borderColor:'#111', backgroundColor:'rgba(0,0,0,.08)', tension:.3, fill:true }]
+  }, options:{ responsive:true, maintainAspectRatio:false }});
+
+  // Cumulative spend
+  const cctx = document.getElementById('lineCumulative');
+  if(chartCumulative) chartCumulative.destroy();
+  chartCumulative = new Chart(cctx,{ type:'line', data:{
+    labels, datasets:[{label:'Cumulative Spend (₹)', data:cumul, borderColor:'#f0c400', backgroundColor:'rgba(240,196,0,.15)', tension:.2, fill:true}]
+  }, options:{ responsive:true, maintainAspectRatio:false }});
+}
+
+/* ===================== Add / Edit / Delete ===================== */
+['amount','additives','rate','startKm','endKm'].forEach(id=>{
+  const el=document.getElementById(id); if(el) el.addEventListener('input', calcPreview);
+});
+document.getElementById('station').addEventListener('change', (e)=>{
+  document.getElementById('stationOtherWrap').style.display = e.target.value==='Other' ? 'block' : 'none';
+});
+
+function calcPreview(){
+  const A = parseFloat(document.getElementById('amount').value)||0;
+  const Ad = parseFloat(document.getElementById('additives').value)||0;
+  const R = parseFloat(document.getElementById('rate').value)||0;
+  const sKm = parseFloat(document.getElementById('startKm').value);
+  const eKm = parseFloat(document.getElementById('endKm').value);
+
+  const net = Math.max(A - Ad, 0);
+  const litres = (R>0) ? (net / R) : 0;
+  const calcRate = (litres>0) ? (net / litres) : 0;
+  const mileage = (isFinite(eKm - sKm) && litres>0) ? ((eKm - sKm) / litres) : 0;
+
+  document.getElementById('pvLitres').textContent = 'Litres: ' + litres.toFixed(2);
+  document.getElementById('pvNet').textContent = 'Net: ' + fmtMoney(net);
+  document.getElementById('pvRate').textContent = 'Effective Rate: ' + fmtMoney(calcRate) + '/L';
+  document.getElementById('pvMileage').textContent = 'Mileage: ' + mileage.toFixed(1) + ' km/L';
+
+  return {net, litres, mileage};
+}
+
+document.getElementById('entryForm').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const date = document.getElementById('date').value;
+  const amount = parseFloat(document.getElementById('amount').value)||0;
+  const additives = parseFloat(document.getElementById('additives').value)||0;
+  const rate = parseFloat(document.getElementById('rate').value)||0;
+  const {net, litres, mileage} = calcPreview();
+  let station = document.getElementById('station').value;
+  if(station==='Other'){ station = (document.getElementById('stationOther').value || 'Other').trim(); }
+
+  const entry = { id: Date.now(), date, station, amount, additives, rate, litres, total: net, mileage };
+  entries.push(entry);
+  persist();
+  e.target.reset();
+  document.getElementById('stationOtherWrap').style.display='none';
+  renderAll();
+  showSection('history');
+});
+
+function deleteEntry(id){
+  if(!confirm('Delete this entry?')) return;
+  entries = entries.filter(e => e.id !== id);
+  persist();
+  renderAll();
+}
+function editEntry(id){
+  const e = entries.find(x=>x.id===id); if(!e) return;
+  showSection('add');
+  document.getElementById('date').value = e.date;
+  document.getElementById('amount').value = e.amount;
+  document.getElementById('additives').value = e.additives;
+  document.getElementById('rate').value = e.rate;
+  document.getElementById('startKm').value = '';
+  document.getElementById('endKm').value = '';
+  document.getElementById('station').value = ['IOCL','BPCL','HPCL','Shell','Reliance'].includes(e.station) ? e.station : 'Other';
+  document.getElementById('stationOther').value = (document.getElementById('station').value==='Other') ? e.station : '';
+  document.getElementById('stationOtherWrap').style.display = (document.getElementById('station').value==='Other') ? 'block':'none';
+  calcPreview();
+  // remove old (update=replace)
+  entries = entries.filter(x=>x.id!==id);
+  persist();
+  renderAll();
+}
+
+/* ===================== History (filters + sort + pagination) ===================== */
+let sortState = {}; // {field:asc}
+let page = 1; const pageSize = 10;
+
+function withinRange(dateStr, fromStr, toStr){
+  if(!fromStr && !toStr) return true;
+  const d = asDate(dateStr); if(!d) return false;
+  const from = asDate(fromStr) || new Date('1900-01-01');
+  const to = asDate(toStr) || new Date('9999-12-31');
+  return d>=from && d<=to;
+}
+
+function rowHTML(e){
+  const calcRate = e.total>0 && e.litres>0 ? (e.total/e.litres) : 0;
+  const milClass = mileageClass(e.mileage||0);
+  return `
+    <tr>
+      <td>${e.date}</td>
+      <td>${stationBadge(e.station||'—')}</td>
+      <td>${fmtMoney(e.amount)}</td>
+      <td>${fmtMoney(e.additives)}</td>
+      <td>${fmtMoney(e.rate)}</td>
+      <td>${fmtNum(e.litres)}</td>
+      <td>${fmtMoney(e.total)}</td>
+      <td>${fmtMoney(calcRate)}</td>
+      <td class="${milClass}">${(e.mileage||0).toFixed(1)}</td>
+      <td class="text-nowrap">
+        <button class="btn btn-sm btn-warning me-1" onclick="editEntry(${e.id})">✏️ Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteEntry(${e.id})">🗑 Delete</button>
+      </td>
+    </tr>`;
+}
+
+function filteredSorted(){
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  const from = document.getElementById('dateFrom').value;
+  const to = document.getElementById('dateTo').value;
+  const stationF = document.getElementById('stationFilter').value;
+  let list = entries.filter(e =>
+    JSON.stringify(e).toLowerCase().includes(q) &&
+    withinRange(e.date, from, to) &&
+    (!stationF || (e.station||'').toLowerCase()===stationF.toLowerCase())
+  );
+  const field = Object.keys(sortState)[0];
+  if(field){
+    const asc = sortState[field];
+    list.sort((a,b)=>{
+      let A = (field==='calcRate') ? (a.total/a.litres) : a[field];
+      let B = (field==='calcRate') ? (b.total/b.litres) : b[field];
+      if(A==null) A=0; if(B==null) B=0;
+      return asc ? (A>B?1:-1) : (A<B?1:-1);
     });
   }
+  return list;
+}
 
-  function deleteEntry(id){
-    if(confirm("Delete this entry?")){
-      entries=entries.filter(e=>e.id!==id);
-      localStorage.setItem("entries",JSON.stringify(entries));
-      render(); renderHistory();
+function renderHistory(){
+  const tb = document.getElementById('historyBody');
+  tb.innerHTML = '';
+  const list = filteredSorted();
+  const pages = Math.max(1, Math.ceil(list.length / pageSize));
+  if(page>pages) page = pages;
+  const start = (page-1)*pageSize, end = start + pageSize;
+  list.slice(start,end).forEach(e => tb.insertAdjacentHTML('beforeend', rowHTML(e)));
+  document.getElementById('pageInfo').textContent = `Page ${page} / ${pages} — ${list.length} rows`;
+}
+
+['search','dateFrom','dateTo','stationFilter'].forEach(id=>{
+  const el=document.getElementById(id); if(el) el.addEventListener('input', ()=>{ page=1; renderHistory(); });
+});
+document.getElementById('btnResetFilters').addEventListener('click', ()=>{
+  document.getElementById('search').value=''; document.getElementById('dateFrom').value='';
+  document.getElementById('dateTo').value=''; document.getElementById('stationFilter').value='';
+  page=1; renderHistory();
+});
+document.querySelectorAll('#history th.sortable').forEach(th=>{
+  th.addEventListener('click', ()=>{
+    const field = th.dataset.sort;
+    sortState = {[field]: !(sortState[field])}; page=1; renderHistory();
+  });
+});
+document.getElementById('prevPage').addEventListener('click', ()=>{ if(page>1){ page--; renderHistory(); } });
+document.getElementById('nextPage').addEventListener('click', ()=>{ page++; renderHistory(); });
+
+/* ===================== Reports (monthly + stations) ===================== */
+let barMonthly, lineMileage, barStationSpend, barStationMileage;
+
+function groupByMonth(){
+  const map = {};
+  entries.forEach(e=>{
+    if(!e.date) return;
+    const d = asDate(e.date); if(!d) return;
+    const k = keyMonth(d);
+    if(!map[k]) map[k] = {amount:0, litres:0, additives:0, mileageSum:0, trips:0};
+    map[k].amount += e.amount;
+    map[k].litres += e.litres;
+    map[k].additives += e.additives;
+    map[k].mileageSum += (e.mileage||0);
+    map[k].trips += 1;
+  });
+  const months = Object.keys(map).sort();
+  return months.map(m=>({
+    month: m,
+    amount: map[m].amount,
+    litres: map[m].litres,
+    additives: map[m].additives,
+    avgMileage: map[m].trips? (map[m].mileageSum/map[m].trips):0
+  }));
+}
+function groupByStation(){
+  const map = {};
+  entries.forEach(e=>{
+    const s = e.station || 'Unknown';
+    if(!map[s]) map[s] = {amount:0, litres:0, mileageSum:0, trips:0};
+    map[s].amount += e.amount;
+    map[s].litres += e.litres;
+    map[s].mileageSum += (e.mileage||0);
+    map[s].trips += 1;
+  });
+  return Object.keys(map).sort().map(s=>({
+    station:s,
+    amount: map[s].amount,
+    litres: map[s].litres,
+    avgMileage: map[s].trips? (map[s].mileageSum/map[s].trips):0
+  }));
+}
+function monthLabel(m){ const [y,mm]=m.split('-'); return new Date(+y, +mm-1, 1).toLocaleString(undefined,{month:'short', year:'numeric'}); }
+
+function renderReports(){
+  const monthly = groupByMonth();
+  const labels = monthly.map(d=>monthLabel(d.month));
+  const amt = monthly.map(d=>Number(d.amount.toFixed(2)));
+  const lits = monthly.map(d=>Number(d.litres.toFixed(2)));
+  const avgMil = monthly.map(d=>Number(d.avgMileage.toFixed(2)));
+
+  // cards
+  const wrap = document.getElementById('monthCards'); wrap.innerHTML='';
+  monthly.forEach(d=>{
+    const avgRate = d.litres>0 ? (d.amount/d.litres) : 0;
+    wrap.insertAdjacentHTML('beforeend', `
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="stat-card">
+          <div class="chip">${monthLabel(d.month)}</div>
+          <div class="mt-2 small text-muted">Paid</div><div class="stat-value">${fmtMoney(d.amount)}</div>
+          <div class="mt-2 small text-muted">Litres</div><div class="stat-value">${fmtNum(d.litres)} L</div>
+          <div class="mt-2 small text-muted">Avg Mileage</div><div class="stat-value">${d.avgMileage.toFixed(1)} km/L</div>
+          <div class="mt-2 small text-muted">Avg Rate</div><div class="stat-value">${fmtMoney(avgRate)}</div>
+        </div>
+      </div>`);
+  });
+
+  // charts monthly
+  const bctx = document.getElementById('barMonthly'); if(barMonthly) barMonthly.destroy();
+  barMonthly = new Chart(bctx,{ type:'bar', data:{ labels, datasets:[
+    {label:'Amount (₹)', data:amt, backgroundColor:'rgba(240,196,0,.85)'},
+    {label:'Litres', data:lits, backgroundColor:'rgba(0,0,0,.2)'}
+  ]}, options:{responsive:true, maintainAspectRatio:false}});
+
+  const lctx = document.getElementById('lineMileage'); if(lineMileage) lineMileage.destroy();
+  lineMileage = new Chart(lctx,{ type:'line', data:{ labels, datasets:[{label:'Avg Mileage', data:avgMil, borderColor:'#111', backgroundColor:'rgba(0,0,0,.08)', tension:.3, fill:true}]}, options:{responsive:true, maintainAspectRatio:false}});
+
+  // station charts
+  const byS = groupByStation();
+  const sLabels = byS.map(x=>x.station);
+  const sAmt = byS.map(x=>Number(x.amount.toFixed(2)));
+  const sMil = byS.map(x=>Number(x.avgMileage.toFixed(2)));
+
+  const s1 = document.getElementById('barStationSpend'); if(barStationSpend) barStationSpend.destroy();
+  barStationSpend = new Chart(s1,{ type:'bar', data:{ labels:sLabels, datasets:[{label:'Amount (₹)', data:sAmt, backgroundColor:'rgba(240,196,0,.85)'}] }, options:{responsive:true, maintainAspectRatio:false} });
+
+  const s2 = document.getElementById('barStationMileage'); if(barStationMileage) barStationMileage.destroy();
+  barStationMileage = new Chart(s2,{ type:'bar', data:{ labels:sLabels, datasets:[{label:'Avg Mileage', data:sMil, backgroundColor:'rgba(0,0,0,.2)'}] }, options:{responsive:true, maintainAspectRatio:false} });
+}
+
+/* ===================== Export / Import / Clear ===================== */
+function exportExcel(rows){
+  const list = (rows && rows.length ? rows : entries).map(e=>({
+    Date:e.date, Station:e.station||'', Amount_Paid:e.amount, Additives:e.additives,
+    Rate_Per_Litre:e.rate, Litres:e.litres, Net:e.total,
+    Effective_Rate: (e.litres>0? (e.total/e.litres):0), Mileage:e.mileage
+  }));
+  if(!list.length){ alert('No data to export.'); return; }
+  const ws = XLSX.utils.json_to_sheet(list);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Petrol');
+  XLSX.writeFile(wb, 'petrol-expense.xlsx');
+}
+document.getElementById('exportBtn').addEventListener('click', ()=>exportExcel());
+document.getElementById('btnExport2').addEventListener('click', ()=>exportExcel());
+document.getElementById('btnExportReport').addEventListener('click', ()=>{
+  const monthly = groupByMonth().map(d=>({
+    Month: d.month, Amount: d.amount, Litres: d.litres, Additives: d.additives,
+    Avg_Mileage: d.avgMileage, Avg_Rate: d.litres>0? d.amount/d.litres : 0
+  }));
+  if(!monthly.length){ alert('No report data.'); return; }
+  const ws = XLSX.utils.json_to_sheet(monthly);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Monthly Report');
+  XLSX.writeFile(wb, 'petrol-monthly-report.xlsx');
+});
+
+document.getElementById('btnClearAll').addEventListener('click', ()=>{
+  if(!confirm('This will erase ALL entries for this user. Continue?')) return;
+  localStorage.removeItem(userKey());
+  entries = [];
+  renderAll();
+  alert('Data cleared.');
+});
+
+document.getElementById('btnImport').addEventListener('click', ()=>{
+  const file = document.getElementById('fileImport').files[0];
+  if(!file){ alert('Choose a CSV/XLSX file first.'); return; }
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    const data = new Uint8Array(e.target.result);
+    let wb;
+    try{ wb = XLSX.read(data, {type:'array'}); }
+    catch{ // maybe CSV string
+      const text = new TextDecoder().decode(data);
+      wb = XLSX.read(text, {type:'string'});
     }
+    const first = wb.SheetNames[0];
+    const ws = wb.Sheets[first];
+    const json = XLSX.utils.sheet_to_json(ws);
+    // Expect columns: Date, Station, Amount_Paid, Additives, Rate_Per_Litre, Litres, Net (or compute), Mileage
+    json.forEach(r=>{
+      const date = (r.Date || r.date || '').toString().slice(0,10);
+      const amount = parseFloat(r.Amount_Paid || r.Amount || r.amount || 0) || 0;
+      const additives = parseFloat(r.Additives || 0) || 0;
+      const rate = parseFloat(r.Rate_Per_Litre || r.Rate || 0) || 0;
+      const litres = parseFloat(r.Litres || 0) || 0;
+      const total = parseFloat(r.Net || r.Total || 0) || (amount - additives);
+      const mileage = parseFloat(r.Mileage || 0) || 0;
+      const station = (r.Station || r.station || 'Unknown').toString();
+      entries.push({ id: Date.now()+Math.floor(Math.random()*100000), date, station, amount, additives, rate, litres, total, mileage });
+    });
+    persist();
+    renderAll();
+    showSection('history');
+    alert('Import completed.');
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+/* ===================== Theme Toggle ===================== */
+const themeBtn = document.getElementById('themeToggle');
+function applyTheme(){
+  const theme = localStorage.getItem('theme') || 'light';
+  if(theme==='dark'){
+    document.documentElement.setAttribute('data-bs-theme','dark');
+    document.documentElement.setAttribute('data-theme','dark');
+    themeBtn.textContent = 'Light';
+  } else {
+    document.documentElement.removeAttribute('data-bs-theme');
+    document.documentElement.removeAttribute('data-theme');
+    themeBtn.textContent = 'Dark';
   }
-  function editEntry(id){
-    let e=entries.find(x=>x.id===id);
-    if(!e) return;
-    showPage("addEntry");
-    date.value=e.date; amount.value=e.amount; additives.value=e.additives; rate.value=e.rate;
-    startKm.value=""; endKm.value="";
-    deleteEntry(id);
-  }
-  function clearAll(){
-    if(confirm("Clear ALL data?")){
-      entries=[]; localStorage.clear(); render(); renderHistory();
-    }
-  }
-  function exportToExcel(){
-    let ws=XLSX.utils.json_to_sheet(entries);
-    let wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb,ws,"Petrol Data");
-    XLSX.writeFile(wb,"PetrolExpense.xlsx");
-  }
-  render();
+}
+themeBtn.addEventListener('click', ()=>{
+  const cur = localStorage.getItem('theme') || 'light';
+  const next = cur==='light' ? 'dark' : 'light';
+  localStorage.setItem('theme', next);
+  applyTheme();
+});
+
+/* ===================== Render All ===================== */
+function renderAll(){
+  renderDashboard();
+  renderHistory();
+  renderReports();
+}
+
+/* ===================== Boot (stay on login until auth) ===================== */
 </script>
 </body>
 </html>
