@@ -8,21 +8,20 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
-    body { display: flex; min-height: 100vh; overflow-x: hidden; background:#f8f9fa; }
+    body { display:flex; min-height:100vh; overflow-x:hidden; background:#f8f9fa; }
     /* Sidebar */
-    #sidebar { width: 240px; background: linear-gradient(180deg,#a832d6,#6a1b9a); color:white; transition: all .3s ease; }
-    #sidebar h4 { padding: 15px; }
+    #sidebar { width:240px; background:linear-gradient(180deg,#a832d6,#6a1b9a); color:white; transition:.3s; }
+    #sidebar h4 { padding:15px; }
     #sidebar a { color:white; padding:12px 20px; display:block; text-decoration:none; }
-    #sidebar a.active { background: rgba(255,255,255,0.2); border-radius: 6px; }
+    #sidebar a.active { background:rgba(255,255,255,0.2); border-radius:6px; }
     #sidebar.collapsed { margin-left:-240px; }
     /* Content */
     #content { flex:1; padding:20px; }
     #menu-btn { display:none; background:#6a1b9a; border:none; color:white; padding:8px 12px; margin-bottom:10px; border-radius:6px; }
-    .card { border-radius:12px; text-align:center; }
+    .card { border-radius:12px; text-align:center; margin-bottom:10px; }
     .table-responsive { margin-top:20px; }
     @media(max-width:768px){
       #menu-btn{display:inline-block;}
-      .card{margin-bottom:10px;}
     }
   </style>
 </head>
@@ -33,6 +32,7 @@
     <h4>📊 Tracker</h4>
     <a href="#" class="active" onclick="showPage('dashboard')">Dashboard</a>
     <a href="#" onclick="showPage('addEntry')">Add Entry</a>
+    <a href="#" onclick="showPage('history')">History</a>
     <a href="#" onclick="showPage('reports')">Reports</a>
     <a href="#" onclick="showPage('settings')">Settings</a>
   </div>
@@ -44,14 +44,35 @@
 
     <!-- Dashboard -->
     <div id="dashboard">
-      <div class="row">
+      <div class="row g-2">
         <div class="col-md-2 col-6"><div class="card p-3"><h6>Total Paid</h6><p id="totalPaid">₹0</p></div></div>
         <div class="col-md-2 col-6"><div class="card p-3"><h6>Total Litres</h6><p id="totalLitres">0 L</p></div></div>
         <div class="col-md-2 col-6"><div class="card p-3"><h6>Avg Mileage</h6><p id="avgMileage">0 km/L</p></div></div>
-        <div class="col-md-2 col-6"><div class="card p-3"><h6>Fuel Additives</h6><p id="totalAdditives">₹0</p></div></div>
+        <div class="col-md-2 col-6"><div class="card p-3"><h6>Additives</h6><p id="totalAdditives">₹0</p></div></div>
         <div class="col-md-2 col-6"><div class="card p-3"><h6>Avg Rate</h6><p id="avgRate">₹0</p></div></div>
       </div>
       <canvas id="expenseChart" height="100"></canvas>
+    </div>
+
+    <!-- Add Entry -->
+    <div id="addEntry" style="display:none;">
+      <h4>Add New Entry</h4>
+      <form id="entryForm">
+        <div class="row g-2">
+          <div class="col-md-3"><input type="date" id="date" class="form-control" required></div>
+          <div class="col-md-2"><input type="number" id="amount" class="form-control" placeholder="Amount Paid" required></div>
+          <div class="col-md-2"><input type="number" id="additives" class="form-control" placeholder="Additives" value="0"></div>
+          <div class="col-md-2"><input type="number" id="rate" class="form-control" placeholder="Rate/Litre" required></div>
+          <div class="col-md-2"><input type="number" id="startKm" class="form-control" placeholder="Start KM"></div>
+          <div class="col-md-2"><input type="number" id="endKm" class="form-control" placeholder="End KM"></div>
+          <div class="col-md-12"><button class="btn btn-primary mt-2">Add Entry</button></div>
+        </div>
+      </form>
+    </div>
+
+    <!-- History Page -->
+    <div id="history" style="display:none;">
+      <h4>Fuel History</h4>
       <div class="table-responsive">
         <table class="table table-bordered mt-3">
           <thead class="table-light">
@@ -60,45 +81,29 @@
               <th>Litres</th><th>Total</th><th>Calc Rate</th><th>Mileage</th><th>Actions</th>
             </tr>
           </thead>
-          <tbody id="entriesTable"></tbody>
+          <tbody id="historyTable"></tbody>
         </table>
       </div>
-      <button class="btn btn-success" onclick="exportToExcel()">⬇ Export to Excel</button>
-    </div>
-
-    <!-- Add Entry -->
-    <div id="addEntry" style="display:none;">
-      <h4>Add New Entry</h4>
-      <form id="entryForm">
-        <div class="row">
-          <div class="col-md-3"><input type="date" id="date" class="form-control" required></div>
-          <div class="col-md-2"><input type="number" id="amount" class="form-control" placeholder="Amount Paid" required></div>
-          <div class="col-md-2"><input type="number" id="additives" class="form-control" placeholder="Additives" value="0"></div>
-          <div class="col-md-2"><input type="number" id="rate" class="form-control" placeholder="Rate/Litre" required></div>
-          <div class="col-md-2"><input type="number" id="startKm" class="form-control" placeholder="Start KM"></div>
-          <div class="col-md-2"><input type="number" id="endKm" class="form-control" placeholder="End KM"></div>
-          <div class="col-md-12 mt-2"><button class="btn btn-primary">Add Entry</button></div>
-        </div>
-      </form>
     </div>
 
     <!-- Reports -->
     <div id="reports" style="display:none;">
       <h4>Reports</h4>
-      <p>Charts and summary will appear here (coming soon).</p>
+      <p>More charts & analysis coming soon.</p>
     </div>
 
     <!-- Settings -->
     <div id="settings" style="display:none;">
       <h4>Settings</h4>
       <button class="btn btn-danger" onclick="clearAll()">Clear All Data</button>
+      <button class="btn btn-success" onclick="exportToExcel()">⬇ Export to Excel</button>
     </div>
   </div>
 
 <script>
   let entries = JSON.parse(localStorage.getItem("entries")) || [];
   const ctx = document.getElementById('expenseChart').getContext('2d');
-  let expenseChart = new Chart(ctx, {
+  let expenseChart = new Chart(ctx,{
     type:'line',
     data:{labels:[],datasets:[
       {label:'Amount Paid (₹)', data:[], borderColor:'blue', fill:false},
@@ -107,39 +112,48 @@
   });
 
   function showPage(page){
-    document.querySelectorAll("#content > div").forEach(div => div.style.display="none");
+    document.querySelectorAll("#content > div").forEach(div=>div.style.display="none");
     document.getElementById(page).style.display="block";
-    document.querySelectorAll("#sidebar a").forEach(a => a.classList.remove("active"));
+    document.querySelectorAll("#sidebar a").forEach(a=>a.classList.remove("active"));
     document.querySelector(`#sidebar a[onclick*='${page}']`).classList.add("active");
+    if(page==="history") renderHistory();
   }
-
   document.getElementById("menu-btn").onclick=()=>document.getElementById("sidebar").classList.toggle("collapsed");
 
   document.getElementById("entryForm").addEventListener("submit", function(e){
     e.preventDefault();
-    let entry = {
-      id: Date.now(),
-      date: date.value,
-      amount: +amount.value,
-      additives: +additives.value,
-      rate: +rate.value,
-      litres: (+amount.value - +additives.value) / +rate.value,
-      total: +amount.value - +additives.value,
-      mileage: endKm.value && startKm.value ? (endKm.value - startKm.value)/((+amount.value - +additives.value) / +rate.value) : 0
+    let entry={
+      id:Date.now(),
+      date:date.value,
+      amount:+amount.value,
+      additives:+additives.value,
+      rate:+rate.value,
+      litres:(+amount.value-+additives.value)/+rate.value,
+      total:+amount.value-+additives.value,
+      mileage:endKm.value&&startKm.value? (endKm.value-startKm.value)/((+amount.value-+additives.value)/+rate.value):0
     };
     entries.push(entry);
-    localStorage.setItem("entries", JSON.stringify(entries));
-    this.reset();
-    showPage('dashboard');
-    render();
+    localStorage.setItem("entries",JSON.stringify(entries));
+    this.reset(); showPage('dashboard'); render();
   });
 
   function render(){
-    let table=document.getElementById("entriesTable");
-    table.innerHTML="";
     let totalPaid=0,totalLitres=0,totalAdditives=0,totalMileage=0;
+    entries.forEach(e=>{ totalPaid+=e.amount; totalLitres+=e.litres; totalAdditives+=e.additives; totalMileage+=e.mileage; });
+    document.getElementById("totalPaid").innerText="₹"+totalPaid.toFixed(2);
+    document.getElementById("totalLitres").innerText=totalLitres.toFixed(2)+" L";
+    document.getElementById("totalAdditives").innerText="₹"+totalAdditives.toFixed(2);
+    document.getElementById("avgMileage").innerText=(entries.length?(totalMileage/entries.length).toFixed(1):0)+" km/L";
+    document.getElementById("avgRate").innerText=entries.length?"₹"+(totalPaid/totalLitres).toFixed(2):"₹0";
+    expenseChart.data.labels=entries.map(e=>e.date);
+    expenseChart.data.datasets[0].data=entries.map(e=>e.amount);
+    expenseChart.data.datasets[1].data=entries.map(e=>e.litres.toFixed(2));
+    expenseChart.update();
+  }
+
+  function renderHistory(){
+    let table=document.getElementById("historyTable"); table.innerHTML="";
     entries.forEach(e=>{
-      totalPaid+=e.amount; totalLitres+=e.litres; totalAdditives+=e.additives; totalMileage+=e.mileage;
       table.innerHTML+=`
         <tr>
           <td>${e.date}</td><td>₹${e.amount}</td><td>₹${e.additives}</td><td>₹${e.rate}</td>
@@ -151,23 +165,13 @@
           </td>
         </tr>`;
     });
-    document.getElementById("totalPaid").innerText="₹"+totalPaid.toFixed(2);
-    document.getElementById("totalLitres").innerText=totalLitres.toFixed(2)+" L";
-    document.getElementById("totalAdditives").innerText="₹"+totalAdditives.toFixed(2);
-    document.getElementById("avgMileage").innerText=(entries.length? (totalMileage/entries.length).toFixed(1):0)+" km/L";
-    document.getElementById("avgRate").innerText=entries.length? "₹"+(totalPaid/totalLitres).toFixed(2):"₹0";
-
-    expenseChart.data.labels=entries.map(e=>e.date);
-    expenseChart.data.datasets[0].data=entries.map(e=>e.amount);
-    expenseChart.data.datasets[1].data=entries.map(e=>e.litres.toFixed(2));
-    expenseChart.update();
   }
 
   function deleteEntry(id){
     if(confirm("Delete this entry?")){
       entries=entries.filter(e=>e.id!==id);
-      localStorage.setItem("entries", JSON.stringify(entries));
-      render();
+      localStorage.setItem("entries",JSON.stringify(entries));
+      render(); renderHistory();
     }
   }
   function editEntry(id){
@@ -175,12 +179,12 @@
     if(!e) return;
     showPage("addEntry");
     date.value=e.date; amount.value=e.amount; additives.value=e.additives; rate.value=e.rate;
-    startKm.value=""; endKm.value=""; // fresh mileage
-    deleteEntry(id); // remove old, will save new
+    startKm.value=""; endKm.value="";
+    deleteEntry(id);
   }
   function clearAll(){
     if(confirm("Clear ALL data?")){
-      entries=[]; localStorage.clear(); render();
+      entries=[]; localStorage.clear(); render(); renderHistory();
     }
   }
   function exportToExcel(){
@@ -189,7 +193,6 @@
     XLSX.utils.book_append_sheet(wb,ws,"Petrol Data");
     XLSX.writeFile(wb,"PetrolExpense.xlsx");
   }
-
   render();
 </script>
 </body>
