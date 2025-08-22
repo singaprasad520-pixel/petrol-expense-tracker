@@ -1,723 +1,277 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Petrol Expense Tracker</title>
-
-<!-- Chart.js and SheetJS -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-  /* ---------- Reset & basics ---------- */
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%;width:100%;overflow-x:hidden;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
-  :root{--brand:#ffd644;--brand-600:#f0c400;--muted:#6b7280;--card-radius:12px;}
+:root { --yellow:#ffcc00; --bg:#f9f9f9; }
+body {margin:0;font-family:Arial, sans-serif;background:var(--bg);}
+h2,h3 {margin:0 0 1rem 0;}
+.page {padding:1rem;}
+button {cursor:pointer;}
 
-  /* ---------- SPLIT LOGIN ---------- */
-  #loginScreen{display:flex;height:100vh;min-height:600px}
-  .login-left{flex:1;background:linear-gradient(180deg,#fffbea,#fff4cc);display:flex;align-items:center;justify-content:center;padding:3rem}
-  .login-card{width:100%;max-width:520px;background:white;border-radius:14px;padding:28px;box-shadow:0 10px 30px rgba(0,0,0,0.06)}
-  .brand-dot{width:14px;height:14px;border-radius:50%;background:var(--brand);display:inline-block;margin-right:10px;vertical-align:middle}
-  .login-card h2{font-size:1.6rem;margin-bottom:6px}
-  .login-card p{color:var(--muted);margin-bottom:14px}
-  .login-card label{display:block;font-weight:600;margin-top:10px;margin-bottom:6px}
-  .login-card input{width:100%;padding:.8rem;border-radius:28px;border:1px solid #e6e6e6;font-size:1rem}
-  .btn{display:inline-block;padding:.75rem 1rem;border-radius:10px;border:none;background:var(--brand);color:#000;font-weight:800;cursor:pointer}
-  .btn.ghost{background:#fff;border:1px solid #e6e6e6;font-weight:700;color:#222}
-  .btn-block{width:100%;display:block}
-  .login-right{flex:1;background:url('https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1400&auto=format&fit=crop') center/cover no-repeat;display:flex;align-items:flex-end;padding:28px;border-top-left-radius:0}
-  .overlay-text{background:rgba(0,0,0,.35);color:#fff;padding:18px;border-radius:12px;max-width:420px}
-  @media(max-width:900px){#loginScreen{flex-direction:column}.login-right{display:none}.login-left{padding:1.5rem}.login-card{padding:18px}}
+/* Sidebar (desktop) */
+.sidebar {
+  position:fixed;top:0;left:0;width:200px;height:100%;
+  background:var(--yellow);padding:1rem;display:flex;flex-direction:column;
+}
+.sidebar h2 {font-size:1.2rem;margin-bottom:1rem;}
+.sidebar button {background:none;border:none;padding:0.5rem;text-align:left;font-weight:bold;}
 
-  /* ---------- APP SHELL (hidden until login) ---------- */
-  .app-shell{display:flex;min-height:100vh;opacity:1}
-  /* Sidebar desktop */
-  #sidebar{width:240px;background:linear-gradient(180deg,var(--brand),var(--brand-600));padding:18px;flex:0 0 240px;position:fixed;top:0;left:0;bottom:0;overflow:auto}
-  #sidebar .brand{display:flex;align-items:center;gap:10px;margin-bottom:18px;font-weight:800}
-  #sidebar .nav-link{display:block;padding:10px;border-radius:10px;text-decoration:none;color:#111;margin-bottom:8px;font-weight:700}
-  #sidebar .nav-link.active{background:rgba(0,0,0,.06)}
-  /* Main */
-  .main{margin-left:0;padding:18px;flex:1}
-  @media(min-width:992px){.main{margin-left:240px}}
-  /* Top bar (small) */
-  .topbar{background:#fff;border-bottom:1px solid #eee;padding:10px 18px;position:sticky;top:0;z-index:40}
-  .topbar .left{display:flex;align-items:center;gap:12px}
-  .topbar .right{display:flex;align-items:center;gap:10px}
-  /* Bottom nav for mobile */
-  .bottom-nav{display:none;position:fixed;left:0;right:0;bottom:0;height:62px;background:#fff;border-top:1px solid #eee;z-index:50;justify-content:space-around;align-items:center}
-  .bottom-nav a{flex:1;text-align:center;text-decoration:none;color:#222;padding:12px 0;font-weight:700;}
-  .bottom-nav a.active{background:var(--brand)}
-  @media(max-width:991px){#sidebar{transform:translateX(-110%);position:fixed;transition:transform .25s}#sidebar.mobile-open{transform:translateX(0)}.bottom-nav{display:flex}.main{padding-bottom:76px}}
+/* Content */
+.content {margin-left:200px;padding:1rem;}
 
-  /* Cards, Tables, Inputs */
-  .stat-card{background:#fff;border-radius:12px;padding:14px;border:1px solid #eee}
-  .card{background:#fff;border-radius:12px;padding:14px;border:1px solid #eee;margin-bottom:12px}
-  .grid{display:grid;gap:12px}
-  .grid.cols-3{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
-  .table-wrap{overflow:auto}
-  table{width:100%;border-collapse:collapse;min-width:700px}
-  table th, table td{padding:.6rem .75rem;border-bottom:1px solid #eee;text-align:left}
-  table thead th{background:#fff7df;font-weight:700}
+/* Bottom Nav (mobile) */
+.bottom-nav {
+  display:none;position:fixed;bottom:0;left:0;width:100%;
+  background:#fff;border-top:1px solid #ddd;
+  display:flex;justify-content:space-around;padding:0.5rem 0;
+}
+.bottom-nav button {background:none;border:none;font-weight:bold;}
 
-  .chip{background:var(--brand);padding:.25rem .6rem;border-radius:999px;font-weight:800;display:inline-block}
+/* Add Form */
+.add-form {
+  display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-top:1rem;
+}
+.add-form label {font-weight:bold;margin-bottom:0.2rem;display:block;}
+.add-form input {
+  width:100%;padding:0.6rem;border:1px solid #ccc;border-radius:6px;font-size:1rem;
+}
+.add-form button {
+  grid-column: span 2;padding:0.8rem;background:var(--yellow);
+  border:none;border-radius:6px;font-weight:bold;
+}
+.edit-badge {
+  background:#fff9c4;color:#444;padding:0.4rem 0.8rem;border-radius:6px;
+  margin-bottom:1rem;font-size:0.9rem;font-weight:bold;display:inline-block;
+}
 
-  /* small helpers */
-  .muted{color:var(--muted)}
-  .hidden{display:none!important}
-  .actions button{margin-right:6px;padding:.35rem .6rem;border-radius:8px;border:none;cursor:pointer}
-  .actions .edit{background:#ffd644;color:#000} .actions .del{background:#ff6b6b;color:#fff}
+/* History Table */
+.table-container {margin-top:1rem;overflow-x:auto;}
+table {width:100%;border-collapse:collapse;min-width:500px;}
+th,td {border:1px solid #ddd;padding:0.6rem;text-align:center;}
+th {background:var(--yellow);}
+.editing {background:#fff9c4 !important;}
 
-  /* Responsive charts */
-  .chart-wrap{min-height:220px}
+/* Mobile History Cards */
+@media(max-width:768px){
+  .sidebar {display:none;}
+  .content {margin-left:0;padding-bottom:4rem;}
+  .add-form {grid-template-columns:1fr;}
+  .add-form button {grid-column:span 1;}
+  th,td {padding:0.4rem;font-size:0.85rem;}
+  .table-container {display:none;}
+  .history-cards {display:flex;flex-direction:column;gap:1rem;margin-top:1rem;}
+  .history-card {
+    background:#fff;border-radius:8px;padding:1rem;
+    box-shadow:0 2px 5px rgba(0,0,0,0.05);
+  }
+  .history-card p {margin:0.2rem 0;font-size:0.9rem;}
+  .bottom-nav {display:flex;}
+}
+@media(min-width:769px){ .history-cards {display:none;} }
+
+/* Reports */
+.reports-grid {
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:1rem;margin-top:1rem;
+}
+.report-card {
+  background:#fff;padding:1rem;border-radius:8px;
+  box-shadow:0 2px 5px rgba(0,0,0,0.05);
+}
+@media(max-width:768px){ .reports-grid{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
 
-<!-- ========== LOGIN (SPLIT SCREEN) ========== -->
-<div id="loginScreen" aria-hidden="false">
-  <div class="login-left">
-    <div class="login-card" role="region" aria-label="Login">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-        <span class="brand-dot"></span>
-        <div style="font-weight:800">Petrol Expense Tracker</div>
-      </div>
-      <h2 style="margin-bottom:6px">Welcome back</h2>
-      <p class="muted" style="margin-bottom:12px">Local-only login. Your data stays in the browser per username (no backend).</p>
+<!-- Sidebar -->
+<div class="sidebar">
+  <h2>Tracker</h2>
+  <button onclick="showPage('home')">🏠 Home</button>
+  <button onclick="showPage('add')">➕ Add Entry</button>
+  <button onclick="showPage('history')">📑 History</button>
+  <button onclick="showPage('reports')">📊 Reports</button>
+</div>
 
-      <form id="loginForm" class="login-form-inner">
-        <label for="loginUser">Username</label>
-        <input id="loginUser" type="text" placeholder="e.g. prasad" required value="admin">
+<!-- Content -->
+<div class="content">
 
-        <label for="loginPass">Password</label>
-        <input id="loginPass" type="password" placeholder="password" required>
-
-        <button class="btn btn-block" style="margin-top:14px">Enter</button>
-        <button type="button" id="demoBtn" class="btn ghost btn-block" style="margin-top:8px">Load Demo Data</button>
-      </form>
-    </div>
+  <!-- Home -->
+  <div id="home" class="page">
+    <h3>Welcome to Petrol Expense Tracker</h3>
+    <p>Use the menu to add new entries, view history, and check reports.</p>
   </div>
 
-  <div class="login-right" aria-hidden="true">
-    <div class="overlay-text">
-      <h3 style="margin:0 0 .3rem 0">Track fuel & expenses</h3>
-      <p style="margin:0;color:#f8f8f8">Log fills, calculate cost per litre, mileage and export backups to Excel.</p>
+  <!-- Add Entry -->
+  <div id="add" class="page" style="display:none;">
+    <h3 id="addEntryTitle">Add New Entry</h3>
+    <div id="editBadge" style="display:none;" class="edit-badge">✏️ Editing existing entry</div>
+    <form id="entryForm" class="add-form" onsubmit="event.preventDefault();addEntry();">
+      <div><label>Date</label><input type="date" id="date" required></div>
+      <div><label>Amount (₹)</label><input type="number" id="amount" step="0.01" required></div>
+      <div><label>Litres</label><input type="number" id="litres" step="0.01" required></div>
+      <div><label>Additives (₹)</label><input type="number" id="additives" step="0.01" value="0"></div>
+      <div><label>Start KM</label><input type="number" id="startKm"></div>
+      <div><label>End KM</label><input type="number" id="endKm"></div>
+      <button type="submit">Save Entry</button>
+      <button type="button" id="cancelEditBtn" style="display:none;background:#ccc;">Cancel Edit</button>
+    </form>
+  </div>
+
+  <!-- History -->
+  <div id="history" class="page" style="display:none;">
+    <h3>History</h3>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr><th>Date</th><th>Amount</th><th>Litres</th><th>Additives</th><th>Start KM</th><th>End KM</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="historyTable"></tbody>
+      </table>
+    </div>
+    <div class="history-cards" id="historyCards"></div>
+  </div>
+
+  <!-- Reports -->
+  <div id="reports" class="page" style="display:none;">
+    <h3>Reports</h3>
+    <div class="reports-grid">
+      <div class="report-card"><h4>Trend (Amount & Litres)</h4><canvas id="trendChart"></canvas></div>
+      <div class="report-card"><h4>Mileage Trend</h4><canvas id="mileageChart"></canvas></div>
+      <div class="report-card"><h4>Expense Breakdown</h4><canvas id="breakdownChart"></canvas></div>
+      <div class="report-card"><h4>Summary</h4><ul id="reportSummary"></ul></div>
     </div>
   </div>
 </div>
 
-<!-- ========== APP SHELL (hidden until login) ========== -->
-<div class="app-shell hidden" id="appShell" aria-hidden="true">
-
-  <!-- Sidebar -->
-  <aside id="sidebar" aria-label="Main navigation">
-    <div class="brand" style="align-items:center">
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 0 0 5px var(--brand)"></div>
-        <div style="font-weight:800;margin-left:8px">Petrol Tracker</div>
-      </div>
-    </div>
-
-    <nav style="margin-top:12px">
-      <a href="#" class="nav-link active" data-section="dashboard">Dashboard</a>
-      <a href="#" class="nav-link" data-section="add">Add Entry</a>
-      <a href="#" class="nav-link" data-section="history">History</a>
-      <a href="#" class="nav-link" data-section="reports">Reports</a>
-      <a href="#" class="nav-link" data-section="settings">Settings</a>
-    </nav>
-
-    <div style="margin-top:auto">
-      <button id="logoutBtn" class="btn ghost btn-block" style="margin-bottom:8px">Logout</button>
-      <button id="themeToggle" class="btn btn-block">Dark</button>
-    </div>
-  </aside>
-
-  <!-- Main content -->
-  <main class="main" id="main">
-
-    <!-- Top bar -->
-    <div class="topbar" role="banner">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div style="display:flex;align-items:center;gap:12px">
-          <button id="openSidebarBtn" class="btn ghost" style="display:none">☰</button>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:10px;height:10px;border-radius:50%;background:var(--brand)"></div>
-            <div id="brandUser" style="font-weight:700">Petrol Tracker</div>
-          </div>
-        </div>
-
-        <div style="display:flex;align-items:center;gap:8px">
-          <button id="exportBtn" class="btn ghost">Export</button>
-          <button class="btn" data-section="add" id="quickAdd">+ Add Entry</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="content-wrap" style="padding-top:12px">
-
-      <!-- DASHBOARD -->
-      <section id="dashboard" class="section" style="display:block">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
-          <h2 style="margin:0">Petrol Expense Tracker</h2>
-          <div class="chip" id="entryCount">0 Entries</div>
-        </div>
-
-        <div class="grid cols-3" style="margin-bottom:12px">
-          <div class="stat-card"><div class="muted">Total Paid</div><div id="cardTotalPaid" style="font-weight:800;font-size:1.1rem;margin-top:6px">₹0.00</div></div>
-          <div class="stat-card"><div class="muted">Total Litres</div><div id="cardTotalLitres" style="font-weight:800;font-size:1.1rem;margin-top:6px">0.00 L</div></div>
-          <div class="stat-card"><div class="muted">Avg Mileage</div><div id="cardAvgMileage" style="font-weight:800;font-size:1.1rem;margin-top:6px">0.0 km/L</div></div>
-          <div class="stat-card"><div class="muted">Fuel Additives</div><div id="cardAdditives" style="font-weight:800;font-size:1.1rem;margin-top:6px">₹0.00</div></div>
-          <div class="stat-card"><div class="muted">Avg Rate</div><div id="cardAvgRate" style="font-weight:800;font-size:1.1rem;margin-top:6px">₹0.00</div></div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr;gap:12px">
-          <div class="card" style="min-height:260px"><h6 style="margin:.2rem 0 .8rem 0">Amount & Litres Trend</h6><div class="chart-wrap" style="height:220px"><canvas id="lineTrend"></canvas></div></div>
-
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <div class="card"><h6 style="margin:.2rem 0 .6rem 0">Fuel vs Additives</h6><div style="height:180px"><canvas id="donutSummary"></canvas></div></div>
-            <div class="card"><h6 style="margin:.2rem 0 .6rem 0">Mileage Trend</h6><div style="height:180px"><canvas id="lineMileageDash"></canvas></div></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ADD -->
-      <section id="add" class="section" style="display:none">
-        <h3>Add Entry</h3>
-        <form id="entryForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px">
-          <div><label>Date</label><input id="date" type="date" style="width:100%;padding:8px;border-radius:8px;border:1px solid #eee" required></div>
-          <div><label>Amount Paid (₹)</label><input id="amount" type="number" step="0.01" style="width:100%;padding:8px;border-radius:8px;border:1px solid #eee" required></div>
-          <div><label>Additives (₹)</label><input id="additives" type="number" step="0.01" value="0" style="width:100%;padding:8px;border-radius:8px;border:1px solid #eee"></div>
-          <div><label>Rate / Litre (₹)</label><input id="rate" type="number" step="0.01" style="width:100%;padding:8px;border-radius:8px;border:1px solid #eee" required></div>
-          <div><label>Start KM</label><input id="startKm" type="number" step="0.1" style="width:100%;padding:8px;border-radius:8px;border:1px solid #eee"></div>
-          <div><label>End KM</label><input id="endKm" type="number" step="0.1" style="width:100%;padding:8px;border-radius:8px;border:1px solid #eee"></div>
-
-          <div>
-            <label>Fuel Station</label>
-            <select id="station" style="width:100%;padding:8px;border-radius:8px;border:1px solid #eee">
-              <option>IOCL</option><option>BPCL</option><option>HPCL</option><option>Shell</option><option>Reliance</option><option>Other</option>
-            </select>
-          </div>
-          <div id="stationOtherWrap" style="display:none"><label>Other Station</label><input id="stationOther" style="width:100%;padding:8px;border-radius:8px;border:1px solid #eee"></div>
-
-          <div style="grid-column:1/-1">
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-radius:8px;padding:10px;border:1px solid #eee;background:#fff">
-              <strong>Preview:</strong>
-              <span id="pvLitres" class="chip">Litres: 0.00</span>
-              <span id="pvNet" class="chip">Net: ₹0.00</span>
-              <span id="pvRate" class="chip">Eff Rate: ₹0.00/L</span>
-              <span id="pvMileage" class="chip">Mileage: 0.0 km/L</span>
-            </div>
-          </div>
-
-          <div style="grid-column:1/-1">
-            <button class="btn" type="submit" style="width:140px">Save Entry</button>
-          </div>
-        </form>
-      </section>
-
-      <!-- HISTORY -->
-      <section id="history" class="section" style="display:none">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-          <h3>History</h3>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <input id="search" placeholder="Search..." style="padding:8px;border-radius:8px;border:1px solid #eee">
-            <input id="dateFrom" type="date" style="padding:8px;border-radius:8px;border:1px solid #eee">
-            <input id="dateTo" type="date" style="padding:8px;border-radius:8px;border:1px solid #eee">
-            <select id="stationFilter" style="padding:8px;border-radius:8px;border:1px solid #eee">
-              <option value="">All Stations</option><option>IOCL</option><option>BPCL</option><option>HPCL</option><option>Shell</option><option>Reliance</option>
-            </select>
-            <button id="btnResetFilters" class="btn ghost">Reset</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="table-wrap">
-            <table aria-describedby="history">
-              <thead>
-                <tr>
-                  <th data-sort="date" class="sortable">Date</th>
-                  <th data-sort="station" class="sortable">Station</th>
-                  <th data-sort="amount" class="sortable">Amount</th>
-                  <th data-sort="additives" class="sortable">Additives</th>
-                  <th data-sort="rate" class="sortable">Rate/L</th>
-                  <th data-sort="litres" class="sortable">Litres</th>
-                  <th data-sort="total" class="sortable">Net</th>
-                  <th data-sort="calcRate" class="sortable">Eff Rate</th>
-                  <th data-sort="mileage" class="sortable">Mileage</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="historyBody"></tbody>
-            </table>
-          </div>
-
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-            <div><span id="pageInfo" class="muted"></span></div>
-            <div>
-              <button id="prevPage" class="btn ghost">Prev</button>
-              <button id="nextPage" class="btn ghost">Next</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- REPORTS -->
-      <section id="reports" class="section" style="display:none">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <h3>Reports</h3>
-          <div style="display:flex;gap:8px">
-            <button id="btnExportReport" class="btn ghost">Export Report</button>
-          </div>
-        </div>
-
-        <div id="monthCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:12px"></div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div class="card"><h6>Monthly Amount vs Litres</h6><div style="height:220px"><canvas id="barMonthly"></canvas></div></div>
-          <div class="card"><h6>Monthly Avg Mileage</h6><div style="height:220px"><canvas id="lineMileage"></canvas></div></div>
-          <div class="card"><h6>Station-wise Expenses</h6><div style="height:220px"><canvas id="barStationSpend"></canvas></div></div>
-          <div class="card"><h6>Station-wise Avg Mileage</h6><div style="height:220px"><canvas id="barStationMileage"></canvas></div></div>
-        </div>
-      </section>
-
-      <!-- SETTINGS -->
-      <section id="settings" class="section" style="display:none">
-        <h3>Settings</h3>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
-          <input id="fileImport" type="file" accept=".xlsx,.xls,.csv" style="padding:8px;border-radius:8px;border:1px solid #eee">
-          <button id="btnImport" class="btn ghost">Import</button>
-          <button id="btnExport2" class="btn ghost">Export to Excel</button>
-          <button id="btnClearAll" class="btn" style="background:#ff6b6b;color:#fff">Clear ALL Data</button>
-          <button id="logoutBtn2" class="btn ghost" style="margin-left:auto">Logout</button>
-        </div>
-      </section>
-
-    </div>
-  </main>
-</div>
-
-<!-- Bottom nav -->
-<div class="bottom-nav" id="bottomNav" aria-hidden="true">
-  <a class="bn-link active" data-section="dashboard" href="#">Home</a>
-  <a class="bn-link" data-section="add" href="#">Add</a>
-  <a class="bn-link" data-section="history" href="#">History</a>
-  <a class="bn-link" data-section="reports" href="#">Reports</a>
-  <a class="bn-link" data-section="settings" href="#">Settings</a>
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+  <button onclick="showPage('home')">🏠</button>
+  <button onclick="showPage('add')">➕</button>
+  <button onclick="showPage('history')">📑</button>
+  <button onclick="showPage('reports')">📊</button>
 </div>
 
 <script>
-/* ===================== Storage & Utils ===================== */
-let currentUser = null;
-function usersKey(){ return 'petrol_users'; }
-function userKey(){ return currentUser ? 'petrol_entries_' + currentUser : 'petrol_entries_default'; }
+let entries = JSON.parse(localStorage.getItem("entries")||"[]");
+let editIndex = null;
 
-function loadEntries(){ return JSON.parse(localStorage.getItem(userKey()) || '[]'); }
-function saveEntries(list){ localStorage.setItem(userKey(), JSON.stringify(list)); }
-
-let entries = []; // in-memory
-
-const fmtMoney = n => '₹' + (isFinite(n) ? Number(n).toFixed(2) : '0.00');
-const fmtL = n => (isFinite(n) ? Number(n).toFixed(2) : '0.00') + ' L';
-const fmtNum = n => (isFinite(n) ? Number(n).toFixed(2) : '0.00');
-const asDate = s => s ? new Date(s + 'T00:00:00') : null;
-const keyMonth = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-
-function stationBadge(s){
-  const map = {IOCL:'🟠', BPCL:'🔵', HPCL:'🔷', Shell:'🟡', Reliance:'⚫️'};
-  const icon = map[s] || '⛽';
-  return `<span style="display:inline-flex;align-items:center;gap:6px;padding:.2rem .5rem;border-radius:8px;background:#111;color:#fff;font-size:.85rem">${icon}&nbsp;${s||'—'}</span>`;
-}
-function mileageClass(m){
-  if(m>18) return 'mileage-high';
-  if(m>=15) return 'mileage-mid';
-  return 'mileage-low';
+function showPage(id){
+  document.querySelectorAll(".page").forEach(p=>p.style.display="none");
+  document.getElementById(id).style.display="block";
+  if(id==="history") renderHistory();
+  if(id==="reports") renderReports();
 }
 
-/* ===================== LOGIN ===================== */
-document.getElementById('loginForm').addEventListener('submit', (e)=>{
-  e.preventDefault();
-  const u = document.getElementById('loginUser').value.trim();
-  const p = document.getElementById('loginPass').value;
-  if(!u || !p){ alert('enter username and password'); return; }
-  const users = JSON.parse(localStorage.getItem(usersKey()) || '{}');
-  if(!users[u]){ users[u] = btoa(p); localStorage.setItem(usersKey(), JSON.stringify(users)); }
-  else if(users[u] !== btoa(p)){ alert('wrong password'); return; }
-  currentUser = u;
-  document.getElementById('brandUser').textContent = 'Petrol Tracker — ' + currentUser;
-  entries = loadEntries();
-  enterApp();
+function addEntry(){
+  let e = {
+    date:document.getElementById("date").value,
+    amount:+document.getElementById("amount").value,
+    additives:+document.getElementById("additives").value,
+    litres:+document.getElementById("litres").value,
+    startKm:+document.getElementById("startKm").value || null,
+    endKm:+document.getElementById("endKm").value || null
+  };
+  if(editIndex!==null){
+    entries[editIndex]=e; editIndex=null; alert("Entry Updated!");
+  } else { entries.push(e); alert("Entry Added!"); }
+  localStorage.setItem("entries",JSON.stringify(entries));
+  document.getElementById("entryForm").reset();
+  document.getElementById("addEntryTitle").innerText="Add New Entry";
+  document.getElementById("cancelEditBtn").style.display="none";
+  document.getElementById("editBadge").style.display="none";
+  renderHistory(); showPage("history");
+}
+
+function editEntry(i){
+  let e=entries[i];
+  document.getElementById("date").value=e.date;
+  document.getElementById("amount").value=e.amount;
+  document.getElementById("additives").value=e.additives;
+  document.getElementById("litres").value=e.litres;
+  document.getElementById("startKm").value=e.startKm||"";
+  document.getElementById("endKm").value=e.endKm||"";
+  editIndex=i;
+  document.getElementById("addEntryTitle").innerText="Edit Entry";
+  document.getElementById("cancelEditBtn").style.display="inline-block";
+  document.getElementById("editBadge").style.display="inline-block";
+  renderHistory();
+  showPage("add");
+}
+
+document.getElementById("cancelEditBtn").addEventListener("click",()=>{
+  editIndex=null;
+  document.getElementById("entryForm").reset();
+  document.getElementById("addEntryTitle").innerText="Add New Entry";
+  document.getElementById("cancelEditBtn").style.display="none";
+  document.getElementById("editBadge").style.display="none";
+  showPage("history");
 });
 
-document.getElementById('demoBtn').addEventListener('click', ()=>{
-  document.getElementById('loginUser').value = 'demo';
-  document.getElementById('loginPass').value = 'demo';
-  document.querySelector('#loginForm button').click();
-});
-
-function enterApp(){
-  document.getElementById('loginScreen').classList.add('hidden');
-  document.getElementById('appShell').classList.remove('hidden');
-  document.getElementById('bottomNav').style.display = (window.innerWidth <= 991) ? 'flex' : 'none';
-  applyTheme();
-  renderAll();
-}
-
-/* Logout */
-document.getElementById('logoutBtn').addEventListener('click', logout);
-document.getElementById('logoutBtn2').addEventListener('click', logout);
-function logout(){
-  if(!confirm('Logout?')) return;
-  currentUser = null; entries = [];
-  document.getElementById('appShell').classList.add('hidden');
-  document.getElementById('loginScreen').classList.remove('hidden');
-}
-
-/* ===================== Theme Toggle ===================== */
-const themeBtn = document.getElementById('themeToggle');
-function applyTheme(){
-  const theme = localStorage.getItem('theme') || 'light';
-  if(theme === 'dark'){ document.documentElement.setAttribute('data-bs-theme','dark'); themeBtn.textContent = 'Light'; }
-  else { document.documentElement.removeAttribute('data-bs-theme'); themeBtn.textContent = 'Dark'; }
-}
-themeBtn.addEventListener('click', ()=>{
-  const cur = localStorage.getItem('theme') || 'light';
-  const next = cur === 'light' ? 'dark' : 'light';
-  localStorage.setItem('theme', next); applyTheme(); renderAll();
-});
-
-/* ===================== Navigation (sidebar + bottom) ===================== */
-function showSection(id){
-  document.querySelectorAll('.section').forEach(s=>s.style.display='none');
-  document.getElementById(id).style.display = 'block';
-  document.querySelectorAll('#sidebar .nav-link').forEach(a=>a.classList.remove('active'));
-  const top = Array.from(document.querySelectorAll('#sidebar .nav-link')).find(x=>x.dataset.section===id);
-  if(top) top.classList.add('active');
-  document.querySelectorAll('.bn-link').forEach(b=>b.classList.remove('active'));
-  const bot = Array.from(document.querySelectorAll('.bn-link')).find(x=>x.dataset.section===id);
-  if(bot) bot.classList.add('active');
-
-  if(id==='history') renderHistory();
-  if(id==='reports') renderReports();
-}
-document.querySelectorAll('#sidebar .nav-link, .bn-link').forEach(el=>{
-  el.addEventListener('click', e=>{ e.preventDefault(); showSection(el.dataset.section); if(window.innerWidth<992) document.getElementById('sidebar').classList.remove('mobile-open'); });
-});
-document.getElementById('quickAdd').addEventListener('click', ()=> showSection('add'));
-
-/* Mobile sidebar toggle */
-document.getElementById('openSidebarBtn').addEventListener('click', ()=> document.getElementById('sidebar').classList.toggle('mobile-open'));
-
-/* ===================== Dashboard (charts) ===================== */
-let chartTrend, chartDonut, chartMileage, barMonthly, lineMileageRpt, barStationSpend, barStationMileage;
-
-function renderDashboard(){
-  document.getElementById('entryCount').textContent = `${entries.length} ${entries.length===1?'Entry':'Entries'}`;
-
-  let totalPaid=0,totalLitres=0,totalAdd=0,avgMileage=0;
-  const labels=[], amounts=[], litresArr=[], mileArr=[], cumul=[];
-  let running=0;
-  entries.forEach(e=>{
-    totalPaid += e.amount;
-    totalLitres += e.litres;
-    totalAdd += e.additives;
-    avgMileage += e.mileage||0;
-    labels.push(e.date);
-    amounts.push(Number(e.amount.toFixed(2)));
-    litresArr.push(Number(e.litres.toFixed(2)));
-    mileArr.push(Number((e.mileage||0).toFixed(2)));
-    running += e.amount; cumul.push(Number(running.toFixed(2)));
-  });
-
-  document.getElementById('cardTotalPaid').textContent = fmtMoney(totalPaid);
-  document.getElementById('cardTotalLitres').textContent = fmtL(totalLitres);
-  document.getElementById('cardAdditives').textContent = fmtMoney(totalAdd);
-  document.getElementById('cardAvgMileage').textContent = entries.length ? (avgMileage/entries.length).toFixed(1) + ' km/L' : '0.0 km/L';
-  document.getElementById('cardAvgRate').textContent = totalLitres>0 ? fmtMoney(totalPaid/totalLitres) : '₹0.00';
-
-  const themeDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
-  const textColor = themeDark ? '#ddd' : '#222';
-  const gridColor = themeDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
-
-  // Trend
-  const tctx = document.getElementById('lineTrend'); if(chartTrend) chartTrend.destroy();
-  chartTrend = new Chart(tctx, { type:'line', data:{ labels, datasets:[
-    { label:'Amount (₹)', data:amounts, borderColor:'#f0c400', backgroundColor:'rgba(240,196,0,0.12)', tension:.3, fill:true },
-    { label:'Litres', data:litresArr, borderColor:'#6b7280', backgroundColor:'rgba(0,0,0,0.06)', tension:.3, fill:true }
-  ]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:textColor}}}, scales:{ x:{ ticks:{color:textColor}, grid:{color:gridColor}}, y:{ ticks:{color:textColor}, grid:{color:gridColor}} } } });
-
-  // Donut
-  const fuelCost = Math.max(totalPaid-totalAdd,0);
-  const dctx = document.getElementById('donutSummary'); if(chartDonut) chartDonut.destroy();
-  chartDonut = new Chart(dctx, { type:'doughnut', data:{ labels:['Fuel (net)','Additives'], datasets:[{ data:[fuelCost,totalAdd], backgroundColor:['#ffd644','#eaeaea'] }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom',labels:{color:textColor}}} } });
-
-  // Mileage trend
-  const mctx = document.getElementById('lineMileageDash'); if(chartMileage) chartMileage.destroy();
-  chartMileage = new Chart(mctx, { type:'line', data:{ labels, datasets:[{ label:'Mileage', data: mileArr, borderColor:'#111', backgroundColor:'rgba(0,0,0,0.06)', tension:.3, fill:true }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:textColor}}}, scales:{ x:{ ticks:{color:textColor}, grid:{color:gridColor}}, y:{ ticks:{color:textColor}, grid:{color:gridColor}} } } });
-}
-
-/* ===================== Add / Edit / Delete ===================== */
-['amount','additives','rate','startKm','endKm'].forEach(id=>{
-  const el = document.getElementById(id);
-  if(el) el.addEventListener('input', calcPreview);
-});
-document.getElementById('station').addEventListener('change', (e)=>{ document.getElementById('stationOtherWrap').style.display = e.target.value==='Other' ? 'block' : 'none'; });
-
-function calcPreview(){
-  const A = parseFloat(document.getElementById('amount').value) || 0;
-  const Ad = parseFloat(document.getElementById('additives').value) || 0;
-  const R = parseFloat(document.getElementById('rate').value) || 0;
-  const sKm = parseFloat(document.getElementById('startKm').value);
-  const eKm = parseFloat(document.getElementById('endKm').value);
-  const net = Math.max(A - Ad, 0);
-  const litres = (R>0) ? (net / R) : 0;
-  const calcRate = (litres>0) ? (net / litres) : 0;
-  const mileage = (isFinite(eKm - sKm) && litres>0) ? ((eKm - sKm) / litres) : 0;
-  document.getElementById('pvLitres').textContent = 'Litres: ' + litres.toFixed(2);
-  document.getElementById('pvNet').textContent = 'Net: ' + fmtMoney(net);
-  document.getElementById('pvRate').textContent = 'Effective Rate: ' + fmtMoney(calcRate) + '/L';
-  document.getElementById('pvMileage').textContent = 'Mileage: ' + mileage.toFixed(1) + ' km/L';
-  return { net, litres, mileage };
-}
-
-document.getElementById('entryForm').addEventListener('submit', (e)=>{
-  e.preventDefault();
-  const date = document.getElementById('date').value;
-  const amount = parseFloat(document.getElementById('amount').value) || 0;
-  const additives = parseFloat(document.getElementById('additives').value) || 0;
-  const rate = parseFloat(document.getElementById('rate').value) || 0;
-  const { net, litres, mileage } = calcPreview();
-  let station = document.getElementById('station').value;
-  if(station === 'Other'){ station = (document.getElementById('stationOther').value || 'Other').trim(); }
-  const entry = { id: Date.now(), date, station, amount, additives, rate, litres, total: net, mileage };
-  entries.push(entry);
-  saveEntries(entries);
-  e.target.reset(); document.getElementById('stationOtherWrap').style.display='none';
-  renderAll(); showSection('history');
-});
-
-/* edit / delete */
-function deleteEntry(id){
-  if(!confirm('Delete this entry?')) return;
-  entries = entries.filter(e => e.id !== id);
-  saveEntries(entries); renderAll();
-}
-function editEntry(id){
-  const e = entries.find(x=>x.id===id); if(!e) return;
-  showSection('add');
-  document.getElementById('date').value = e.date;
-  document.getElementById('amount').value = e.amount;
-  document.getElementById('additives').value = e.additives;
-  document.getElementById('rate').value = e.rate;
-  document.getElementById('startKm').value = '';
-  document.getElementById('endKm').value = '';
-  document.getElementById('station').value = ['IOCL','BPCL','HPCL','Shell','Reliance'].includes(e.station) ? e.station : 'Other';
-  document.getElementById('stationOther').value = (document.getElementById('station').value==='Other') ? e.station : '';
-  document.getElementById('stationOtherWrap').style.display = (document.getElementById('station').value==='Other') ? 'block':'none';
-  calcPreview();
-  entries = entries.filter(x=>x.id!==id);
-  saveEntries(entries);
-  renderAll();
-}
-
-/* ===================== History: filters & pagination & sorting ===================== */
-let sortState = {}; let page = 1; const pageSize = 10;
-
-function withinRange(dateStr, fromStr, toStr){
-  if(!fromStr && !toStr) return true;
-  const d = asDate(dateStr); if(!d) return false;
-  const from = asDate(fromStr) || new Date('1900-01-01'); const to = asDate(toStr) || new Date('9999-12-31');
-  return d >= from && d <= to;
-}
-
-function rowHtml(e){
-  const calcRate = e.total>0 && e.litres>0 ? (e.total / e.litres) : 0;
-  const milClass = mileageClass(e.mileage || 0);
-  return `<tr>
-    <td>${e.date}</td>
-    <td>${stationBadge(e.station||'—')}</td>
-    <td>${fmtMoney(e.amount)}</td>
-    <td>${fmtMoney(e.additives)}</td>
-    <td>${fmtMoney(e.rate)}</td>
-    <td>${fmtNum(e.litres)}</td>
-    <td>${fmtMoney(e.total)}</td>
-    <td>${fmtMoney(calcRate)}</td>
-    <td class="${milClass}">${(e.mileage||0).toFixed(1)}</td>
-    <td class="actions"><button class="edit" onclick="editEntry(${e.id})">✏</button><button class="del" onclick="deleteEntry(${e.id})">🗑</button></td>
-  </tr>`;
-}
-
-function filteredSorted(){
-  const q = document.getElementById('search').value.toLowerCase().trim();
-  const from = document.getElementById('dateFrom').value;
-  const to = document.getElementById('dateTo').value;
-  const stationF = document.getElementById('stationFilter').value;
-  let list = entries.filter(e =>
-    JSON.stringify(e).toLowerCase().includes(q) &&
-    withinRange(e.date, from, to) &&
-    (!stationF || (e.station||'').toLowerCase() === stationF.toLowerCase())
-  );
-  const field = Object.keys(sortState)[0];
-  if(field){
-    const asc = sortState[field];
-    list.sort((a,b)=>{
-      let A = (field==='calcRate') ? (a.total/a.litres) : a[field];
-      let B = (field==='calcRate') ? (b.total/b.litres) : b[field];
-      if(A==null) A=0; if(B==null) B=0;
-      return asc ? (A>B?1:-1) : (A<B?1:-1);
-    });
+function deleteEntry(i){
+  if(confirm("Are you sure you want to delete this entry?")){
+    entries.splice(i,1);
+    localStorage.setItem("entries",JSON.stringify(entries));
+    renderHistory();
+    alert("Entry Deleted!");
   }
-  return list;
 }
 
 function renderHistory(){
-  const tb = document.getElementById('historyBody'); tb.innerHTML = '';
-  const list = filteredSorted();
-  const pages = Math.max(1, Math.ceil(list.length / pageSize));
-  if(page > pages) page = pages;
-  const start = (page-1)*pageSize, end = start + pageSize;
-  list.slice(start,end).forEach(e => tb.insertAdjacentHTML('beforeend', rowHtml(e)));
-  document.getElementById('pageInfo').textContent = `Page ${page} / ${pages} — ${list.length} rows`;
-}
+  let tbody=document.getElementById("historyTable");
+  let cards=document.getElementById("historyCards");
+  tbody.innerHTML=""; cards.innerHTML="";
+  entries.forEach((e,i)=>{
+    let tr=document.createElement("tr");
+    if(editIndex===i) tr.classList.add("editing");
+    tr.innerHTML=`<td>${e.date}</td><td>₹${e.amount}</td><td>${e.litres} L</td>
+      <td>₹${e.additives}</td><td>${e.startKm||"-"}</td><td>${e.endKm||"-"}</td>
+      <td><button onclick="editEntry(${i})">Edit</button>
+      <button onclick="deleteEntry(${i})">Delete</button></td>`;
+    tbody.appendChild(tr);
 
-['search','dateFrom','dateTo','stationFilter'].forEach(id=>{
-  const el=document.getElementById(id); if(el) el.addEventListener('input', ()=>{ page=1; renderHistory(); });
-});
-document.getElementById('btnResetFilters').addEventListener('click', ()=>{
-  document.getElementById('search').value=''; document.getElementById('dateFrom').value=''; document.getElementById('dateTo').value=''; document.getElementById('stationFilter').value='';
-  page=1; renderHistory();
-});
-document.querySelectorAll('#history th.sortable').forEach(th=>{
-  th.addEventListener('click', ()=>{ const field = th.dataset.sort; sortState = {[field]: !(sortState[field])}; page=1; renderHistory(); });
-});
-document.getElementById('prevPage').addEventListener('click', ()=>{ if(page>1){ page--; renderHistory(); }});
-document.getElementById('nextPage').addEventListener('click', ()=>{ page++; renderHistory(); });
-
-/* ===================== Reports grouping & render ===================== */
-function groupByMonth(){
-  const map = {};
-  entries.forEach(e=>{
-    if(!e.date) return;
-    const d = asDate(e.date); if(!d) return;
-    const k = keyMonth(d);
-    if(!map[k]) map[k] = { amount:0, litres:0, additives:0, mileageSum:0, trips:0 };
-    map[k].amount += e.amount; map[k].litres += e.litres; map[k].additives += e.additives; map[k].mileageSum += (e.mileage||0); map[k].trips++;
+    let card=document.createElement("div");
+    card.className="history-card";
+    if(editIndex===i) card.classList.add("editing");
+    card.innerHTML=`<p><b>Date:</b> ${e.date}</p><p><b>Amount:</b> ₹${e.amount}</p>
+      <p><b>Litres:</b> ${e.litres} L</p><p><b>Additives:</b> ₹${e.additives}</p>
+      <p><b>Start KM:</b> ${e.startKm||"-"}</p><p><b>End KM:</b> ${e.endKm||"-"}</p>
+      <button onclick="editEntry(${i})">Edit</button>
+      <button onclick="deleteEntry(${i})">Delete</button>`;
+    cards.appendChild(card);
   });
-  return Object.keys(map).sort().map(m=>({ month:m, amount:map[m].amount, litres:map[m].litres, additives:map[m].additives, avgMileage: map[m].trips ? (map[m].mileageSum/map[m].trips) : 0 }));
 }
-function groupByStation(){
-  const map = {};
-  entries.forEach(e=>{
-    const s = e.station || 'Unknown';
-    if(!map[s]) map[s] = { amount:0, litres:0, mileageSum:0, trips:0 };
-    map[s].amount += e.amount; map[s].litres += e.litres; map[s].mileageSum += (e.mileage||0); map[s].trips++;
-  });
-  return Object.keys(map).sort().map(s=>({ station:s, amount:map[s].amount, litres:map[s].litres, avgMileage: map[s].trips ? (map[s].mileageSum/map[s].trips) : 0 }));
-}
-function monthLabel(m){ const [y,mm]=m.split('-'); return new Date(+y,+mm-1,1).toLocaleString(undefined,{month:'short', year:'numeric'}); }
 
 function renderReports(){
-  const monthly = groupByMonth();
-  const labels = monthly.map(d=>monthLabel(d.month));
-  const amt = monthly.map(d=>Number(d.amount.toFixed(2)));
-  const lits = monthly.map(d=>Number(d.litres.toFixed(2)));
-  const avgMil = monthly.map(d=>Number(d.avgMileage.toFixed(2)));
+  let ctx1=document.getElementById("trendChart"), ctx2=document.getElementById("mileageChart"), ctx3=document.getElementById("breakdownChart");
+  if(!entries.length) return;
+  let labels=entries.map(e=>e.date);
+  let amounts=entries.map(e=>e.amount);
+  let litres=entries.map(e=>e.litres);
+  let mileage=entries.map(e=>(e.endKm&&e.startKm)?((e.endKm-e.startKm)/e.litres).toFixed(1):null);
 
-  // month cards
-  const wrap = document.getElementById('monthCards'); wrap.innerHTML = '';
-  monthly.forEach(d=>{
-    const avgRate = d.litres>0 ? d.amount/d.litres : 0;
-    wrap.insertAdjacentHTML('beforeend', `<div style="background:#fff;padding:12px;border-radius:10px;border:1px solid #eee">
-      <div class="chip">${monthLabel(d.month)}</div>
-      <div style="margin-top:8px;color:var(--muted);font-size:.85rem">Paid</div><div style="font-weight:800">${fmtMoney(d.amount)}</div>
-      <div style="margin-top:8px;color:var(--muted);font-size:.85rem">Litres</div><div style="font-weight:800">${fmtNum(d.litres)} L</div>
-      <div style="margin-top:8px;color:var(--muted);font-size:.85rem">Avg Mileage</div><div style="font-weight:800">${d.avgMileage.toFixed(1)} km/L</div>
-      <div style="margin-top:8px;color:var(--muted);font-size:.85rem">Avg Rate</div><div style="font-weight:800">${fmtMoney(avgRate)}</div>
-    </div>`);
-  });
+  new Chart(ctx1,{type:'line',data:{labels,datasets:[
+    {label:"Amount",data:amounts,borderColor:"red"},
+    {label:"Litres",data:litres,borderColor:"blue"}
+  ]}});
+  new Chart(ctx2,{type:'line',data:{labels,datasets:[
+    {label:"Mileage (KM/L)",data:mileage,borderColor:"green"}
+  ]}});
+  new Chart(ctx3,{type:'pie',data:{labels:["Fuel","Additives"],datasets:[{
+    data:[amounts.reduce((a,b)=>a+b,0), entries.reduce((a,b)=>a+b.additives,0)],
+    backgroundColor:["#ffcc00","#999"]
+  }]}});
 
-  // charts
-  const bctx = document.getElementById('barMonthly'); if(window.barMonthly) window.barMonthly.destroy();
-  window.barMonthly = new Chart(bctx, { type:'bar', data:{ labels, datasets:[{label:'Amount (₹)',data:amt,backgroundColor:'rgba(240,196,0,.85)'},{label:'Litres',data:lits,backgroundColor:'rgba(0,0,0,.12)'}] }, options:{responsive:true,maintainAspectRatio:false} });
-
-  const lctx = document.getElementById('lineMileage'); if(window.lineMileageRpt) window.lineMileageRpt.destroy();
-  window.lineMileageRpt = new Chart(lctx, { type:'line', data:{ labels, datasets:[{label:'Avg Mileage',data:avgMil,borderColor:'#111',backgroundColor:'rgba(0,0,0,.08)',fill:true}] }, options:{responsive:true,maintainAspectRatio:false} });
-
-  const byS = groupByStation(); const sLabels = byS.map(x=>x.station); const sAmt = byS.map(x=>Number(x.amount.toFixed(2))); const sMil = byS.map(x=>Number(x.avgMileage.toFixed(2)));
-  const s1 = document.getElementById('barStationSpend'); if(window.barStationSpend) window.barStationSpend.destroy();
-  window.barStationSpend = new Chart(s1,{type:'bar',data:{labels:sLabels,datasets:[{label:'Amount (₹)',data:sAmt,backgroundColor:'rgba(240,196,0,.85)'}]},options:{responsive:true,maintainAspectRatio:false}});
-  const s2 = document.getElementById('barStationMileage'); if(window.barStationMileage) window.barStationMileage.destroy();
-  window.barStationMileage = new Chart(s2,{type:'bar',data:{labels:sLabels,datasets:[{label:'Avg Mileage',data:sMil,backgroundColor:'rgba(0,0,0,.12)'}]},options:{responsive:true,maintainAspectRatio:false}});
+  let summary=document.getElementById("reportSummary");
+  summary.innerHTML="";
+  summary.innerHTML+=`<li>Total Spent: ₹${amounts.reduce((a,b)=>a+b,0)}</li>`;
+  summary.innerHTML+=`<li>Total Litres: ${litres.reduce((a,b)=>a+b,0)} L</li>`;
+  let avgRate=(amounts.reduce((a,b)=>a+b,0)/litres.reduce((a,b)=>a+b,1)).toFixed(2);
+  summary.innerHTML+=`<li>Avg Rate: ₹${avgRate}/L</li>`;
 }
-
-/* ===================== Export / Import / Clear ===================== */
-function exportExcel(rows){
-  const list = (rows && rows.length ? rows : entries).map(e=>({
-    Date:e.date, Station:e.station||'', Amount_Paid:e.amount, Additives:e.additives, Rate_Per_Litre:e.rate, Litres:e.litres, Net:e.total, Effective_Rate:e.litres>0 ? (e.total/e.litres) : 0, Mileage:e.mileage
-  }));
-  if(!list.length){ alert('No data to export.'); return; }
-  const ws = XLSX.utils.json_to_sheet(list); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Petrol'); XLSX.writeFile(wb, 'petrol-expense.xlsx');
-}
-document.getElementById('exportBtn').addEventListener('click', ()=>exportExcel());
-document.getElementById('btnExport2').addEventListener('click', ()=>exportExcel());
-document.getElementById('btnExportReport').addEventListener('click', ()=>{
-  const monthly = groupByMonth().map(d=>({ Month:d.month, Amount:d.amount, Litres:d.litres, Additives:d.additives, Avg_Mileage:d.avgMileage, Avg_Rate:d.litres>0 ? d.amount/d.litres : 0 }));
-  if(!monthly.length){ alert('No report data'); return; }
-  const ws = XLSX.utils.json_to_sheet(monthly); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Monthly Report'); XLSX.writeFile(wb, 'petrol-monthly-report.xlsx');
-});
-
-document.getElementById('btnClearAll').addEventListener('click', ()=>{
-  if(!confirm('This will erase ALL entries for this user. Continue?')) return;
-  localStorage.removeItem(userKey()); entries=[]; renderAll(); alert('Data cleared.');
-});
-
-document.getElementById('btnImport').addEventListener('click', ()=>{
-  const file = document.getElementById('fileImport').files[0];
-  if(!file){ alert('Choose a CSV/XLSX file first.'); return; }
-  const reader = new FileReader();
-  reader.onload = (e)=> {
-    const data = new Uint8Array(e.target.result);
-    let wb;
-    try{ wb = XLSX.read(data, {type:'array'}); } catch { const text = new TextDecoder().decode(data); wb = XLSX.read(text, {type:'string'}); }
-    const first = wb.SheetNames[0]; const ws = wb.Sheets[first]; const json = XLSX.utils.sheet_to_json(ws);
-    json.forEach(r=>{
-      const date = (r.Date || r.date || '').toString().slice(0,10);
-      const amount = parseFloat(r.Amount_Paid || r.Amount || r.amount || 0) || 0;
-      const additives = parseFloat(r.Additives || 0) || 0;
-      const rate = parseFloat(r.Rate_Per_Litre || r.Rate || 0) || 0;
-      const litres = parseFloat(r.Litres || 0) || 0;
-      const total = parseFloat(r.Net || r.Total || 0) || (amount - additives);
-      const mileage = parseFloat(r.Mileage || 0) || 0;
-      const station = (r.Station || r.station || 'Unknown').toString();
-      entries.push({ id: Date.now() + Math.floor(Math.random()*100000), date, station, amount, additives, rate, litres, total, mileage });
-    });
-    saveEntries(entries); renderAll(); showSection('history'); alert('Import completed.');
-  };
-  reader.readAsArrayBuffer(file);
-});
-
-/* ===================== Render All & helpers ===================== */
-function renderHistoryIfVisible(){ const h = document.getElementById('history'); if(h.style.display!=='none') renderHistory(); }
-function renderAll(){ renderDashboard(); renderHistory(); renderReports(); }
-
-function initFromStorage(){
-  // no automatic login - user must login
-}
-
-/* Expose edit/delete to global for inline onclick */
-window.editEntry = editEntry; window.deleteEntry = deleteEntry; window.exportExcel = exportExcel;
-
-/* Boot helpers: make log-in persistent for dev if desired (not auto) */
-// Uncomment to auto-login demo user (dev only)
-/*
-currentUser = 'demo';
-entries = loadEntries();
-enterApp();
-*/
-
-/* Prevent horizontal overflow caused by large tables or charts on small screens */
-window.addEventListener('resize', ()=>{ document.getElementById('bottomNav').style.display = (window.innerWidth <= 991) ? 'flex' : 'none'; });
-
 </script>
 </body>
 </html>
