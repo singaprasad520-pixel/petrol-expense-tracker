@@ -1,206 +1,263 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Petrol Tracker Dashboard</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    :root {
-      --yellow: #FFD600;
-      --black: #222;
-      --gray-bg: #f4f5f7;
-      --white: #fff;
-    }
-    body {
-      margin: 0;
-      background: var(--gray-bg);
-      font-family: 'Montserrat', Segoe UI, Arial, sans-serif;
-      color: var(--black);
-    }
-    .navbar {
-      display: flex;
-      align-items: center;
-      background: var(--white);
-      padding: 0 24px;
-      box-shadow: 0 2px 8px #dedede40;
-      height: 60px;
-    }
-    .nav-logo {
-      font-weight: 700;
-      color: var(--yellow);
-      font-size: 2.1rem;
-      margin-right: 32px;
-      letter-spacing: 1px;
-    }
-    .nav-menu {
-      display: flex;
-      gap: 28px;
-      font-size: 1rem;
-      font-weight: 600;
-    }
-    .nav-menu span {
-      cursor: pointer;
-      transition: color 0.12s, border-bottom 0.12s;
-    }
-    .nav-menu .active {
-      color: var(--yellow);
-      border-bottom: 2.5px solid var(--yellow);
-    }
-    .nav-end {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .nav-profile {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: #FFD60022;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      color: var(--yellow);
-      font-size: 1.2em;
-    }
-    .dashboard-container { display: block; }
-    /* DASHBOARD GRID */
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Petrol Tracker Dashboard</title>
+<link href="https://fonts.googleapis.com/css?family=Montserrat:400,600&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root {
+    --yellow: #FFD600;
+    --black: #222;
+    --gray-bg: #f4f5f7;
+    --white: #fff;
+  }
+  body {
+    margin: 0;
+    background: var(--gray-bg);
+    font-family: 'Montserrat', Segoe UI, Arial, sans-serif;
+    color: var(--black);
+  }
+  .navbar {
+    display: flex;
+    align-items: center;
+    background: var(--white);
+    padding: 0 16px;
+    box-shadow: 0 2px 8px #dedede40;
+    height: 56px;
+  }
+  .nav-logo {
+    font-weight: 700;
+    color: var(--yellow);
+    font-size: 1.8rem;
+    margin-right: 16px;
+  }
+  .nav-menu {
+    display: flex;
+    gap: 16px;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .nav-menu span {
+    cursor: pointer;
+    transition: color 0.12s, border-bottom 0.12s;
+  }
+  .nav-menu .active {
+    color: var(--yellow);
+    border-bottom: 2.5px solid var(--yellow);
+  }
+  .nav-end {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .nav-profile {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #FFD60022;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--yellow);
+    font-size: 1.1em;
+  }
+  .dashboard-container {
+    display: block;
+    max-width: 960px;
+    margin: 20px auto;
+    padding: 0 12px;
+  }
+  .dash-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .main-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .card {
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px #e9ede940;
+    padding: 16px;
+    min-height: 110px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .card-title {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--black);
+  }
+  .big-number {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: var(--yellow);
+  }
+  .dash-charts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .side-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .side-box {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 14px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95em;
+    box-shadow: 0 2px 8px #e9ede940;
+  }
+  .side-box-icon {
+    background: #FFD60055;
+    color: var(--yellow);
+    font-size: 1.4em;
+    border-radius: 4px;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* Form styles */
+  .expenses-panel {
+    display: none;
+    max-width: 960px;
+    margin: 28px auto;
+    padding: 0 12px;
+  }
+  .expenses-panel.show {
+    display: block;
+  }
+  .expenses-panel h2 {
+    font-size: 1.2em;
+    color: var(--black);
+    margin-bottom: 12px;
+  }
+  form .exp-form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 12px 0;
+  }
+  form .exp-form-row input,
+  form .exp-form-row button {
+    padding: 10px;
+    border: 1px solid #FFD60055;
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 1rem;
+    min-width: 100px;
+    box-sizing: border-box;
+  }
+  form .exp-form-row input[readonly],
+  form .exp-form-row input[disabled] {
+    background-color: #f0f0f0;
+  }
+  form .exp-form-row button {
+    background: var(--yellow);
+    color: var(--black);
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    min-width: 100px;
+    transition: background 0.14s;
+  }
+  form .exp-form-row button:hover {
+    background: #ffe84b;
+  }
+  .exp-table-container {
+    margin-top: 18px;
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+    background: var(--white);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px #e9ede940;
+  }
+  th,
+  td {
+    padding: 6px 4px;
+    text-align: center;
+    border-bottom: 1px solid #f3e294;
+  }
+  th {
+    background: #FFF9E2;
+    color: var(--black);
+  }
+  .act-btn {
+    background: var(--yellow);
+    color: var(--black);
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    padding: 4px 10px;
+    cursor: pointer;
+  }
+  .act-btn.delete {
+    background: #ef476f;
+    color: #fff;
+  }
+  .act-btn:hover {
+    opacity: 0.85;
+  }
+  /* Responsive */
+  @media (max-width: 700px) {
     .dash-grid {
-      max-width: 1190px;
-      margin: 36px auto;
-      padding: 0 16px;
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 28px;
+      grid-template-columns: 1fr;
     }
     .main-cards {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      margin-bottom: 14px;
-    }
-    .card {
-      background: var(--white);
-      border-radius: 14px;
-      box-shadow: 0 2px 8px #e9ede940;
-      padding: 20px 14px 20px 20px;
-      min-height: 130px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .card-title {
-      font-size: 1.13em;
-      font-weight: 600;
-      margin-bottom: 7px;
-      color: #222;
-    }
-    .big-number {
-      font-size: 2.07em;
-      font-weight: 700;
-      color: var(--yellow);
+      grid-template-columns: 1fr;
     }
     .dash-charts {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 23px;
-      margin-top: 18px;
+      grid-template-columns: 1fr;
     }
     .side-cards {
-      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+    }
+    form .exp-form-row input,
+    form .exp-form-row button {
+      flex: 1 1 45%;
+      min-width: unset;
+    }
+  }
+  @media (max-width: 400px) {
+    .side-cards {
       flex-direction: column;
-      gap: 24px;
+      gap: 12px;
     }
-    .side-box {
-      background: var(--white);
-      border-radius: 14px;
-      padding: 18px 15px;
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      font-size: 1em;
-      box-shadow: 0 2px 8px #e9ede940;
+    .exp-table-container {
+      font-size: 0.85em;
     }
-    .side-box-icon {
-      background: #FFD60055;
-      color: var(--yellow);
-      font-size: 1.6em;
-      border-radius: 8px;
-      width: 38px;
-      height: 38px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    th,
+    td {
+      padding: 4px 2px;
     }
-    /* CRUD SECTION STYLE */
-    .expenses-panel { display: none; max-width: 960px; margin: 38px auto; padding: 0 8px;}
-    .expenses-panel.show { display: block;}
-    .expenses-panel h2 { font-size: 1.2em; color: var(--black); }
-    .exp-form-row {
-      display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0;
-    }
-    .exp-form-row input, .exp-form-row button {
-      padding: 10px;
-      border: 1px solid #FFD60055;
-      border-radius: 7px;
-      font-family: inherit;
-      font-size: 1rem;
-      min-width: 110px;
-    }
-    .exp-form-row button {
-      background: var(--yellow);
-      color: var(--black);
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-      min-width: 110px;
-      transition: background 0.14s;
-    }
-    .exp-form-row button:hover { background: #ffe84b; }
-    .exp-table-container { margin-top: 21px; overflow-x: auto; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.96em;
-      background: #fff;
-      border-radius: 9px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px #e9ede940;
-    }
-    th, td {
-      padding: 8px 4px;
-      text-align: center;
-      border-bottom: 1px solid #f3e294;
-    }
-    th { background: #FFF9E2; color: #222;}
-    .act-btn {
-      background: var(--yellow);
-      color: var(--black);
-      font-weight: bold;
-      border: none;
-      border-radius: 5px;
-      padding: 4px 10px;
-      cursor: pointer;
-    }
-    .act-btn.delete { background: #ef476f; color: #fff;}
-    .act-btn:hover { opacity: 0.83;}
-    @media (max-width: 1024px) {
-      .dash-charts { grid-template-columns: 1fr; }
-      .dash-grid { grid-template-columns: 1fr;}
-    }
-    @media (max-width: 600px) {
-      .dash-grid { padding: 0 2px;}
-      .main-cards { gap: 9px;}
-      .side-cards { flex-direction: column; gap: 9px;}
-      .exp-form-row input, .exp-form-row button { min-width: 90px; font-size:0.93em;}
-      th, td { font-size: 0.90em;}
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <!-- TOP NAV -->
+  <!-- NAVIGATION -->
   <div class="navbar">
     <span class="nav-logo">&#9679;&#9679;</span>
     <div class="nav-menu">
@@ -212,6 +269,7 @@
       <span class="nav-profile">P</span>
     </div>
   </div>
+
   <!-- DASHBOARD -->
   <div class="dashboard-container" id="dashboard-container">
     <div class="dash-grid">
@@ -253,39 +311,36 @@
       </div>
     </div>
   </div>
-  <!-- CRUD PANEL -->
+
+  <!-- EXPENSES PANEL -->
   <div class="expenses-panel" id="expenses-panel">
     <h2>Add/Manage Petrol Expenses</h2>
     <form id="expense-form" autocomplete="off">
       <div class="exp-form-row">
-        <input type="date" id="date" required>
-        <input type="number" id="amount" placeholder="Amount Paid (₹)" required>
-        <input type="number" id="rate" placeholder="Rate/Litre (₹)" step="0.01" required>
-        <input type="number" id="litres" placeholder="Litres" step="0.01" required>
-        <input type="number" id="total" placeholder="Total (₹)" step="0.01" required>
-        <input type="number" id="rate2" placeholder="Rate2 (₹)" step="0.01">
-        <input type="number" id="fuel" placeholder="Additives" min="0">
-        <input type="number" id="startKM" placeholder="Start KM" step="0.1">
-        <input type="number" id="endKM" placeholder="End KM" step="0.1">
-        <input type="number" id="mileage" placeholder="Mileage" step="0.1">
+        <input type="date" id="date" required />
+        <input type="number" id="amount" placeholder="Amount Paid (₹)" step="0.01" min="0" required />
+        <input type="number" id="rate" placeholder="Rate/Litre (₹)" step="0.01" min="0" required />
+        <input type="number" id="litres" placeholder="Litres" step="0.01" readonly />
+        <input type="number" id="totalPetrolPrice" placeholder="Total Petrol Price (₹)" step="0.01" disabled />
+        <input type="number" id="fuel" placeholder="Additives" step="0.01" min="0" />
+        <input type="number" id="startKM" placeholder="Start KM" step="0.1" min="0" />
+        <input type="number" id="endKM" placeholder="End KM" step="0.1" min="0" />
         <button type="submit" id="add-btn">Add</button>
         <button type="button" id="update-btn" style="display:none;">Update</button>
       </div>
     </form>
     <div class="exp-table-container">
-      <table id="expense-table">
+      <table id="expense-table" aria-label="Petrol expenses table">
         <thead>
           <tr>
             <th>Date</th>
             <th>Amount</th>
             <th>Rate/Ltr</th>
             <th>Litres</th>
-            <th>Total</th>
-            <th>Rate2</th>
+            <th>Total Petrol Price</th>
             <th>Additives</th>
             <th>Start</th>
             <th>End</th>
-            <th>Mileage</th>
             <th>Edit</th>
             <th>Del</th>
           </tr>
@@ -294,192 +349,224 @@
       </table>
     </div>
   </div>
-  <script>
-    // Tab navigation
-    const tabDashboard = document.getElementById('tab-dashboard');
-    const tabExpenses = document.getElementById('tab-expenses');
-    const dashContainer = document.getElementById('dashboard-container');
-    const expPanel = document.getElementById('expenses-panel');
-    tabDashboard.onclick = () => {
-      tabDashboard.classList.add('active');
-      tabExpenses.classList.remove('active');
-      dashContainer.style.display = 'block';
-      expPanel.style.display = 'none';
-    };
-    tabExpenses.onclick = () => {
-      tabExpenses.classList.add('active');
-      tabDashboard.classList.remove('active');
-      dashContainer.style.display = 'none';
-      expPanel.style.display = 'block';
-    };
-    // Expense CRUD logic + dashboard stat update
-    let expenses = JSON.parse(localStorage.getItem('petrolExpenses')) || [];
-    let editIndex = -1;
-    const expenseForm = document.getElementById('expense-form');
-    const addBtn = document.getElementById('add-btn');
-    const updateBtn = document.getElementById('update-btn');
-    // Inputs
-    const date = document.getElementById('date');
-    const amount = document.getElementById('amount');
-    const rate = document.getElementById('rate');
-    const litres = document.getElementById('litres');
-    const total = document.getElementById('total');
-    const rate2 = document.getElementById('rate2');
-    const fuel = document.getElementById('fuel');
-    const startKM = document.getElementById('startKM');
-    const endKM = document.getElementById('endKM');
-    const mileage = document.getElementById('mileage');
-    // Dashboard stat elements
-    const dashTotal = document.getElementById('dash-total');
-    const dashMileage = document.getElementById('dash-mileage');
-    const dashFuelups = document.getElementById('dash-fuelups');
-    const dashMaxAmount = document.getElementById('dash-maxamount');
-    const dashMaxDist = document.getElementById('dash-maxdist');
-    // Chart.js charts
-    let lineChart, pieChart;
-    function updateDashboard() {
-      let total = 0, msum = 0, maxAmount = 0, maxDist = 0, mileageCount = 0;
-      expenses.forEach(e => {
-        total += Number(e.amount);
-        if(+e.mileage) { msum += Number(e.mileage); mileageCount++; }
-        if(+e.amount > maxAmount) maxAmount=+e.amount;
-        let dist = Number(e.endKM)-Number(e.startKM);
-        if(dist > maxDist) maxDist = dist;
-      });
-      dashTotal.textContent = `₹ ${total.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-      dashMileage.textContent = mileageCount ? (msum/mileageCount).toFixed(1)+' km/L' : '0 km/L';
-      dashFuelups.innerHTML = `<b>${expenses.length}</b> Fuel ups`;
-      dashMaxAmount.innerHTML = `<b>₹ ${maxAmount.toLocaleString()}</b> Max per fuel`;
-      dashMaxDist.innerHTML = `<b>${maxDist} km</b> Longest drive`;
 
-      // Chart: Monthly Spend
-      let byMonth = {};
-      let months = [], amounts = [];
-      for (let e of expenses) {
-        if (!e.date) continue;
-        let ym = e.date.slice(0,7);
-        if (!byMonth[ym]) byMonth[ym]=0;
-        byMonth[ym] += Number(e.amount);
-      }
-      months = Object.keys(byMonth).sort();
-      amounts = months.map(m => byMonth[m]);
-      if(lineChart) lineChart.destroy();
-      lineChart = new Chart(document.getElementById('lineChart').getContext('2d'), {
-        type: 'line',
-        data: {
-          labels: months.length ? months : ['No Data'],
-          datasets: [{
-            label: 'Petrol Spend',
-            data: months.length ? amounts : [0],
-            borderColor: '#FFD600',
-            backgroundColor: 'rgba(255,214,0,0.09)',
-            borderWidth: 3,
-            pointRadius: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: {display:false}, tooltip: {enabled:true}},
-          scales: { y: {beginAtZero: true, grid:{color:'#eee'}}, x:{grid:{display:false}} }
-        }
-      });
-      // Pie: Fuel companies add demo logic -- you can customize for your data!
-      let brands = {};
-      for(let e of expenses)
-        brands[e.rate2||'Other'] = (brands[e.rate2||'Other']||0)+1;
-      let pieLabels = Object.keys(brands);
-      let pieData = pieLabels.map(l=>brands[l]);
-      let pieColors = pieLabels.map((_,i)=> ['#FFD600','#222','#AAA','#888','#333'][i%5]);
-      if (pieChart) pieChart.destroy();
-      pieChart = new Chart(document.getElementById('pieChart').getContext('2d'), {
-        type: 'doughnut',
-        data: {
-          labels: pieLabels.length?pieLabels:['N/A'],
-          datasets: [{
-            data: pieData.length?pieData:[1],
-            backgroundColor: pieColors.length?pieColors:['#e0e0e0'],
-            borderWidth:1
-          }]
-        },
-        options: {responsive:true, plugins:{legend:{position:'bottom'}}}
-      });
+<script>
+  // Tab navigation
+  const tabDashboard = document.getElementById('tab-dashboard');
+  const tabExpenses = document.getElementById('tab-expenses');
+  const dashContainer = document.getElementById('dashboard-container');
+  const expPanel = document.getElementById('expenses-panel');
+
+  tabDashboard.onclick = () => {
+    tabDashboard.classList.add('active');
+    tabExpenses.classList.remove('active');
+    dashContainer.style.display = 'block';
+    expPanel.style.display = 'none';
+  };
+  tabExpenses.onclick = () => {
+    tabExpenses.classList.add('active');
+    tabDashboard.classList.remove('active');
+    dashContainer.style.display = 'none';
+    expPanel.style.display = 'block';
+  };
+
+  // Expense CRUD logic + dashboard stat update
+  let expenses = JSON.parse(localStorage.getItem('petrolExpenses')) || [];
+  let editIndex = -1;
+  const expenseForm = document.getElementById('expense-form');
+  const addBtn = document.getElementById('add-btn');
+  const updateBtn = document.getElementById('update-btn');
+
+  // Inputs
+  const date = document.getElementById('date');
+  const amount = document.getElementById('amount');
+  const rate = document.getElementById('rate');
+  const litres = document.getElementById('litres');
+  const totalPetrolPrice = document.getElementById('totalPetrolPrice');
+  const fuel = document.getElementById('fuel');
+  const startKM = document.getElementById('startKM');
+  const endKM = document.getElementById('endKM');
+
+  // Dashboard elements
+  const dashTotal = document.getElementById('dash-total');
+  const dashFuelups = document.getElementById('dash-fuelups');
+  const dashMaxAmount = document.getElementById('dash-maxamount');
+  const dashMaxDist = document.getElementById('dash-maxdist');
+
+  // Chart.js instances
+  let lineChart, pieChart;
+
+  // Auto-calc totalPetrolPrice & litres on input change
+  function calculateDerivedValues() {
+    const amountVal = Number(amount.value) || 0;
+    const fuelVal = Number(fuel.value) || 0;
+    const rateVal = Number(rate.value) || 0;
+
+    const calcTotalPetrolPrice = amountVal - fuelVal;
+    totalPetrolPrice.value = calcTotalPetrolPrice > 0 ? calcTotalPetrolPrice.toFixed(2) : '';
+
+    if (rateVal > 0 && calcTotalPetrolPrice > 0) {
+      litres.value = (calcTotalPetrolPrice / rateVal).toFixed(2);
+    } else {
+      litres.value = '';
     }
-    function renderTable() {
-      const tbody = document.querySelector('#expense-table tbody');
-      tbody.innerHTML = '';
-      expenses.forEach((exp, i) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${exp.date||''}</td>
-          <td>${exp.amount||''}</td>
-          <td>${exp.rate||''}</td>
-          <td>${exp.litres||''}</td>
-          <td>${exp.total||''}</td>
-          <td>${exp.rate2||''}</td>
-          <td>${exp.fuel||''}</td>
-          <td>${exp.startKM||''}</td>
-          <td>${exp.endKM||''}</td>
-          <td>${exp.mileage||''}</td>
-          <td><button class="act-btn" onclick="editExpense(${i})">Edit</button></td>
-          <td><button class="act-btn delete" onclick="deleteExpense(${i})">Del</button></td>
-        `;
-        tbody.appendChild(tr);
-      });
-      localStorage.setItem('petrolExpenses', JSON.stringify(expenses));
-      updateDashboard();
-    }
-    expenseForm.addEventListener('submit', function(e){
-      e.preventDefault();
-      const exp = {
-        date: date.value,
-        amount: amount.value,
-        rate: rate.value,
-        litres: litres.value,
-        total: total.value,
-        rate2: rate2.value,
-        fuel: fuel.value,
-        startKM: startKM.value,
-        endKM: endKM.value,
-        mileage: mileage.value
-      };
-      if(editIndex === -1){
-        expenses.push(exp);
-      } else {
-        expenses[editIndex] = exp;
-        editIndex = -1;
-        addBtn.style.display = 'inline';
-        updateBtn.style.display = 'none';
-      }
-      renderTable();
-      expenseForm.reset();
+  }
+
+  amount.addEventListener('input', calculateDerivedValues);
+  fuel.addEventListener('input', calculateDerivedValues);
+  rate.addEventListener('input', calculateDerivedValues);
+
+  function updateDashboard() {
+    let totalSpent = 0, maxAmount = 0, maxDist = 0;
+    expenses.forEach(e => {
+      totalSpent += Number(e.amount);
+      if (+e.amount > maxAmount) maxAmount = +e.amount;
+      let dist = Number(e.endKM) - Number(e.startKM);
+      if (dist > maxDist) maxDist = dist;
     });
-    window.editExpense = function(index){
-      let exp = expenses[index];
-      date.value = exp.date||'';
-      amount.value = exp.amount||'';
-      rate.value = exp.rate||'';
-      litres.value = exp.litres||'';
-      total.value = exp.total||'';
-      rate2.value = exp.rate2||'';
-      fuel.value = exp.fuel||'';
-      startKM.value = exp.startKM||'';
-      endKM.value = exp.endKM||'';
-      mileage.value = exp.mileage||'';
-      editIndex = index;
-      addBtn.style.display = 'none';
-      updateBtn.style.display = 'inline';
+    dashTotal.textContent = `₹ ${totalSpent.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+    dashFuelups.innerHTML = `<b>${expenses.length}</b> Fuel ups`;
+    dashMaxAmount.innerHTML = `<b>₹ ${maxAmount.toLocaleString()}</b> Max per fuel`;
+    dashMaxDist.innerHTML = `<b>${maxDist} km</b> Longest drive`;
+
+    // Monthly spend chart data
+    let byMonth = {};
+    for (let e of expenses) {
+      if (!e.date) continue;
+      let ym = e.date.slice(0, 7);
+      if (!byMonth[ym]) byMonth[ym] = 0;
+      byMonth[ym] += Number(e.amount);
     }
-    updateBtn.addEventListener('click', function(){
-      expenseForm.requestSubmit();
-    });
-    window.deleteExpense = function(index){
-      if(confirm("Delete this entry?")) {
-        expenses.splice(index, 1);
-        renderTable();
+    const months = Object.keys(byMonth).sort();
+    const amounts = months.map(m => byMonth[m]);
+
+    if (lineChart) lineChart.destroy();
+    lineChart = new Chart(document.getElementById('lineChart').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: months.length ? months : ['No Data'],
+        datasets: [{
+          label: 'Petrol Spend',
+          data: months.length ? amounts : [0],
+          borderColor: '#FFD600',
+          backgroundColor: 'rgba(255,214,0,0.09)',
+          borderWidth: 3,
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false }, tooltip: { enabled: true } },
+        scales: { y: { beginAtZero: true, grid: { color: '#eee' } }, x: { grid: { display: false } } }
       }
+    });
+
+    // Pie chart with totalPetrolPrice labels
+    let brands = {};
+    for (let e of expenses) {
+      let label = e.totalPetrolPrice || 'Other';
+      brands[label] = (brands[label] || 0) + 1;
     }
-    // Initial table and dashboard
+    const pieLabels = Object.keys(brands);
+    const pieData = pieLabels.map(l => brands[l]);
+    const pieColors = pieLabels.map((_, i) => ['#FFD600', '#222', '#AAA', '#888', '#333'][i % 5]);
+
+    if (pieChart) pieChart.destroy();
+    pieChart = new Chart(document.getElementById('pieChart').getContext('2d'), {
+      type: 'doughnut',
+      data: {
+        labels: pieLabels.length ? pieLabels : ['N/A'],
+        datasets: [{
+          data: pieData.length ? pieData : [1],
+          backgroundColor: pieColors.length ? pieColors : ['#e0e0e0'],
+          borderWidth: 1
+        }]
+      },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+  }
+
+  function renderTable() {
+    const tbody = document.querySelector('#expense-table tbody');
+    tbody.innerHTML = '';
+    expenses.forEach((exp, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${exp.date || ''}</td>
+        <td>${exp.amount || ''}</td>
+        <td>${exp.rate || ''}</td>
+        <td>${exp.litres || ''}</td>
+        <td>${exp.totalPetrolPrice || ''}</td>
+        <td>${exp.fuel || ''}</td>
+        <td>${exp.startKM || ''}</td>
+        <td>${exp.endKM || ''}</td>
+        <td><button class="act-btn" onclick="editExpense(${i})">Edit</button></td>
+        <td><button class="act-btn delete" onclick="deleteExpense(${i})">Del</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    localStorage.setItem('petrolExpenses', JSON.stringify(expenses));
+    updateDashboard();
+  }
+
+  expenseForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    let fuelValue = Number(fuel.value) || 0;
+    let amountValue = Number(amount.value) || 0;
+    let calculatedTotalPetrolPrice = amountValue - fuelValue;
+
+    const exp = {
+      date: date.value,
+      amount: amount.value,
+      rate: rate.value,
+      litres: litres.value,
+      totalPetrolPrice: calculatedTotalPetrolPrice > 0 ? calculatedTotalPetrolPrice.toFixed(2) : '0.00',
+      fuel: fuel.value,
+      startKM: startKM.value,
+      endKM: endKM.value
+    };
+
+    if (editIndex === -1) {
+      expenses.push(exp);
+    } else {
+      expenses[editIndex] = exp;
+      editIndex = -1;
+      addBtn.style.display = 'inline';
+      updateBtn.style.display = 'none';
+    }
     renderTable();
-  </script>
+    expenseForm.reset();
+  });
+
+  window.editExpense = function(index) {
+    let exp = expenses[index];
+    date.value = exp.date || '';
+    amount.value = exp.amount || '';
+    rate.value = exp.rate || '';
+    litres.value = exp.litres || '';
+    totalPetrolPrice.value = exp.totalPetrolPrice || '';
+    fuel.value = exp.fuel || '';
+    startKM.value = exp.startKM || '';
+    endKM.value = exp.endKM || '';
+    editIndex = index;
+    addBtn.style.display = 'none';
+    updateBtn.style.display = 'inline';
+  };
+
+  updateBtn.addEventListener('click', function() {
+    expenseForm.requestSubmit();
+  });
+
+  window.deleteExpense = function(index) {
+    if (confirm("Delete this entry?")) {
+      expenses.splice(index, 1);
+      renderTable();
+    }
+  };
+
+  // Initial render
+  renderTable();
+</script>
 </body>
 </html>
