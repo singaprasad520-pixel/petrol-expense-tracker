@@ -5,272 +5,586 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Petrol Tracker Dashboard</title>
-<link href="https://fonts.googleapis.com/css?family=Montserrat:400,600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700&display=swap" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   :root {
-    --yellow: #FFD600;
-    --black: #222;
-    --gray-bg: #f4f5f7;
-    --white: #fff;
+    --primary-yellow: #FFD600;
+    --primary-yellow-hover: #FFE84B;
+    --primary-yellow-light: #FFF9E2;
+    --primary-yellow-shadow: rgba(255, 214, 0, 0.3);
+    --dark-text: #1a1a1a;
+    --medium-text: #4a4a4a;
+    --light-text: #7a7a7a;
+    --background-gray: #f8fafc;
+    --card-white: #ffffff;
+    --border-light: #e2e8f0;
+    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.1);
+    --shadow-strong: 0 10px 30px rgba(0, 0, 0, 0.15);
+    --gradient-yellow: linear-gradient(135deg, #FFD600 0%, #FFA000 100%);
+    --gradient-card: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 16px;
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-quick: all 0.15s ease-out;
   }
+
+  * {
+    box-sizing: border-box;
+  }
+
   body {
     margin: 0;
-    background: var(--gray-bg);
-    font-family: 'Montserrat', Segoe UI, Arial, sans-serif;
-    color: var(--black);
+    background: var(--background-gray);
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    color: var(--dark-text);
+    line-height: 1.6;
+    font-size: 14px;
   }
+
   .navbar {
     display: flex;
     align-items: center;
-    background: var(--white);
-    padding: 0 16px;
-    box-shadow: 0 2px 8px #dedede40;
-    height: 56px;
+    background: var(--card-white);
+    padding: 0 20px;
+    box-shadow: var(--shadow-soft);
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-light);
   }
+
   .nav-logo {
     font-weight: 700;
-    color: var(--yellow);
+    background: var(--gradient-yellow);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     font-size: 1.8rem;
-    margin-right: 16px;
+    margin-right: 20px;
+    text-shadow: 0 2px 4px var(--primary-yellow-shadow);
   }
+
   .nav-menu {
     display: flex;
-    gap: 16px;
+    gap: 24px;
     font-size: 1rem;
     font-weight: 600;
   }
+
   .nav-menu span {
     cursor: pointer;
-    transition: color 0.12s, border-bottom 0.12s;
+    padding: 8px 16px;
+    border-radius: var(--border-radius-sm);
+    transition: var(--transition-smooth);
+    position: relative;
+    color: var(--medium-text);
   }
+
+  .nav-menu span:hover {
+    background: var(--primary-yellow-light);
+    color: var(--primary-yellow);
+    transform: translateY(-1px);
+  }
+
   .nav-menu .active {
-    color: var(--yellow);
-    border-bottom: 2.5px solid var(--yellow);
+    color: var(--primary-yellow);
+    background: var(--primary-yellow-light);
+    border-bottom: 3px solid var(--primary-yellow);
+    box-shadow: 0 4px 8px var(--primary-yellow-shadow);
   }
+
   .nav-end {
     margin-left: auto;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
   }
+
   .nav-profile {
-    width: 34px;
-    height: 34px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background: #FFD60022;
+    background: var(--gradient-yellow);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    color: var(--yellow);
+    color: var(--card-white);
     font-size: 1.1em;
+    box-shadow: var(--shadow-medium);
+    transition: var(--transition-smooth);
+    cursor: pointer;
   }
+
+  .nav-profile:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: var(--shadow-strong);
+  }
+
   .dashboard-container {
     display: block;
-    max-width: 960px;
-    margin: 20px auto;
-    padding: 0 12px;
+    max-width: 1100px;
+    margin: 24px auto;
+    padding: 0 20px;
   }
+
   .dash-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
   }
+
   .main-cards {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px;
+    gap: 20px;
+    margin-bottom: 24px;
   }
+
   .card {
-    background: var(--white);
-    border-radius: 12px;
-    box-shadow: 0 2px 8px #e9ede940;
-    padding: 16px;
-    min-height: 110px;
+    background: var(--gradient-card);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-soft);
+    padding: 24px;
+    min-height: 120px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    transition: var(--transition-smooth);
+    border: 1px solid var(--border-light);
+    position: relative;
+    overflow: hidden;
   }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-yellow);
+    opacity: 0;
+    transition: var(--transition-smooth);
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-medium);
+  }
+
+  .card:hover::before {
+    opacity: 1;
+  }
+
   .card-title {
     font-size: 1.1em;
     font-weight: 600;
-    margin-bottom: 6px;
-    color: var(--black);
+    margin-bottom: 8px;
+    color: var(--medium-text);
+    letter-spacing: 0.5px;
   }
+
   .big-number {
-    font-size: 1.8em;
+    font-size: 2em;
     font-weight: 700;
-    color: var(--yellow);
+    background: var(--gradient-yellow);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
   }
+
   .dash-charts {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 12px;
+    gap: 20px;
   }
+
   .side-cards {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
   }
+
   .side-box {
-    background: var(--white);
-    border-radius: 12px;
-    padding: 14px 12px;
+    background: var(--gradient-card);
+    border-radius: var(--border-radius-md);
+    padding: 20px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 16px;
     font-size: 0.95em;
-    box-shadow: 0 2px 8px #e9ede940;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-light);
+    transition: var(--transition-smooth);
   }
+
+  .side-box:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow-medium);
+  }
+
   .side-box-icon {
-    background: #FFD60055;
-    color: var(--yellow);
+    background: var(--gradient-yellow);
+    color: var(--card-white);
     font-size: 1.4em;
-    border-radius: 4px;
-    width: 34px;
-    height: 34px;
+    border-radius: var(--border-radius-sm);
+    width: 42px;
+    height: 42px;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: var(--shadow-soft);
   }
-  /* Form styles */
+
+  /* Form styles with modern UI */
   .expenses-panel {
     display: none;
-    max-width: 960px;
-    margin: 28px auto;
-    padding: 0 12px;
+    max-width: 1100px;
+    margin: 32px auto;
+    padding: 0 20px;
   }
+
   .expenses-panel.show {
     display: block;
   }
+
   .expenses-panel h2 {
-    font-size: 1.2em;
-    color: var(--black);
-    margin-bottom: 12px;
+    font-size: 1.4em;
+    color: var(--dark-text);
+    margin-bottom: 24px;
+    font-weight: 700;
+    text-align: center;
   }
+
   form .exp-form-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 12px 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+    padding: 24px;
+    background: var(--card-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-light);
   }
+
   form .exp-form-row input,
   form .exp-form-row button {
-    padding: 10px;
-    border: 1px solid #FFD60055;
-    border-radius: 7px;
+    padding: 14px 16px;
+    border: 2px solid var(--border-light);
+    border-radius: var(--border-radius-sm);
     font-family: inherit;
     font-size: 1rem;
-    min-width: 100px;
-    box-sizing: border-box;
+    font-weight: 500;
+    transition: var(--transition-smooth);
+    background: var(--card-white);
   }
+
+  form .exp-form-row input:focus {
+    outline: none;
+    border-color: var(--primary-yellow);
+    box-shadow: 0 0 0 3px var(--primary-yellow-shadow);
+    transform: translateY(-1px);
+  }
+
   form .exp-form-row input[readonly],
   form .exp-form-row input[disabled] {
-    background-color: #f0f0f0;
+    background: var(--background-gray);
+    color: var(--medium-text);
+    border-color: var(--border-light);
   }
+
   form .exp-form-row button {
-    background: var(--yellow);
-    color: var(--black);
+    background: var(--gradient-yellow);
+    color: var(--card-white);
     border: none;
-    font-weight: bold;
+    font-weight: 700;
     cursor: pointer;
-    min-width: 100px;
-    transition: background 0.14s;
+    transition: var(--transition-smooth);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: var(--shadow-soft);
   }
+
   form .exp-form-row button:hover {
-    background: #ffe84b;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
   }
+
+  form .exp-form-row button:active {
+    transform: translateY(0);
+  }
+
   .exp-table-container {
-    margin-top: 18px;
+    margin-top: 24px;
     overflow-x: auto;
+    background: var(--card-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-light);
   }
+
   table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.9em;
-    background: var(--white);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px #e9ede940;
+    background: transparent;
   }
+
   th,
   td {
-    padding: 6px 4px;
+    padding: 12px 8px;
     text-align: center;
-    border-bottom: 1px solid #f3e294;
+    border-bottom: 1px solid var(--border-light);
+    font-weight: 500;
   }
+
   th {
-    background: #FFF9E2;
-    color: var(--black);
+    background: var(--primary-yellow-light);
+    color: var(--dark-text);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85em;
   }
+
+  tbody tr {
+    transition: var(--transition-quick);
+  }
+
+  tbody tr:hover {
+    background: var(--primary-yellow-light);
+    transform: scale(1.01);
+  }
+
   .act-btn {
-    background: var(--yellow);
-    color: var(--black);
-    font-weight: bold;
+    background: var(--gradient-yellow);
+    color: var(--card-white);
+    font-weight: 700;
     border: none;
-    border-radius: 5px;
-    padding: 4px 10px;
+    border-radius: var(--border-radius-sm);
+    padding: 8px 14px;
     cursor: pointer;
+    transition: var(--transition-smooth);
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    box-shadow: var(--shadow-soft);
   }
+
   .act-btn.delete {
-    background: #ef476f;
-    color: #fff;
+    background: linear-gradient(135deg, #ef476f 0%, #d63384 100%);
   }
+
   .act-btn:hover {
-    opacity: 0.85;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
   }
-  /* Responsive */
-  @media (max-width: 700px) {
+
+  /* Mileage column enhanced styling */
+  .mileage-cell {
+    font-weight: 700;
+    background: var(--gradient-yellow);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 0.95em;
+  }
+
+  /* Enhanced responsive design */
+  @media (max-width: 768px) {
+    .navbar {
+      padding: 0 16px;
+      height: 56px;
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      margin-right: 16px;
+    }
+
+    .nav-menu {
+      gap: 16px;
+      font-size: 0.9rem;
+    }
+
+    .nav-menu span {
+      padding: 6px 12px;
+    }
+
+    .nav-profile {
+      width: 36px;
+      height: 36px;
+      font-size: 1rem;
+    }
+
+    .dashboard-container {
+      margin: 16px auto;
+      padding: 0 16px;
+    }
+
     .dash-grid {
       grid-template-columns: 1fr;
+      gap: 20px;
     }
+
     .main-cards {
       grid-template-columns: 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
     }
+
     .dash-charts {
       grid-template-columns: 1fr;
+      gap: 16px;
     }
+
     .side-cards {
       flex-direction: row;
-      justify-content: space-around;
+      justify-content: space-between;
+      gap: 12px;
     }
+
+    .side-box {
+      flex: 1;
+      padding: 16px 12px;
+      font-size: 0.85em;
+    }
+
+    .side-box-icon {
+      width: 36px;
+      height: 36px;
+      font-size: 1.2em;
+    }
+
+    .expenses-panel {
+      margin: 20px auto;
+      padding: 0 16px;
+    }
+
+    .expenses-panel h2 {
+      font-size: 1.2em;
+    }
+
+    form .exp-form-row {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      padding: 20px;
+    }
+
     form .exp-form-row input,
     form .exp-form-row button {
-      flex: 1 1 45%;
-      min-width: unset;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+    }
+
+    .exp-table-container {
+      font-size: 0.8em;
+    }
+
+    th,
+    td {
+      padding: 8px 4px;
+    }
+
+    .act-btn {
+      padding: 6px 10px;
+      font-size: 0.75em;
     }
   }
-  @media (max-width: 400px) {
+
+  @media (max-width: 480px) {
     .side-cards {
       flex-direction: column;
       gap: 12px;
     }
-    .exp-table-container {
-      font-size: 0.85em;
+
+    .side-box {
+      padding: 14px;
     }
-    th,
-    td {
-      padding: 4px 2px;
+
+    .nav-menu {
+      gap: 12px;
     }
+
+    .nav-menu span {
+      padding: 4px 8px;
+      font-size: 0.85rem;
+    }
+
+    .big-number {
+      font-size: 1.8em;
+    }
+
+    .card {
+      padding: 20px;
+      min-height: 100px;
+    }
+  }
+
+  /* Loading states and animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .card,
+  .side-box,
+  .exp-form-row {
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Custom scrollbar */
+  .exp-table-container::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .exp-table-container::-webkit-scrollbar-track {
+    background: var(--background-gray);
+    border-radius: 4px;
+  }
+
+  .exp-table-container::-webkit-scrollbar-thumb {
+    background: var(--primary-yellow);
+    border-radius: 4px;
+  }
+
+  .exp-table-container::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-yellow-hover);
   }
 </style>
 </head>
 <body>
   <!-- NAVIGATION -->
   <div class="navbar">
-    <span class="nav-logo">&#9679;&#9679;</span>
+    <span class="nav-logo">⛽</span>
     <div class="nav-menu">
       <span id="tab-dashboard" class="active">Dashboard</span>
       <span id="tab-expenses">Expenses</span>
     </div>
     <div class="nav-end">
-      <span title="Notifications">&#128276;</span>
+      <span title="Notifications" style="font-size: 1.2em; cursor: pointer; transition: var(--transition-quick);" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">🔔</span>
       <span class="nav-profile">P</span>
     </div>
   </div>
-
   <!-- DASHBOARD -->
   <div class="dashboard-container" id="dashboard-container">
     <div class="dash-grid">
@@ -281,7 +595,7 @@
             <div class="big-number" id="dash-total">₹ 0.00</div>
           </div>
           <div class="card">
-            <div class="card-title">Mileage (Avg)</div>
+            <div class="card-title">Mileage (Average)</div>
             <div class="big-number" id="dash-mileage">0 km/L</div>
           </div>
         </div>
@@ -291,28 +605,27 @@
             <canvas id="lineChart" height="110"></canvas>
           </div>
           <div class="card">
-            <div class="card-title">Fuel Types (Pie Example)</div>
+            <div class="card-title">Expense Distribution</div>
             <canvas id="pieChart" height="110"></canvas>
           </div>
         </div>
       </div>
       <div class="side-cards">
         <div class="side-box">
-          <span class="side-box-icon">&#128663;</span>
+          <span class="side-box-icon">🚗</span>
           <span id="dash-fuelups"><b>0</b> Fuel ups</span>
         </div>
         <div class="side-box">
-          <span class="side-box-icon">&#128200;</span>
+          <span class="side-box-icon">📈</span>
           <span id="dash-maxamount"><b>₹ 0</b> Max per fuel</span>
         </div>
         <div class="side-box">
-          <span class="side-box-icon">&#128202;</span>
+          <span class="side-box-icon">📊</span>
           <span id="dash-maxdist"><b>0 km</b> Longest drive</span>
         </div>
       </div>
     </div>
   </div>
-
   <!-- EXPENSES PANEL -->
   <div class="expenses-panel" id="expenses-panel">
     <h2>Add/Manage Petrol Expenses</h2>
@@ -326,8 +639,9 @@
         <input type="number" id="fuel" placeholder="Additives" step="0.01" min="0" />
         <input type="number" id="startKM" placeholder="Start KM" step="0.1" min="0" />
         <input type="number" id="endKM" placeholder="End KM" step="0.1" min="0" />
-        <button type="submit" id="add-btn">Add</button>
-        <button type="button" id="update-btn" style="display:none;">Update</button>
+        <input type="number" id="calculatedMileage" placeholder="Mileage (km/L)" step="0.01" readonly />
+        <button type="submit" id="add-btn">Add Entry</button>
+        <button type="button" id="update-btn" style="display:none;">Update Entry</button>
       </div>
     </form>
     <div class="exp-table-container">
@@ -342,6 +656,7 @@
             <th>Additives</th>
             <th>Start</th>
             <th>End</th>
+            <th>Mileage</th>
             <th>Edit</th>
             <th>Del</th>
           </tr>
@@ -350,30 +665,49 @@
       </table>
     </div>
   </div>
-
 <script>
-  // Tab navigation
+  // Tab navigation with smooth transitions
   const tabDashboard = document.getElementById('tab-dashboard');
   const tabExpenses = document.getElementById('tab-expenses');
   const dashContainer = document.getElementById('dashboard-container');
   const expPanel = document.getElementById('expenses-panel');
 
+  function switchToTab(activeTab, inactiveTab, showContainer, hideContainer) {
+    activeTab.classList.add('active');
+    inactiveTab.classList.remove('active');
+
+    hideContainer.style.opacity = '0';
+    hideContainer.style.transform = 'translateY(20px)';
+
+    setTimeout(() => {
+      hideContainer.style.display = 'none';
+      showContainer.style.display = 'block';
+      showContainer.style.opacity = '0';
+      showContainer.style.transform = 'translateY(20px)';
+
+      setTimeout(() => {
+        showContainer.style.opacity = '1';
+        showContainer.style.transform = 'translateY(0)';
+      }, 50);
+    }, 150);
+  }
+
   tabDashboard.onclick = () => {
-    tabDashboard.classList.add('active');
-    tabExpenses.classList.remove('active');
-    dashContainer.style.display = 'block';
-    expPanel.style.display = 'none';
+    switchToTab(tabDashboard, tabExpenses, dashContainer, expPanel);
   };
+
   tabExpenses.onclick = () => {
-    tabExpenses.classList.add('active');
-    tabDashboard.classList.remove('active');
-    dashContainer.style.display = 'none';
-    expPanel.style.display = 'block';
+    switchToTab(tabExpenses, tabDashboard, expPanel, dashContainer);
   };
+
+  // Add smooth transitions to containers
+  dashContainer.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+  expPanel.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
 
   // Expense CRUD logic + dashboard stat update
   let expenses = JSON.parse(localStorage.getItem('petrolExpenses')) || [];
   let editIndex = -1;
+
   const expenseForm = document.getElementById('expense-form');
   const addBtn = document.getElementById('add-btn');
   const updateBtn = document.getElementById('update-btn');
@@ -387,9 +721,11 @@
   const fuel = document.getElementById('fuel');
   const startKM = document.getElementById('startKM');
   const endKM = document.getElementById('endKM');
+  const calculatedMileage = document.getElementById('calculatedMileage');
 
   // Dashboard elements
   const dashTotal = document.getElementById('dash-total');
+  const dashMileage = document.getElementById('dash-mileage');
   const dashFuelups = document.getElementById('dash-fuelups');
   const dashMaxAmount = document.getElementById('dash-maxamount');
   const dashMaxDist = document.getElementById('dash-maxdist');
@@ -397,35 +733,140 @@
   // Chart.js instances
   let lineChart, pieChart;
 
-  // Auto-calc totalPetrolPrice & litres on input change
+  // Calculate mileage for individual entry
+  function calculateMileageForEntry(startKMVal, endKMVal, litresVal) {
+    const start = Number(startKMVal) || 0;
+    const end = Number(endKMVal) || 0;
+    const litre = Number(litresVal) || 0;
+
+    const distance = end - start;
+    if (distance > 0 && litre > 0) {
+      return (distance / litre).toFixed(2);
+    }
+    return '';
+  }
+
+  // Auto-calc totalPetrolPrice, litres & mileage on input change
   function calculateDerivedValues() {
     const amountVal = Number(amount.value) || 0;
     const fuelVal = Number(fuel.value) || 0;
     const rateVal = Number(rate.value) || 0;
+    const startKMVal = Number(startKM.value) || 0;
+    const endKMVal = Number(endKM.value) || 0;
 
     const calcTotalPetrolPrice = amountVal - fuelVal;
     totalPetrolPrice.value = calcTotalPetrolPrice > 0 ? calcTotalPetrolPrice.toFixed(2) : '';
 
+    let litresVal = '';
     if (rateVal > 0 && calcTotalPetrolPrice > 0) {
-      litres.value = (calcTotalPetrolPrice / rateVal).toFixed(2);
+      litresVal = (calcTotalPetrolPrice / rateVal).toFixed(2);
+      litres.value = litresVal;
     } else {
       litres.value = '';
     }
+
+    // Calculate mileage for current form
+    const mileage = calculateMileageForEntry(startKMVal, endKMVal, litresVal);
+    calculatedMileage.value = mileage;
   }
 
   amount.addEventListener('input', calculateDerivedValues);
   fuel.addEventListener('input', calculateDerivedValues);
   rate.addEventListener('input', calculateDerivedValues);
+  startKM.addEventListener('input', calculateDerivedValues);
+  endKM.addEventListener('input', calculateDerivedValues);
+
+  // Function to create automated price ranges based on actual data
+  function createAutomatedPriceRanges(amounts) {
+    if (amounts.length === 0) return { 'No Data': [1] };
+
+    const sortedAmounts = amounts.sort((a, b) => a - b);
+    const min = sortedAmounts[0];
+    const max = sortedAmounts[sortedAmounts.length - 1];
+
+    // If all amounts are the same, create a single category
+    if (min === max) {
+      return { [`₹${min}`]: [amounts.length] };
+    }
+
+    // Calculate quartiles for dynamic ranges
+    const q1Index = Math.floor(amounts.length * 0.25);
+    const q2Index = Math.floor(amounts.length * 0.5);
+    const q3Index = Math.floor(amounts.length * 0.75);
+
+    const q1 = sortedAmounts[q1Index];
+    const q2 = sortedAmounts[q2Index];
+    const q3 = sortedAmounts[q3Index];
+
+    // Create dynamic categories based on data distribution
+    let categories = {};
+    let categoryNames = [];
+    let categoryValues = [];
+
+    if (amounts.length < 4) {
+      // For small datasets, use simple min-max ranges
+      const mid = Math.round((min + max) / 2);
+      categoryNames = [`Low (₹${min}-${mid})`, `High (₹${mid + 1}-${max})`];
+      categories[categoryNames[0]] = 0;
+      categories[categoryNames[1]] = 0;
+
+      amounts.forEach(amt => {
+        if (amt <= mid) {
+          categories[categoryNames[0]]++;
+        } else {
+          categories[categoryNames[1]]++;
+        }
+      });
+    } else {
+      // Use quartile-based ranges for larger datasets
+      categoryNames = [
+        `Low (₹${Math.round(min)}-${Math.round(q2)})`,
+        `Medium (₹${Math.round(q2 + 1)}-${Math.round(q3)})`,
+        `High (₹${Math.round(q3 + 1)}-${Math.round(max)})`
+      ];
+
+      categories[categoryNames[0]] = 0;
+      categories[categoryNames[1]] = 0;
+      categories[categoryNames[2]] = 0;
+
+      amounts.forEach(amt => {
+        if (amt <= q2) {
+          categories[categoryNames[0]]++;
+        } else if (amt <= q3) {
+          categories[categoryNames[1]]++;
+        } else {
+          categories[categoryNames[2]]++;
+        }
+      });
+    }
+
+    return categories;
+  }
 
   function updateDashboard() {
     let totalSpent = 0, maxAmount = 0, maxDist = 0;
+    let totalLitres = 0, totalDistance = 0;
+    let amounts = [];
+
     expenses.forEach(e => {
-      totalSpent += Number(e.amount);
-      if (+e.amount > maxAmount) maxAmount = +e.amount;
-      let dist = Number(e.endKM) - Number(e.startKM);
+      const amt = Number(e.amount) || 0;
+      totalSpent += amt;
+      amounts.push(amt);
+      if (amt > maxAmount) maxAmount = amt;
+
+      let dist = (Number(e.endKM) || 0) - (Number(e.startKM) || 0);
       if (dist > maxDist) maxDist = dist;
+
+      // For mileage calculation
+      totalLitres += Number(e.litres) || 0;
+      totalDistance += dist > 0 ? dist : 0;
     });
+
+    // Calculate average mileage
+    const avgMileage = totalLitres > 0 ? (totalDistance / totalLitres).toFixed(1) : 0;
+
     dashTotal.textContent = `₹ ${totalSpent.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+    dashMileage.textContent = `${avgMileage} km/L`;
     dashFuelups.innerHTML = `<b>${expenses.length}</b> Fuel ups`;
     dashMaxAmount.innerHTML = `<b>₹ ${maxAmount.toLocaleString()}</b> Max per fuel`;
     dashMaxDist.innerHTML = `<b>${maxDist} km</b> Longest drive`;
@@ -436,10 +877,11 @@
       if (!e.date) continue;
       let ym = e.date.slice(0, 7);
       if (!byMonth[ym]) byMonth[ym] = 0;
-      byMonth[ym] += Number(e.amount);
+      byMonth[ym] += Number(e.amount) || 0;
     }
+
     const months = Object.keys(byMonth).sort();
-    const amounts = months.map(m => byMonth[m]);
+    const monthlyAmounts = months.map(m => byMonth[m]);
 
     if (lineChart) lineChart.destroy();
     lineChart = new Chart(document.getElementById('lineChart').getContext('2d'), {
@@ -448,50 +890,92 @@
         labels: months.length ? months : ['No Data'],
         datasets: [{
           label: 'Petrol Spend',
-          data: months.length ? amounts : [0],
+          data: months.length ? monthlyAmounts : [0],
           borderColor: '#FFD600',
-          backgroundColor: 'rgba(255,214,0,0.09)',
+          backgroundColor: 'rgba(255,214,0,0.1)',
           borderWidth: 3,
-          pointRadius: 4
+          pointRadius: 5,
+          pointBackgroundColor: '#FFD600',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          fill: true,
+          tension: 0.4
         }]
       },
       options: {
         responsive: true,
         plugins: { legend: { display: false }, tooltip: { enabled: true } },
-        scales: { y: { beginAtZero: true, grid: { color: '#eee' } }, x: { grid: { display: false } } }
+        scales: { y: { beginAtZero: true, grid: { color: '#f0f0f0' } }, x: { grid: { display: false } } }
       }
     });
 
-    // Pie chart with totalPetrolPrice labels
-    let brands = {};
-    for (let e of expenses) {
-      let label = e.totalPetrolPrice || 'Other';
-      brands[label] = (brands[label] || 0) + 1;
-    }
-    const pieLabels = Object.keys(brands);
-    const pieData = pieLabels.map(l => brands[l]);
-    const pieColors = pieLabels.map((_, i) => ['#FFD600', '#222', '#AAA', '#888', '#333'][i % 5]);
+    // Automated pie chart based on actual price data
+    const priceCategories = createAutomatedPriceRanges(amounts);
+    const pieLabels = Object.keys(priceCategories);
+    const pieData = pieLabels.map(label => priceCategories[label]);
+
+    // Dynamic colors based on number of categories
+    const generateColors = (count) => {
+      const baseColors = ['#FFD600', '#FFA000', '#FF8F00', '#FF6F00', '#E65100'];
+      const colors = [];
+      for (let i = 0; i < count; i++) {
+        colors.push(baseColors[i % baseColors.length]);
+      }
+      return colors;
+    };
+
+    const pieColors = generateColors(pieLabels.length);
 
     if (pieChart) pieChart.destroy();
     pieChart = new Chart(document.getElementById('pieChart').getContext('2d'), {
       type: 'doughnut',
       data: {
-        labels: pieLabels.length ? pieLabels : ['N/A'],
+        labels: pieLabels,
         datasets: [{
-          data: pieData.length ? pieData : [1],
-          backgroundColor: pieColors.length ? pieColors : ['#e0e0e0'],
-          borderWidth: 1
+          data: pieData,
+          backgroundColor: pieColors,
+          borderWidth: 0,
+          cutout: '60%'
         }]
       },
-      options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+      options: { 
+        responsive: true, 
+        plugins: { 
+          legend: { 
+            position: 'bottom', 
+            labels: { 
+              usePointStyle: true,
+              font: { size: 11 },
+              padding: 15
+            } 
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${label}: ${value} entries (${percentage}%)`;
+              }
+            }
+          }
+        }
+      }
     });
   }
 
   function renderTable() {
     const tbody = document.querySelector('#expense-table tbody');
     tbody.innerHTML = '';
+
     expenses.forEach((exp, i) => {
       const tr = document.createElement('tr');
+
+      // Calculate mileage for this row
+      const mileage = calculateMileageForEntry(exp.startKM, exp.endKM, exp.litres);
+      const mileageDisplay = mileage ? `${mileage} km/L` : '-';
+
       tr.innerHTML = `
         <td>${exp.date || ''}</td>
         <td>${exp.amount || ''}</td>
@@ -501,11 +985,13 @@
         <td>${exp.fuel || ''}</td>
         <td>${exp.startKM || ''}</td>
         <td>${exp.endKM || ''}</td>
+        <td class="mileage-cell">${mileageDisplay}</td>
         <td><button class="act-btn" onclick="editExpense(${i})">Edit</button></td>
         <td><button class="act-btn delete" onclick="deleteExpense(${i})">Del</button></td>
       `;
       tbody.appendChild(tr);
     });
+
     localStorage.setItem('petrolExpenses', JSON.stringify(expenses));
     updateDashboard();
   }
@@ -525,17 +1011,32 @@
       totalPetrolPrice: calculatedTotalPetrolPrice > 0 ? calculatedTotalPetrolPrice.toFixed(2) : '0.00',
       fuel: fuel.value,
       startKM: startKM.value,
-      endKM: endKM.value
+      endKM: endKM.value,
+      mileage: calculatedMileage.value
     };
 
     if (editIndex === -1) {
       expenses.push(exp);
+      // Success animation
+      addBtn.textContent = 'Added! ✓';
+      addBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+      setTimeout(() => {
+        addBtn.textContent = 'Add Entry';
+        addBtn.style.background = '';
+      }, 2000);
     } else {
       expenses[editIndex] = exp;
       editIndex = -1;
       addBtn.style.display = 'inline';
       updateBtn.style.display = 'none';
+      updateBtn.textContent = 'Updated! ✓';
+      updateBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+      setTimeout(() => {
+        updateBtn.textContent = 'Update Entry';
+        updateBtn.style.background = '';
+      }, 2000);
     }
+
     renderTable();
     expenseForm.reset();
   });
@@ -550,9 +1051,15 @@
     fuel.value = exp.fuel || '';
     startKM.value = exp.startKM || '';
     endKM.value = exp.endKM || '';
+
+    calculateDerivedValues();
+
     editIndex = index;
     addBtn.style.display = 'none';
     updateBtn.style.display = 'inline';
+
+    // Scroll to form
+    expenseForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
   updateBtn.addEventListener('click', function() {
@@ -560,14 +1067,32 @@
   });
 
   window.deleteExpense = function(index) {
-    if (confirm("Delete this entry?")) {
+    if (confirm("Are you sure you want to delete this entry?")) {
       expenses.splice(index, 1);
       renderTable();
+
+      // Show success message
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 1000;
+        background: linear-gradient(135deg, #ef476f 0%, #d63384 100%);
+        color: white; padding: 12px 20px; border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(239, 71, 111, 0.3);
+        font-weight: 600; animation: fadeIn 0.3s ease-out;
+      `;
+      notification.textContent = 'Entry deleted successfully!';
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
     }
   };
 
-  // Initial render
-  renderTable();
+  // Initial render with animation
+  setTimeout(() => {
+    renderTable();
+  }, 100);
 </script>
 </body>
 </html>
