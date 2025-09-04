@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,12 +10,9 @@
 <style>
   :root {
     --yellow: #FFD600;
-    --yellow-light: #fff8e1;
     --black: #222;
     --gray-bg: #f4f5f7;
     --white: #fff;
-    --accent-color: #5c9ead;
-    --shadow-card: 0 6px 15px rgba(0,0,0,0.09);
   }
   body {
     margin: 0;
@@ -27,240 +25,203 @@
     align-items: center;
     background: var(--white);
     padding: 0 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px #dedede40;
     height: 56px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
   }
   .nav-logo {
-    font-weight: 800;
+    font-weight: 700;
     color: var(--yellow);
-    font-size: 2rem;
-    margin-right: 20px;
-    user-select: none;
-    letter-spacing: 0.1em;
+    font-size: 1.8rem;
+    margin-right: 16px;
   }
   .nav-menu {
     display: flex;
-    gap: 20px;
-    font-size: 1.05rem;
-    font-weight: 700;
+    gap: 16px;
+    font-size: 1rem;
+    font-weight: 600;
   }
   .nav-menu span {
     cursor: pointer;
-    transition: color 0.15s ease, border-bottom 0.15s ease;
-    padding-bottom: 6px;
-    border-bottom: 2.5px solid transparent;
-    user-select: none;
+    transition: color 0.12s, border-bottom 0.12s;
   }
   .nav-menu .active {
     color: var(--yellow);
-    border-bottom-color: var(--yellow);
-  }
-  .nav-menu span:hover:not(.active) {
-    color: var(--accent-color);
+    border-bottom: 2.5px solid var(--yellow);
   }
   .nav-end {
     margin-left: auto;
     display: flex;
     align-items: center;
-    gap: 16px;
-    font-size: 1.3rem;
-    color: var(--black);
-    user-select: none;
+    gap: 12px;
   }
   .nav-profile {
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
-    background: var(--yellow-light);
+    background: #FFD60022;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 800;
+    font-weight: 700;
     color: var(--yellow);
-    font-size: 1.25rem;
-    box-shadow: 0 2px 8px var(--yellow-light);
-    transition: background 0.3s ease;
-  }
-  .nav-profile:hover {
-    background: var(--yellow);
-    color: var(--white);
-    cursor: default;
+    font-size: 1.1em;
   }
   .dashboard-container {
+    display: block;
     max-width: 960px;
-    margin: 28px auto 40px;
-    padding: 0 14px;
+    margin: 20px auto;
+    padding: 0 12px;
   }
   .dash-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 16px;
   }
   .main-cards {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 18px;
+    gap: 14px;
   }
   .card {
     background: var(--white);
-    border-radius: 16px;
-    box-shadow: var(--shadow-card);
-    padding: 22px 20px;
-    min-height: 125px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px #e9ede940;
+    padding: 16px;
+    min-height: 110px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    transition: box-shadow 0.25s ease;
-  }
-  .card:hover {
-    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
   }
   .card-title {
-    font-size: 1.18em;
-    font-weight: 700;
-    margin-bottom: 12px;
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: 6px;
     color: var(--black);
   }
   .big-number {
-    font-size: 2.1em;
-    font-weight: 800;
+    font-size: 1.8em;
+    font-weight: 700;
     color: var(--yellow);
-    letter-spacing: 0.05em;
   }
   .dash-charts {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-top: 18px;
+    gap: 12px;
+    margin-top: 12px;
   }
   .side-cards {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 16px;
   }
   .side-box {
     background: var(--white);
-    border-radius: 16px;
-    padding: 18px 16px;
+    border-radius: 12px;
+    padding: 14px 12px;
     display: flex;
     align-items: center;
-    gap: 14px;
-    font-size: 1em;
-    box-shadow: var(--shadow-card);
-    font-weight: 600;
-    color: var(--black);
-    user-select: none;
+    gap: 10px;
+    font-size: 0.95em;
+    box-shadow: 0 2px 8px #e9ede940;
   }
   .side-box-icon {
-    background: #ffd60088;
+    background: #FFD60055;
     color: var(--yellow);
-    font-size: 1.8em;
-    border-radius: 6px;
-    width: 38px;
-    height: 38px;
+    font-size: 1.4em;
+    border-radius: 4px;
+    width: 34px;
+    height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
   }
+  /* Form styles */
   .expenses-panel {
     display: none;
     max-width: 960px;
-    margin: 36px auto 50px;
-    padding: 0 14px;
+    margin: 28px auto;
+    padding: 0 12px;
   }
   .expenses-panel.show {
     display: block;
   }
   .expenses-panel h2 {
-    font-size: 1.4em;
+    font-size: 1.2em;
     color: var(--black);
-    margin-bottom: 20px;
-    font-weight: 800;
+    margin-bottom: 12px;
   }
   form .exp-form-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    margin: 14px 0;
+    gap: 10px;
+    margin: 12px 0;
   }
   form .exp-form-row input,
   form .exp-form-row button {
-    padding: 14px;
-    border: 1.3px solid #FFD60088;
-    border-radius: 10px;
+    padding: 10px;
+    border: 1px solid #FFD60055;
+    border-radius: 7px;
     font-family: inherit;
-    font-size: 1.1rem;
-    min-width: 110px;
+    font-size: 1rem;
+    min-width: 100px;
     box-sizing: border-box;
-    transition: border-color 0.3s ease;
-  }
-  form .exp-form-row input:focus,
-  form .exp-form-row button:focus {
-    outline: none;
-    border-color: var(--accent-color);
-    box-shadow: 0 0 8px var(--accent-color);
   }
   form .exp-form-row input[readonly],
   form .exp-form-row input[disabled] {
-    background-color: #f7f7f7;
-    cursor: not-allowed;
+    background-color: #f0f0f0;
   }
   form .exp-form-row button {
     background: var(--yellow);
     color: var(--black);
     border: none;
-    font-weight: 700;
+    font-weight: bold;
     cursor: pointer;
-    min-width: 110px;
-    transition: background 0.2s ease;
+    min-width: 100px;
+    transition: background 0.14s;
   }
   form .exp-form-row button:hover {
     background: #ffe84b;
   }
   .exp-table-container {
-    margin-top: 24px;
+    margin-top: 18px;
     overflow-x: auto;
   }
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.95em;
+    font-size: 0.9em;
     background: var(--white);
-    border-radius: 10px;
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: var(--shadow-card);
+    box-shadow: 0 2px 8px #e9ede940;
   }
   th,
   td {
-    padding: 8px 6px;
+    padding: 6px 4px;
     text-align: center;
     border-bottom: 1px solid #f3e294;
   }
   th {
-    background: var(--yellow-light);
+    background: #FFF9E2;
     color: var(--black);
-    font-weight: 700;
   }
   .act-btn {
     background: var(--yellow);
     color: var(--black);
-    font-weight: 700;
+    font-weight: bold;
     border: none;
-    border-radius: 8px;
-    padding: 6px 14px;
+    border-radius: 5px;
+    padding: 4px 10px;
     cursor: pointer;
-    transition: background 0.25s ease;
   }
   .act-btn.delete {
     background: #ef476f;
     color: #fff;
   }
   .act-btn:hover {
-    opacity: 0.9;
+    opacity: 0.85;
   }
+  /* Responsive */
   @media (max-width: 700px) {
     .dash-grid {
       grid-template-columns: 1fr;
@@ -284,39 +245,36 @@
   @media (max-width: 400px) {
     .side-cards {
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
     .exp-table-container {
       font-size: 0.85em;
     }
     th,
     td {
-      padding: 6px 4px;
+      padding: 4px 2px;
     }
-  }
-  canvas {
-    width: 100% !important;
-    height: 150px !important;
-    max-height: 250px;
   }
 </style>
 </head>
 <body>
+  <!-- NAVIGATION -->
   <div class="navbar">
     <span class="nav-logo">&#9679;&#9679;</span>
     <div class="nav-menu">
-      <span id="tab-dashboard" class="active" tabindex="0">Dashboard</span>
-      <span id="tab-expenses" tabindex="0">Expenses</span>
+      <span id="tab-dashboard" class="active">Dashboard</span>
+      <span id="tab-expenses">Expenses</span>
     </div>
-    <div class="nav-end" aria-label="User controls">
-      <span title="Notifications" role="button" tabindex="0" aria-label="Notifications">&#128276;</span>
-      <span class="nav-profile" aria-label="Profile initial">P</span>
+    <div class="nav-end">
+      <span title="Notifications">&#128276;</span>
+      <span class="nav-profile">P</span>
     </div>
   </div>
 
-  <main class="dashboard-container" id="dashboard-container" role="main">
+  <!-- DASHBOARD -->
+  <div class="dashboard-container" id="dashboard-container">
     <div class="dash-grid">
-      <section aria-label="Main stats and summary">
+      <div>
         <div class="main-cards">
           <div class="card">
             <div class="card-title">Total Petrol Spent</div>
@@ -327,46 +285,47 @@
             <div class="big-number" id="dash-mileage">0 km/L</div>
           </div>
         </div>
-        <div class="dash-charts" aria-label="Charts section">
+        <div class="dash-charts">
           <div class="card">
             <div class="card-title">Fuel Spend By Month</div>
-            <canvas id="lineChart" aria-label="Line chart showing monthly petrol spending"></canvas>
+            <canvas id="lineChart" height="110"></canvas>
           </div>
           <div class="card">
             <div class="card-title">Fuel Types (Pie Example)</div>
-            <canvas id="pieChart" aria-label="Pie chart showing distribution of fuel types"></canvas>
+            <canvas id="pieChart" height="110"></canvas>
           </div>
         </div>
-      </section>
-      <aside class="side-cards" aria-label="Additional stats">
-        <div class="side-box" role="region" aria-live="polite" aria-atomic="true">
+      </div>
+      <div class="side-cards">
+        <div class="side-box">
           <span class="side-box-icon">&#128663;</span>
           <span id="dash-fuelups"><b>0</b> Fuel ups</span>
         </div>
-        <div class="side-box" role="region" aria-live="polite" aria-atomic="true">
+        <div class="side-box">
           <span class="side-box-icon">&#128200;</span>
           <span id="dash-maxamount"><b>₹ 0</b> Max per fuel</span>
         </div>
-        <div class="side-box" role="region" aria-live="polite" aria-atomic="true">
+        <div class="side-box">
           <span class="side-box-icon">&#128202;</span>
           <span id="dash-maxdist"><b>0 km</b> Longest drive</span>
         </div>
-      </aside>
+      </div>
     </div>
-  </main>
+  </div>
 
-  <section class="expenses-panel" id="expenses-panel" aria-label="Petrol expenses input form">
+  <!-- EXPENSES PANEL -->
+  <div class="expenses-panel" id="expenses-panel">
     <h2>Add/Manage Petrol Expenses</h2>
     <form id="expense-form" autocomplete="off">
       <div class="exp-form-row">
-        <input type="date" id="date" required aria-label="Date" />
-        <input type="number" id="amount" placeholder="Amount Paid (₹)" step="0.01" min="0" required aria-label="Amount Paid" />
-        <input type="number" id="rate" placeholder="Rate/Litre (₹)" step="0.01" min="0" required aria-label="Rate per Litre" />
-        <input type="number" id="litres" placeholder="Litres" step="0.01" readonly aria-label="Litres" />
-        <input type="number" id="totalPetrolPrice" placeholder="Total Petrol Price (₹)" step="0.01" disabled aria-label="Total Petrol Price" />
-        <input type="number" id="fuel" placeholder="Additives" step="0.01" min="0" aria-label="Additives" />
-        <input type="number" id="startKM" placeholder="Start KM" step="0.1" min="0" aria-label="Start Kilometers" />
-        <input type="number" id="endKM" placeholder="End KM" step="0.1" min="0" aria-label="End Kilometers" />
+        <input type="date" id="date" required />
+        <input type="number" id="amount" placeholder="Amount Paid (₹)" step="0.01" min="0" required />
+        <input type="number" id="rate" placeholder="Rate/Litre (₹)" step="0.01" min="0" required />
+        <input type="number" id="litres" placeholder="Litres" step="0.01" readonly />
+        <input type="number" id="totalPetrolPrice" placeholder="Total Petrol Price (₹)" step="0.01" disabled />
+        <input type="number" id="fuel" placeholder="Additives" step="0.01" min="0" />
+        <input type="number" id="startKM" placeholder="Start KM" step="0.1" min="0" />
+        <input type="number" id="endKM" placeholder="End KM" step="0.1" min="0" />
         <button type="submit" id="add-btn">Add</button>
         <button type="button" id="update-btn" style="display:none;">Update</button>
       </div>
@@ -383,7 +342,6 @@
             <th>Additives</th>
             <th>Start</th>
             <th>End</th>
-            <th>Mileage</th>
             <th>Edit</th>
             <th>Del</th>
           </tr>
@@ -391,20 +349,36 @@
         <tbody></tbody>
       </table>
     </div>
-  </section>
+  </div>
 
 <script>
+  // Tab navigation
   const tabDashboard = document.getElementById('tab-dashboard');
   const tabExpenses = document.getElementById('tab-expenses');
   const dashContainer = document.getElementById('dashboard-container');
   const expPanel = document.getElementById('expenses-panel');
+
+  tabDashboard.onclick = () => {
+    tabDashboard.classList.add('active');
+    tabExpenses.classList.remove('active');
+    dashContainer.style.display = 'block';
+    expPanel.style.display = 'none';
+  };
+  tabExpenses.onclick = () => {
+    tabExpenses.classList.add('active');
+    tabDashboard.classList.remove('active');
+    dashContainer.style.display = 'none';
+    expPanel.style.display = 'block';
+  };
+
+  // Expense CRUD logic + dashboard stat update
   let expenses = JSON.parse(localStorage.getItem('petrolExpenses')) || [];
   let editIndex = -1;
-
   const expenseForm = document.getElementById('expense-form');
   const addBtn = document.getElementById('add-btn');
   const updateBtn = document.getElementById('update-btn');
 
+  // Inputs
   const date = document.getElementById('date');
   const amount = document.getElementById('amount');
   const rate = document.getElementById('rate');
@@ -414,26 +388,16 @@
   const startKM = document.getElementById('startKM');
   const endKM = document.getElementById('endKM');
 
+  // Dashboard elements
   const dashTotal = document.getElementById('dash-total');
   const dashFuelups = document.getElementById('dash-fuelups');
   const dashMaxAmount = document.getElementById('dash-maxamount');
   const dashMaxDist = document.getElementById('dash-maxdist');
-  const dashMileage = document.getElementById('dash-mileage');
 
-  tabDashboard.onclick = () => {
-    tabDashboard.classList.add('active');
-    tabExpenses.classList.remove('active');
-    dashContainer.style.display = 'block';
-    expPanel.style.display = 'none';
-  };
+  // Chart.js instances
+  let lineChart, pieChart;
 
-  tabExpenses.onclick = () => {
-    tabExpenses.classList.add('active');
-    tabDashboard.classList.remove('active');
-    dashContainer.style.display = 'none';
-    expPanel.style.display = 'block';
-  };
-
+  // Auto-calc totalPetrolPrice & litres on input change
   function calculateDerivedValues() {
     const amountVal = Number(amount.value) || 0;
     const fuelVal = Number(fuel.value) || 0;
@@ -453,86 +417,32 @@
   fuel.addEventListener('input', calculateDerivedValues);
   rate.addEventListener('input', calculateDerivedValues);
 
-  function updateStartKMForNewEntry() {
-    if (editIndex === -1) { // New entry
-      if (expenses.length > 0) {
-        const lastEndKM = expenses[expenses.length - 1].endKM || '';
-        startKM.value = lastEndKM;
-      } else {
-        startKM.value = '';
-      }
-      startKM.readOnly = true;
-    }
-  }
-
   function updateDashboard() {
-    let totalSpent = 0, maxAmount = 0, maxDist = 0, totalMileage = 0, mileageCount = 0;
+    let totalSpent = 0, maxAmount = 0, maxDist = 0;
     expenses.forEach(e => {
       totalSpent += Number(e.amount);
       if (+e.amount > maxAmount) maxAmount = +e.amount;
       let dist = Number(e.endKM) - Number(e.startKM);
       if (dist > maxDist) maxDist = dist;
-
-      const litresUsed = Number(e.litres);
-      if (litresUsed > 0 && dist >= 0) {
-        totalMileage += dist / litresUsed;
-        mileageCount++;
-      }
     });
-    const avgMileage = mileageCount > 0 ? (totalMileage / mileageCount).toFixed(2) : 0;
-
     dashTotal.textContent = `₹ ${totalSpent.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
     dashFuelups.innerHTML = `<b>${expenses.length}</b> Fuel ups`;
     dashMaxAmount.innerHTML = `<b>₹ ${maxAmount.toLocaleString()}</b> Max per fuel`;
     dashMaxDist.innerHTML = `<b>${maxDist} km</b> Longest drive`;
-    dashMileage.textContent = `${avgMileage} km/L`;
-  }
 
-  let lineChart, pieChart;
-
-  function renderTable() {
-    const tbody = document.querySelector('#expense-table tbody');
-    tbody.innerHTML = '';
-    expenses.forEach((exp, i) => {
-      const distance = Number(exp.endKM) - Number(exp.startKM);
-      const litresUsed = Number(exp.litres);
-      const mileage = (litresUsed > 0 && distance >= 0) ? (distance / litresUsed).toFixed(2) : '';
-      const mileageDisplay = mileage ? `${mileage} km/L` : '';
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${exp.date || ''}</td>
-        <td>${exp.amount || ''}</td>
-        <td>${exp.rate || ''}</td>
-        <td>${exp.litres || ''}</td>
-        <td>${exp.totalPetrolPrice || ''}</td>
-        <td>${exp.fuel || ''}</td>
-        <td>${exp.startKM || ''}</td>
-        <td>${exp.endKM || ''}</td>
-        <td>${mileageDisplay}</td>
-        <td><button class="act-btn" onclick="editExpense(${i})" aria-label="Edit expense on ${exp.date}">Edit</button></td>
-        <td><button class="act-btn delete" onclick="deleteExpense(${i})" aria-label="Delete expense on ${exp.date}">Del</button></td>
-      `;
-      tbody.appendChild(tr);
-    });
-    localStorage.setItem('petrolExpenses', JSON.stringify(expenses));
-    updateDashboard();
-    updateCharts();
-  }
-
-  function updateCharts() {
+    // Monthly spend chart data
     let byMonth = {};
-    expenses.forEach(e => {
-      if (!e.date) return;
+    for (let e of expenses) {
+      if (!e.date) continue;
       let ym = e.date.slice(0, 7);
       if (!byMonth[ym]) byMonth[ym] = 0;
       byMonth[ym] += Number(e.amount);
-    });
+    }
     const months = Object.keys(byMonth).sort();
     const amounts = months.map(m => byMonth[m]);
 
     if (lineChart) lineChart.destroy();
-    const ctxLine = document.getElementById('lineChart').getContext('2d');
-    lineChart = new Chart(ctxLine, {
+    lineChart = new Chart(document.getElementById('lineChart').getContext('2d'), {
       type: 'line',
       data: {
         labels: months.length ? months : ['No Data'],
@@ -540,10 +450,9 @@
           label: 'Petrol Spend',
           data: months.length ? amounts : [0],
           borderColor: '#FFD600',
-          backgroundColor: 'rgba(255,214,0,0.12)',
-          borderWidth: 4,
-          pointRadius: 6,
-          tension: 0.35
+          backgroundColor: 'rgba(255,214,0,0.09)',
+          borderWidth: 3,
+          pointRadius: 4
         }]
       },
       options: {
@@ -553,18 +462,18 @@
       }
     });
 
+    // Pie chart with totalPetrolPrice labels
     let brands = {};
-    expenses.forEach(e => {
+    for (let e of expenses) {
       let label = e.totalPetrolPrice || 'Other';
       brands[label] = (brands[label] || 0) + 1;
-    });
+    }
     const pieLabels = Object.keys(brands);
     const pieData = pieLabels.map(l => brands[l]);
     const pieColors = pieLabels.map((_, i) => ['#FFD600', '#222', '#AAA', '#888', '#333'][i % 5]);
 
     if (pieChart) pieChart.destroy();
-    const ctxPie = document.getElementById('pieChart').getContext('2d');
-    pieChart = new Chart(ctxPie, {
+    pieChart = new Chart(document.getElementById('pieChart').getContext('2d'), {
       type: 'doughnut',
       data: {
         labels: pieLabels.length ? pieLabels : ['N/A'],
@@ -576,6 +485,29 @@
       },
       options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
     });
+  }
+
+  function renderTable() {
+    const tbody = document.querySelector('#expense-table tbody');
+    tbody.innerHTML = '';
+    expenses.forEach((exp, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${exp.date || ''}</td>
+        <td>${exp.amount || ''}</td>
+        <td>${exp.rate || ''}</td>
+        <td>${exp.litres || ''}</td>
+        <td>${exp.totalPetrolPrice || ''}</td>
+        <td>${exp.fuel || ''}</td>
+        <td>${exp.startKM || ''}</td>
+        <td>${exp.endKM || ''}</td>
+        <td><button class="act-btn" onclick="editExpense(${i})">Edit</button></td>
+        <td><button class="act-btn delete" onclick="deleteExpense(${i})">Del</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    localStorage.setItem('petrolExpenses', JSON.stringify(expenses));
+    updateDashboard();
   }
 
   expenseForm.addEventListener('submit', function(e) {
@@ -601,16 +533,11 @@
     } else {
       expenses[editIndex] = exp;
       editIndex = -1;
-      addBtn.style.display = "inline";
-      updateBtn.style.display = "none";
-      startKM.readOnly = true;
+      addBtn.style.display = 'inline';
+      updateBtn.style.display = 'none';
     }
-
     renderTable();
     expenseForm.reset();
-    totalPetrolPrice.value = "";
-    litres.value = "";
-    updateStartKMForNewEntry();
   });
 
   window.editExpense = function(index) {
@@ -624,32 +551,23 @@
     startKM.value = exp.startKM || '';
     endKM.value = exp.endKM || '';
     editIndex = index;
-    addBtn.style.display = "none";
-    updateBtn.style.display = "inline";
-    startKM.readOnly = false;
+    addBtn.style.display = 'none';
+    updateBtn.style.display = 'inline';
   };
+
+  updateBtn.addEventListener('click', function() {
+    expenseForm.requestSubmit();
+  });
 
   window.deleteExpense = function(index) {
     if (confirm("Delete this entry?")) {
       expenses.splice(index, 1);
       renderTable();
-      updateStartKMForNewEntry();
     }
   };
 
-  function updateStartKMForNewEntry() {
-    if (editIndex === -1) {
-      if (expenses.length > 0) {
-        startKM.value = expenses[expenses.length - 1].endKM || '';
-      } else {
-        startKM.value = '';
-      }
-      startKM.readOnly = true;
-    }
-  }
-
+  // Initial render
   renderTable();
-  updateStartKMForNewEntry();
 </script>
 </body>
 </html>
