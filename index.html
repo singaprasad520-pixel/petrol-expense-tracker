@@ -3,1308 +3,1310 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>FuelTracker Pro - Fixed Version</title>
-<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700&display=swap" rel="stylesheet" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>FuelTracker Pro - Modern Mobile</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<meta name="theme-color" content="#FFD600">
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+<meta name="theme-color" content="#6366f1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="FuelTracker Pro">
+<link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;FuelTracker Pro&quot;,&quot;short_name&quot;:&quot;FuelTracker&quot;,&quot;theme_color&quot;:&quot;%236366f1&quot;,&quot;background_color&quot;:&quot;%23ffffff&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;start_url&quot;:&quot;.&quot;}">
 <style>
   :root {
-    --primary-yellow: #FFD600;
-    --primary-yellow-light: #FFF9E2;
-    --dark-text: #1a1a1a;
-    --medium-text: #4a4a4a;
-    --light-text: #7a7a7a;
-    --background-gray: #f8fafc;
-    --card-white: #ffffff;
-    --border-light: #e2e8f0;
-    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
-    --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.1);
-    --gradient-yellow: linear-gradient(135deg, #FFD600 0%, #FFA000 100%);
-    --success-green: #10b981;
-    --info-blue: #3b82f6;
-    --error-red: #ef4444;
-    --warning-orange: #f59e0b;
-    --border-radius-sm: 8px;
-    --border-radius-md: 12px;
-    --border-radius-lg: 16px;
-    --transition-smooth: all 0.3s ease;
+    --primary: #6366f1;
+    --primary-light: #a5b4fc;
+    --primary-dark: #4f46e5;
+    --secondary: #f59e0b;
+    --success: #10b981;
+    --error: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --surface-2: #f1f5f9;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --border: #e2e8f0;
+    --border-light: #f1f5f9;
+    --shadow: rgba(15, 23, 42, 0.08);
+    --shadow-lg: rgba(15, 23, 42, 0.15);
+    --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    --gradient-secondary: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+    --radius: 16px;
+    --radius-sm: 8px;
+    --radius-lg: 24px;
+    --spacing: 16px;
+    --spacing-sm: 8px;
+    --spacing-lg: 24px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --glass: rgba(255, 255, 255, 0.25);
+    --glass-border: rgba(255, 255, 255, 0.18);
   }
 
-  * { box-sizing: border-box; }
+  [data-theme="dark"] {
+    --background: #0f172a;
+    --surface: #1e293b;
+    --surface-2: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #64748b;
+    --border: #334155;
+    --border-light: #475569;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --shadow-lg: rgba(0, 0, 0, 0.5);
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
 
   body {
     margin: 0;
-    background: var(--background-gray);
-    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-    color: var(--dark-text);
+    padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--background);
+    color: var(--text-primary);
     font-size: 14px;
-    line-height: 1.6;
+    line-height: 1.5;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* NAVIGATION - MOBILE FRIENDLY */
-  .navbar {
+  /* MODERN TOP HEADER - MOBILE OPTIMIZED */
+  .top-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
     display: flex;
     align-items: center;
-    background: var(--card-white);
-    padding: 0 20px;
-    box-shadow: var(--shadow-soft);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    min-height: 64px;
-    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 0 var(--spacing);
+    box-shadow: 0 1px 3px var(--shadow);
   }
 
-  .nav-logo {
-    font-weight: 700;
-    background: var(--gradient-yellow);
+  .logo {
+    font-size: 20px;
+    font-weight: 800;
+    background: var(--gradient);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-size: 1.8rem;
-    margin-right: 20px;
     display: flex;
     align-items: center;
     gap: 8px;
   }
 
-  .nav-menu {
-    display: flex;
-    gap: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .nav-menu::-webkit-scrollbar { display: none; }
-
-  .nav-menu span {
-    cursor: pointer;
-    padding: 8px 12px;
-    border-radius: var(--border-radius-sm);
-    transition: var(--transition-smooth);
-    color: var(--medium-text);
-    white-space: nowrap;
-  }
-
-  .nav-menu span:hover {
-    background: var(--primary-yellow-light);
-    color: var(--primary-yellow);
-  }
-
-  .nav-menu .active {
-    color: var(--primary-yellow);
-    background: var(--primary-yellow-light);
-    border-bottom: 3px solid var(--primary-yellow);
-  }
-
-  .nav-end {
-    margin-left: auto;
+  .header-actions {
     display: flex;
     align-items: center;
     gap: 12px;
   }
 
-  .location-info {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    background: var(--primary-yellow-light);
-    border-radius: var(--border-radius-sm);
-    font-size: 0.8em;
-    font-weight: 600;
-    color: var(--primary-yellow);
-  }
-
-  .nav-profile {
-    width: 38px;
-    height: 38px;
+  .header-btn {
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background: var(--gradient-yellow);
+    background: var(--surface-2);
+    border: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    color: var(--card-white);
     cursor: pointer;
+    transition: var(--transition);
     position: relative;
   }
 
-  .achievements-badge {
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    width: 16px;
-    height: 16px;
-    background: var(--error-red);
-    border-radius: 50%;
-    font-size: 0.7em;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 700;
+  .header-btn:active {
+    transform: scale(0.95);
+    background: var(--border);
   }
 
-  /* CONTAINER */
+  .location-pill {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* MODERN BOTTOM NAVIGATION */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 8px var(--spacing) calc(8px + env(safe-area-inset-bottom));
+    box-shadow: 0 -1px 3px var(--shadow);
+  }
+
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    cursor: pointer;
+    transition: var(--transition);
+    border-radius: var(--radius-sm);
+    position: relative;
+  }
+
+  .nav-item.active {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+  }
+
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 3px;
+    background: var(--primary);
+    border-radius: 2px;
+  }
+
+  .nav-icon {
+    font-size: 20px;
+    transition: var(--transition);
+  }
+
+  .nav-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .nav-item:active {
+    transform: scale(0.95);
+  }
+
+  /* FLOATING ACTION BUTTON */
+  .fab {
+    position: fixed;
+    bottom: 100px;
+    right: var(--spacing);
+    width: 56px;
+    height: 56px;
+    background: var(--gradient);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 99;
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .fab:active {
+    transform: scale(0.9);
+  }
+
+  .fab:hover {
+    box-shadow: 0 12px 32px rgba(99, 102, 241, 0.6);
+  }
+
+  /* MAIN CONTENT */
+  .main-content {
+    padding-top: 60px;
+    padding-bottom: 80px;
+    min-height: 100vh;
+  }
+
   .container {
-    max-width: 1200px;
-    margin: 24px auto;
-    padding: 0 20px;
+    padding: var(--spacing);
+    max-width: 100%;
   }
 
   /* PANELS */
   .panel {
     display: none;
+    animation: slideIn 0.3s ease;
   }
 
   .panel.active {
     display: block;
   }
 
-  /* BUTTONS */
-  .btn {
-    background: var(--gradient-yellow);
-    color: var(--card-white);
-    border: none;
-    padding: 12px 20px;
-    border-radius: var(--border-radius-sm);
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* MODERN CARDS */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing);
+    box-shadow: 0 1px 3px var(--shadow);
+    border: 1px solid var(--border-light);
+    transition: var(--transition);
+  }
+
+  .card:active {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px var(--shadow-lg);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: between;
+    margin-bottom: var(--spacing);
+  }
+
+  .card-title {
+    font-size: 16px;
     font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition-smooth);
-    display: inline-flex;
+    color: var(--text-primary);
+    display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.9em;
+    margin: 0;
   }
 
-  .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-medium);
-  }
-
-  .btn-secondary { background: var(--info-blue); }
-  .btn-success { background: var(--success-green); }
-  .btn-warning { background: var(--warning-orange); }
-  .btn-danger { background: var(--error-red); }
-
-  /* VEHICLE SELECTOR */
-  .vehicle-selector {
-    background: var(--card-white);
-    border-radius: var(--border-radius-lg);
-    padding: 20px;
-    margin-bottom: 24px;
-    box-shadow: var(--shadow-soft);
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-
-  .vehicle-select {
-    padding: 12px 16px;
-    border: 2px solid var(--primary-yellow);
-    border-radius: var(--border-radius-sm);
-    background: var(--card-white);
-    font-weight: 600;
-    min-width: 150px;
-    cursor: pointer;
-  }
-
-  .vehicle-select:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(255, 214, 0, 0.3);
-  }
-
-  /* BUDGET PANEL */
-  .budget-panel {
-    background: var(--card-white);
-    border-radius: var(--border-radius-lg);
-    padding: 20px;
-    margin-bottom: 24px;
-    box-shadow: var(--shadow-soft);
-  }
-
-  .budget-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-  }
-
-  .budget-progress {
-    width: 100%;
-    height: 12px;
-    background: var(--border-light);
-    border-radius: 6px;
-    margin: 12px 0;
-    overflow: hidden;
-  }
-
-  .budget-progress-bar {
-    height: 100%;
-    background: var(--gradient-yellow);
-    border-radius: 6px;
-    transition: width 0.5s ease;
-  }
-
-  .budget-progress-bar.warning { background: var(--warning-orange); }
-  .budget-progress-bar.danger { background: var(--error-red); }
-
-  .budget-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 16px;
-    margin-top: 16px;
-  }
-
-  .budget-stat {
-    text-align: center;
-    padding: 12px;
-    background: var(--primary-yellow-light);
-    border-radius: var(--border-radius-sm);
-  }
-
-  .budget-stat-value {
-    font-size: 1.4em;
-    font-weight: 700;
-    color: var(--primary-yellow);
-  }
-
-  .budget-stat-label {
-    font-size: 0.85em;
-    color: var(--medium-text);
+  .card-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
     margin-top: 4px;
   }
 
-  /* LIVE PRICES */
-  .live-prices-panel {
-    background: var(--card-white);
-    border-radius: var(--border-radius-lg);
-    padding: 20px;
-    margin-bottom: 24px;
-    box-shadow: var(--shadow-soft);
+  /* STATS CARDS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing);
+    margin-bottom: var(--spacing-lg);
   }
 
-  .live-prices-header {
+  .stat-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: var(--spacing);
+    text-align: center;
+    box-shadow: 0 1px 3px var(--shadow);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient);
+  }
+
+  .stat-value {
+    font-size: 24px;
+    font-weight: 800;
+    background: var(--gradient);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .stat-change {
+    font-size: 10px;
+    margin-top: 4px;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+
+  .stat-change.positive {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+  }
+
+  .stat-change.negative {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+  }
+
+  /* MODERN FORMS */
+  .form-section {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing);
+    box-shadow: 0 1px 3px var(--shadow);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing);
+  }
+
+  .form-grid.two-col {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .input-group {
+    position: relative;
+  }
+
+  .input-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .form-input {
+    width: 100%;
+    height: 48px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0 var(--spacing);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+    transition: var(--transition);
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    background: var(--surface);
+  }
+
+  .form-input[readonly] {
+    background: var(--border-light);
+    color: var(--text-muted);
+  }
+
+  /* MODERN BUTTONS */
+  .btn {
+    height: 48px;
+    padding: 0 var(--spacing-lg);
+    border-radius: var(--radius-sm);
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    user-select: none;
+  }
+
+  .btn-primary {
+    background: var(--gradient);
+    color: white;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  }
+
+  .btn-primary:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 4px rgba(99, 102, 241, 0.4);
+  }
+
+  .btn-secondary {
+    background: var(--surface-2);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:active {
+    background: var(--border);
+  }
+
+  .btn-success {
+    background: var(--success);
+    color: white;
+  }
+
+  .btn-warning {
+    background: var(--warning);
+    color: white;
+  }
+
+  .btn-error {
+    background: var(--error);
+    color: white;
+  }
+
+  .btn-full {
+    width: 100%;
+  }
+
+  /* MODERN MODALS */
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 200;
+    display: none;
+    align-items: end;
+    justify-content: center;
+  }
+
+  .modal.show {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .modal-content {
+    background: var(--surface);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .modal-header {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 1;
+  }
+
+  .modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    text-align: center;
+  }
+
+  .modal-body {
+    padding: var(--spacing-lg);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: var(--spacing);
+    right: var(--spacing);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  /* MODERN TABLE */
+  .table-wrapper {
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 1px 3px var(--shadow);
+    margin-bottom: var(--spacing);
+  }
+
+  .table-header {
+    background: var(--surface-2);
+    padding: var(--spacing);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: between;
+  }
+
+  .expense-list {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .expense-item {
+    padding: var(--spacing);
+    border-bottom: 1px solid var(--border-light);
+    transition: var(--transition);
+    cursor: pointer;
+  }
+
+  .expense-item:last-child {
+    border-bottom: none;
+  }
+
+  .expense-item:active {
+    background: var(--surface-2);
+  }
+
+  .expense-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-    gap: 12px;
+    margin-bottom: 8px;
   }
 
+  .expense-amount {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .expense-date {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .expense-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .expense-type {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  /* CHARTS */
+  .chart-container {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing);
+    box-shadow: 0 1px 3px var(--shadow);
+  }
+
+  .chart-canvas {
+    position: relative;
+    height: 240px;
+    width: 100%;
+  }
+
+  /* PRICE CARDS */
   .price-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing);
   }
 
   .price-card {
-    background: var(--primary-yellow-light);
-    border-radius: var(--border-radius-md);
-    padding: 16px;
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: var(--spacing);
     text-align: center;
-    border: 2px solid var(--primary-yellow);
-    transition: var(--transition-smooth);
+    box-shadow: 0 1px 3px var(--shadow);
+    position: relative;
+    overflow: hidden;
   }
 
-  .price-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-medium);
+  .price-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-secondary);
   }
 
   .fuel-type {
-    font-size: 0.9em;
+    font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
+    color: var(--text-secondary);
     margin-bottom: 8px;
   }
 
   .fuel-price {
-    font-size: 1.5em;
-    font-weight: 700;
-    color: var(--primary-yellow);
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 4px;
   }
 
   .price-change {
-    font-size: 0.8em;
-    margin-top: 4px;
+    font-size: 10px;
     font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 6px;
   }
 
-  .price-change.up { color: var(--error-red); }
-  .price-change.down { color: var(--success-green); }
-  .price-change.neutral { color: var(--medium-text); }
-
-  /* DASHBOARD GRID */
-  .dash-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 24px;
-    margin-bottom: 24px;
+  .price-change.up {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
   }
 
-  .main-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 16px;
-    margin-bottom: 20px;
-  }
-
-  .card {
-    background: var(--card-white);
-    border-radius: var(--border-radius-lg);
-    padding: 20px;
-    box-shadow: var(--shadow-soft);
-    transition: var(--transition-smooth);
-    border: 1px solid var(--border-light);
-  }
-
-  .card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-medium);
-  }
-
-  .card-title {
-    font-size: 1em;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: var(--medium-text);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .big-number {
-    font-size: 1.8em;
-    font-weight: 700;
-    background: var(--gradient-yellow);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .dash-charts {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-
-  .side-cards {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .side-box {
-    background: var(--card-white);
-    border-radius: var(--border-radius-md);
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: var(--shadow-soft);
-    transition: var(--transition-smooth);
-  }
-
-  .side-box:hover {
-    transform: translateX(4px);
-  }
-
-  .side-box-icon {
-    background: var(--gradient-yellow);
-    color: var(--card-white);
-    width: 40px;
-    height: 40px;
-    border-radius: var(--border-radius-sm);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3em;
-  }
-
-  /* FORMS */
-  .form-container {
-    background: var(--card-white);
-    border-radius: var(--border-radius-lg);
-    padding: 24px;
-    box-shadow: var(--shadow-soft);
-    margin-bottom: 24px;
-  }
-
-  .form-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    margin: 20px 0;
-  }
-
-  .form-row input,
-  .form-row select,
-  .form-row button {
-    padding: 14px 16px;
-    border: 2px solid var(--border-light);
-    border-radius: var(--border-radius-sm);
-    font-family: inherit;
-    font-size: 1rem;
-    transition: var(--transition-smooth);
-    background: var(--card-white);
-  }
-
-  .form-row input:focus,
-  .form-row select:focus {
-    outline: none;
-    border-color: var(--primary-yellow);
-    box-shadow: 0 0 0 3px rgba(255, 214, 0, 0.3);
-  }
-
-  .form-row input[readonly],
-  .form-row input[disabled] {
-    background: var(--background-gray);
-    color: var(--medium-text);
+  .price-change.down {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error);
   }
 
   /* NOTIFICATIONS */
   .notification {
     position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 2000;
-    padding: 12px 20px;
-    border-radius: var(--border-radius-sm);
-    box-shadow: var(--shadow-medium);
-    font-weight: 600;
-    animation: slideIn 0.3s ease;
-    max-width: 300px;
+    top: 80px;
+    left: var(--spacing);
+    right: var(--spacing);
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: var(--spacing);
+    box-shadow: 0 8px 24px var(--shadow-lg);
+    z-index: 300;
+    transform: translateY(-100px);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 4px solid var(--primary);
   }
 
-  .notification.success { background: var(--success-green); color: white; }
-  .notification.error { background: var(--error-red); color: white; }
-  .notification.info { background: var(--info-blue); color: white; }
-  .notification.warning { background: var(--warning-orange); color: white; }
-
-  @keyframes slideIn {
-    from { transform: translateX(100%); }
-    to { transform: translateX(0); }
+  .notification.show {
+    transform: translateY(0);
+    opacity: 1;
   }
 
-  /* TABLE */
-  .table-container {
-    background: var(--card-white);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-soft);
-    overflow-x: auto;
-    margin-bottom: 24px;
+  .notification.success {
+    border-left-color: var(--success);
   }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85em;
+  .notification.error {
+    border-left-color: var(--error);
   }
 
-  th, td {
-    padding: 12px 8px;
+  .notification.warning {
+    border-left-color: var(--warning);
+  }
+
+  .notification-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .notification-icon {
+    font-size: 20px;
+  }
+
+  .notification-text {
+    font-size: 14px;
+    font-weight: 500;
+    flex: 1;
+  }
+
+  /* SWIPE INDICATORS */
+  .swipe-indicator {
+    position: absolute;
+    right: var(--spacing);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  /* EMPTY STATES */
+  .empty-state {
     text-align: center;
-    border-bottom: 1px solid var(--border-light);
+    padding: var(--spacing-lg);
+    color: var(--text-muted);
   }
 
-  th {
-    background: var(--primary-yellow-light);
-    font-weight: 700;
-    text-transform: uppercase;
-    font-size: 0.8em;
+  .empty-state-icon {
+    font-size: 48px;
+    margin-bottom: var(--spacing);
+    opacity: 0.5;
   }
 
-  tbody tr:hover {
-    background: var(--primary-yellow-light);
+  .empty-state-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
   }
 
-  .act-btn {
-    background: var(--gradient-yellow);
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: var(--border-radius-sm);
-    font-size: 0.75em;
-    cursor: pointer;
-    margin: 2px;
-    transition: var(--transition-smooth);
+  .empty-state-text {
+    font-size: 14px;
+    line-height: 1.4;
   }
 
-  .act-btn:hover {
-    transform: translateY(-1px);
-  }
-
-  .act-btn.delete { background: var(--error-red); }
-  .act-btn.edit { background: var(--info-blue); }
-
-  .mileage-cell {
-    font-weight: 700;
-    color: var(--success-green);
-  }
-
-  /* Current vehicle indicator */
-  .current-vehicle {
-    background: var(--success-green);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.7em;
-    margin-left: 8px;
-  }
-
-  /* RESPONSIVE DESIGN */
-  @media (max-width: 768px) {
-    .navbar {
-      padding: 12px 16px;
-    }
-
-    .nav-logo {
-      font-size: 1.5rem;
-    }
-
-    .nav-menu {
-      order: 2;
-      width: 100%;
-      justify-content: center;
-      margin: 8px 0;
-      gap: 6px;
-    }
-
-    .nav-menu span {
-      padding: 6px 8px;
-      font-size: 0.75rem;
-    }
-
-    .nav-end {
-      order: 1;
-      margin-left: auto;
-    }
-
+  /* RESPONSIVE TABLET */
+  @media (min-width: 768px) {
     .container {
-      padding: 0 16px;
-      margin: 16px auto;
+      padding: var(--spacing-lg);
+      max-width: 768px;
+      margin: 0 auto;
     }
 
-    .dash-grid {
-      grid-template-columns: 1fr;
+    .stats-grid {
+      grid-template-columns: repeat(4, 1fr);
     }
 
-    .main-cards {
+    .form-grid {
       grid-template-columns: repeat(2, 1fr);
     }
 
-    .dash-charts {
-      grid-template-columns: 1fr;
+    .bottom-nav {
+      display: none;
     }
 
-    .side-cards {
-      flex-direction: row;
-      flex-wrap: wrap;
+    .top-header {
+      padding: 0 var(--spacing-lg);
     }
 
-    .side-box {
-      flex: 1;
-      min-width: 140px;
+    .main-content {
+      padding-bottom: var(--spacing-lg);
     }
 
-    .price-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .form-row {
-      grid-template-columns: 1fr;
-    }
-
-    .budget-stats {
-      grid-template-columns: repeat(2, 1fr);
+    .fab {
+      bottom: var(--spacing-lg);
     }
   }
 
-  @media (max-width: 480px) {
-    .navbar {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .nav-logo {
-      text-align: center;
-      margin: 8px 0;
-    }
-
-    .nav-menu {
-      order: 1;
-      margin: 8px 0;
-    }
-
-    .nav-end {
-      order: 2;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin: 8px 0;
-    }
-
-    .location-info {
-      order: 3;
-      width: 100%;
-      text-align: center;
-      margin: 8px 0;
-    }
-
-    .vehicle-selector {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .main-cards {
-      grid-template-columns: 1fr;
-    }
-
-    .side-cards {
-      flex-direction: column;
+  /* DARK MODE SUPPORT */
+  @media (prefers-color-scheme: dark) {
+    [data-theme="auto"] {
+      --background: #0f172a;
+      --surface: #1e293b;
+      --surface-2: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #64748b;
+      --border: #334155;
+      --border-light: #475569;
     }
   }
 </style>
 </head>
-<body>
-  <!-- NAVIGATION -->
-  <div class="navbar">
-    <div class="nav-logo">⛽ FuelTracker Pro</div>
-    <div class="nav-menu">
-      <span id="tab-dashboard" class="active">🏠 Dashboard</span>
-      <span id="tab-expenses">📝 Expenses</span>
-      <span id="tab-vehicles">🚗 Vehicles</span>
-      <span id="tab-budget">💰 Budget</span>
-      <span id="tab-reports">📊 Reports</span>
-      <span id="tab-settings">⚙️ Settings</span>
+<body data-theme="light">
+  <!-- MODERN TOP HEADER -->
+  <div class="top-header">
+    <div class="logo">
+      ⛽ FuelTracker Pro
     </div>
-    <div class="nav-end">
-      <div class="location-info">📍 <span id="current-location">Chennai, TN</span></div>
-      <span style="font-size: 1.2em; cursor: pointer;" title="Notifications">🔔</span>
-      <div class="nav-profile">
-        P
-        <div class="achievements-badge" id="achievements-badge">0</div>
+    <div class="header-actions">
+      <div class="location-pill">
+        📍 Chennai, TN
+      </div>
+      <button class="header-btn" id="notifications-btn">
+        🔔
+      </button>
+      <button class="header-btn" id="profile-btn">
+        👤
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <div class="container">
+      <!-- DASHBOARD PANEL -->
+      <div class="panel active" id="dashboard-panel">
+        <!-- STATS GRID -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="stat-total">₹ 0</div>
+            <div class="stat-label">Total Spent</div>
+            <div class="stat-change positive" id="stat-total-change">+8.2%</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-value" id="stat-mileage">0</div>
+            <div class="stat-label">Avg Mileage</div>
+            <div class="stat-change positive" id="stat-mileage-change">+2.1%</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-value" id="stat-cost">₹ 0</div>
+            <div class="stat-label">Cost/KM</div>
+            <div class="stat-change negative" id="stat-cost-change">-1.5%</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-value" id="stat-trips">0</div>
+            <div class="stat-label">Fuel Ups</div>
+            <div class="stat-change positive" id="stat-trips-change">+3</div>
+          </div>
+        </div>
+
+        <!-- FUEL PRICES -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">📈 Live Fuel Prices</h3>
+            <button class="btn-secondary" style="padding: 8px 12px; height: auto; font-size: 12px;" id="refresh-prices">
+              🔄 Refresh
+            </button>
+          </div>
+          <div class="price-grid">
+            <div class="price-card">
+              <div class="fuel-type">Petrol</div>
+              <div class="fuel-price">₹ 100.79</div>
+              <div class="price-change up">+₹0.41 ▲</div>
+            </div>
+            <div class="price-card">
+              <div class="fuel-type">Diesel</div>
+              <div class="fuel-price">₹ 92.38</div>
+              <div class="price-change up">+₹0.12 ▲</div>
+            </div>
+            <div class="price-card">
+              <div class="fuel-type">CNG</div>
+              <div class="fuel-price">₹ 75.00</div>
+              <div class="price-change down">-₹0.28 ▼</div>
+            </div>
+          </div>
+          <div style="text-align: center; margin-top: 12px; font-size: 11px; color: var(--text-muted);" id="last-updated">
+            Last updated: Now
+          </div>
+        </div>
+
+        <!-- CHARTS -->
+        <div class="chart-container">
+          <h3 class="card-title" style="margin-bottom: var(--spacing);">📊 Monthly Spending</h3>
+          <div class="chart-canvas">
+            <canvas id="monthlyChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-container">
+          <h3 class="card-title" style="margin-bottom: var(--spacing);">🥧 Fuel Distribution</h3>
+          <div class="chart-canvas">
+            <canvas id="fuelChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXPENSES PANEL -->
+      <div class="panel" id="expenses-panel">
+        <div class="table-wrapper">
+          <div class="table-header">
+            <h3 style="margin: 0;">💰 Recent Expenses</h3>
+            <span style="font-size: 12px; color: var(--text-muted);" id="expense-count">0 entries</span>
+          </div>
+          <div class="expense-list" id="expense-list">
+            <div class="empty-state">
+              <div class="empty-state-icon">⛽</div>
+              <div class="empty-state-title">No expenses yet</div>
+              <div class="empty-state-text">Tap the + button to add your first fuel expense</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANALYTICS PANEL -->
+      <div class="panel" id="analytics-panel">
+        <div class="chart-container">
+          <h3 class="card-title" style="margin-bottom: var(--spacing);">📈 Mileage Trends</h3>
+          <div class="chart-canvas">
+            <canvas id="mileageChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-container">
+          <h3 class="card-title" style="margin-bottom: var(--spacing);">🏪 Top Stations</h3>
+          <div class="chart-canvas">
+            <canvas id="stationsChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- VEHICLES PANEL -->
+      <div class="panel" id="vehicles-panel">
+        <div class="card">
+          <h3 class="card-title">🚗 My Vehicles</h3>
+          <div class="card-subtitle">Manage your vehicles and track expenses</div>
+
+          <div style="margin-top: var(--spacing);">
+            <div style="display: flex; align-items: center; justify-content: between; padding: var(--spacing); background: var(--surface-2); border-radius: var(--radius-sm); margin-bottom: var(--spacing-sm);">
+              <div>
+                <div style="font-weight: 600; margin-bottom: 4px;">My Car</div>
+                <div style="font-size: 12px; color: var(--text-muted);">Petrol • Default Vehicle</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-weight: 700; color: var(--primary);" id="default-vehicle-spent">₹ 0</div>
+                <div style="font-size: 12px; color: var(--text-muted);" id="default-vehicle-mileage">0 km/L</div>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-full" id="add-vehicle-btn">
+            ➕ Add New Vehicle
+          </button>
+        </div>
+      </div>
+
+      <!-- SETTINGS PANEL -->
+      <div class="panel" id="settings-panel">
+        <div class="card">
+          <h3 class="card-title">⚙️ Settings</h3>
+
+          <div style="margin-top: var(--spacing);">
+            <div style="margin-bottom: var(--spacing);">
+              <div style="font-weight: 600; margin-bottom: var(--spacing-sm);">Notifications</div>
+              <label style="display: flex; align-items: center; gap: 12px; padding: 12px 0;">
+                <input type="checkbox" id="price-alerts" checked style="width: 20px; height: 20px;">
+                <span>Fuel price alerts</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 12px; padding: 12px 0;">
+                <input type="checkbox" id="budget-alerts" checked style="width: 20px; height: 20px;">
+                <span>Budget warnings</span>
+              </label>
+            </div>
+
+            <div style="margin-bottom: var(--spacing);">
+              <div style="font-weight: 600; margin-bottom: var(--spacing-sm);">Appearance</div>
+              <button class="btn btn-secondary btn-full" id="theme-toggle">
+                🌓 Toggle Dark Mode
+              </button>
+            </div>
+
+            <div>
+              <div style="font-weight: 600; margin-bottom: var(--spacing-sm);">Data</div>
+              <div style="display: grid; gap: var(--spacing-sm);">
+                <button class="btn btn-success btn-full" id="export-data">📤 Export Data</button>
+                <button class="btn btn-warning btn-full" id="backup-data">💾 Backup Data</button>
+                <button class="btn btn-error btn-full" id="clear-data">🗑️ Clear All Data</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="container">
-    <!-- DASHBOARD PANEL -->
-    <div class="panel active" id="dashboard-panel">
-      <!-- Vehicle Selector -->
-      <div class="vehicle-selector">
-        <strong>🚗 Current Vehicle:</strong>
-        <select class="vehicle-select" id="vehicle-selector">
-          <option value="default">My Car</option>
-        </select>
-        <span id="current-vehicle-indicator" class="current-vehicle">ACTIVE</span>
-        <button class="btn" id="add-vehicle-btn">➕ Add Vehicle</button>
-        <button class="btn btn-secondary" id="export-data-btn">📄 Export</button>
-        <button class="btn btn-success" id="backup-data-btn">☁️ Backup</button>
-      </div>
-
-      <!-- Budget Panel -->
-      <div class="budget-panel">
-        <div class="budget-header">
-          <h3 style="margin: 0;">💰 Monthly Budget</h3>
-          <button class="btn" id="set-budget-btn">Set Budget</button>
-        </div>
-        <div class="budget-progress">
-          <div class="budget-progress-bar" id="budget-progress-bar" style="width: 0%"></div>
-        </div>
-        <div class="budget-stats">
-          <div class="budget-stat">
-            <div class="budget-stat-value" id="budget-spent">₹ 0</div>
-            <div class="budget-stat-label">Spent</div>
-          </div>
-          <div class="budget-stat">
-            <div class="budget-stat-value" id="budget-remaining">₹ 0</div>
-            <div class="budget-stat-label">Remaining</div>
-          </div>
-          <div class="budget-stat">
-            <div class="budget-stat-value" id="budget-target">₹ 0</div>
-            <div class="budget-stat-label">Target</div>
-          </div>
-          <div class="budget-stat">
-            <div class="budget-stat-value" id="budget-days">30</div>
-            <div class="budget-stat-label">Days Left</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Live Fuel Prices -->
-      <div class="live-prices-panel">
-        <div class="live-prices-header">
-          <h3 style="margin: 0;">📈 Live Fuel Prices</h3>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button class="btn btn-secondary" id="detect-location">📍 Detect</button>
-            <button class="btn" id="refresh-prices">🔄 Refresh</button>
-            <button class="btn btn-success" id="price-alerts">🔔 Set Alert</button>
-          </div>
-        </div>
-        <div class="price-grid">
-          <div class="price-card">
-            <div class="fuel-type">Petrol</div>
-            <div class="fuel-price" id="petrol-price">₹ 100.79</div>
-            <div class="price-change up" id="petrol-change">+₹0.41 ▲</div>
-          </div>
-          <div class="price-card">
-            <div class="fuel-type">Diesel</div>
-            <div class="fuel-price" id="diesel-price">₹ 92.38</div>
-            <div class="price-change up" id="diesel-change">+₹0.12 ▲</div>
-          </div>
-          <div class="price-card">
-            <div class="fuel-type">CNG</div>
-            <div class="fuel-price" id="cng-price">₹ 75.00</div>
-            <div class="price-change down" id="cng-change">-₹0.28 ▼</div>
-          </div>
-        </div>
-        <div style="text-align: center; margin-top: 12px; font-size: 0.8em; color: var(--medium-text);" id="last-updated">
-          Last updated: Now - Chennai, Tamil Nadu
-        </div>
-      </div>
-
-      <!-- Dashboard Grid -->
-      <div class="dash-grid">
-        <div>
-          <div class="main-cards">
-            <div class="card">
-              <div class="card-title">💰 Total Spent</div>
-              <div class="big-number" id="dash-total">₹ 0</div>
-            </div>
-            <div class="card">
-              <div class="card-title">⛽ Avg Mileage</div>
-              <div class="big-number" id="dash-mileage">0 km/L</div>
-            </div>
-            <div class="card">
-              <div class="card-title">📈 Cost/KM</div>
-              <div class="big-number" id="dash-cost-per-km">₹ 0</div>
-            </div>
-            <div class="card">
-              <div class="card-title">🎯 Efficiency</div>
-              <div class="big-number" id="dash-efficiency">0%</div>
-            </div>
-          </div>
-          <div class="dash-charts">
-            <div class="card">
-              <div class="card-title">📊 Monthly Spend</div>
-              <canvas id="lineChart" height="110"></canvas>
-            </div>
-            <div class="card">
-              <div class="card-title">🥧 Expense Types</div>
-              <canvas id="pieChart" height="110"></canvas>
-            </div>
-          </div>
-        </div>
-        <div class="side-cards">
-          <div class="side-box">
-            <div class="side-box-icon">🚗</div>
-            <div><b id="dash-fuel-ups">0</b> Fuel ups</div>
-          </div>
-          <div class="side-box">
-            <div class="side-box-icon">📈</div>
-            <div><b id="dash-max-amount">₹ 0</b> Max fuel</div>
-          </div>
-          <div class="side-box">
-            <div class="side-box-icon">📊</div>
-            <div><b id="dash-max-distance">0 km</b> Longest trip</div>
-          </div>
-          <div class="side-box">
-            <div class="side-box-icon">⭐</div>
-            <div><b id="dash-best-mileage">0 km/L</b> Best mileage</div>
-          </div>
-        </div>
-      </div>
+  <!-- MODERN BOTTOM NAVIGATION -->
+  <div class="bottom-nav">
+    <div class="nav-item active" data-panel="dashboard">
+      <div class="nav-icon">🏠</div>
+      <div class="nav-label">Home</div>
     </div>
+    <div class="nav-item" data-panel="expenses">
+      <div class="nav-icon">💰</div>
+      <div class="nav-label">Expenses</div>
+    </div>
+    <div class="nav-item" data-panel="analytics">
+      <div class="nav-icon">📊</div>
+      <div class="nav-label">Analytics</div>
+    </div>
+    <div class="nav-item" data-panel="vehicles">
+      <div class="nav-icon">🚗</div>
+      <div class="nav-label">Vehicles</div>
+    </div>
+    <div class="nav-item" data-panel="settings">
+      <div class="nav-icon">⚙️</div>
+      <div class="nav-label">Settings</div>
+    </div>
+  </div>
 
-    <!-- EXPENSES PANEL -->
-    <div class="panel" id="expenses-panel">
-      <h2 style="text-align: center; margin-bottom: 24px;">📝 Add & Manage Expenses</h2>
+  <!-- FLOATING ACTION BUTTON -->
+  <button class="fab" id="fab">➕</button>
 
-      <div class="form-container">
+  <!-- ADD EXPENSE MODAL -->
+  <div class="modal" id="add-expense-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">➕ Add Fuel Expense</h3>
+        <button class="modal-close" id="close-modal">✕</button>
+      </div>
+      <div class="modal-body">
         <form id="expense-form">
-          <div class="form-row">
-            <input type="date" id="date" required />
-            <select id="fuel-type" required>
-              <option value="">Select Fuel Type</option>
-              <option value="petrol">Petrol</option>
-              <option value="diesel">Diesel</option>
-              <option value="cng">CNG</option>
-            </select>
-            <input type="number" id="amount" placeholder="Total Amount (₹)" step="0.01" min="0" required />
-            <input type="number" id="rate" placeholder="Rate per Litre (₹)" step="0.01" min="0" required />
-            <button type="button" class="btn btn-secondary" id="use-live-rate">📍 Use Live Rate</button>
-            <input type="number" id="litres" placeholder="Litres" step="0.01" readonly />
-            <input type="number" id="fuel-cost" placeholder="Pure Fuel Cost (₹)" step="0.01" readonly />
-            <input type="number" id="additives" placeholder="Additives/Others (₹)" step="0.01" min="0" />
-            <input type="number" id="start-km" placeholder="Start Odometer (KM)" step="0.1" min="0" />
-            <input type="number" id="end-km" placeholder="End Odometer (KM)" step="0.1" min="0" />
-            <input type="number" id="calculated-mileage" placeholder="Calculated Mileage" step="0.01" readonly />
-            <input type="text" id="fuel-station" placeholder="Fuel Station Name" />
-            <button type="submit" id="add-expense-btn">➕ Add Expense</button>
-            <button type="button" id="update-expense-btn" style="display:none;">✏️ Update Expense</button>
-            <button type="button" id="cancel-edit-btn" style="display:none;">❌ Cancel Edit</button>
+          <div class="form-grid">
+            <div class="input-group">
+              <label class="input-label">Date</label>
+              <input type="date" class="form-input" id="date" required />
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">Fuel Type</label>
+              <select class="form-input" id="fuel-type" required>
+                <option value="">Select type</option>
+                <option value="petrol">Petrol</option>
+                <option value="diesel">Diesel</option>
+                <option value="cng">CNG</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid two-col">
+            <div class="input-group">
+              <label class="input-label">Total Amount (₹)</label>
+              <input type="number" class="form-input" id="amount" placeholder="1000" step="0.01" required />
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">Rate per Litre (₹)</label>
+              <input type="number" class="form-input" id="rate" placeholder="100.79" step="0.01" required />
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <button type="button" class="btn btn-secondary" id="use-live-rate">
+              📍 Use Live Chennai Rate
+            </button>
+          </div>
+
+          <div class="form-grid two-col">
+            <div class="input-group">
+              <label class="input-label">Litres</label>
+              <input type="number" class="form-input" id="litres" placeholder="Auto calculated" step="0.01" readonly />
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">Additives (₹)</label>
+              <input type="number" class="form-input" id="additives" placeholder="0" step="0.01" />
+            </div>
+          </div>
+
+          <div class="form-grid two-col">
+            <div class="input-group">
+              <label class="input-label">Start KM</label>
+              <input type="number" class="form-input" id="start-km" placeholder="45000" step="0.1" />
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">End KM</label>
+              <input type="number" class="form-input" id="end-km" placeholder="45500" step="0.1" />
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="input-group">
+              <label class="input-label">Calculated Mileage (km/L)</label>
+              <input type="number" class="form-input" id="mileage" placeholder="Auto calculated" step="0.01" readonly />
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">Fuel Station</label>
+              <input type="text" class="form-input" id="station" placeholder="HP, IOCL, etc." />
+            </div>
+          </div>
+
+          <div style="margin-top: var(--spacing-lg);">
+            <button type="submit" class="btn btn-primary btn-full">
+              ✅ Add Expense
+            </button>
           </div>
         </form>
-      </div>
-
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Amount</th>
-              <th>Rate/L</th>
-              <th>Litres</th>
-              <th>Mileage</th>
-              <th>Station</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="expenses-table-body">
-            <tr id="no-expenses-row">
-              <td colspan="8" style="text-align: center; padding: 40px; color: var(--medium-text);">
-                No expenses added yet. Add your first fuel expense above! 🚗
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- VEHICLES PANEL -->
-    <div class="panel" id="vehicles-panel">
-      <h2 style="text-align: center; margin-bottom: 24px;">🚗 Vehicle Management</h2>
-
-      <div class="form-container">
-        <h3>Add New Vehicle</h3>
-        <form id="vehicle-form">
-          <div class="form-row">
-            <input type="text" id="vehicle-name" placeholder="Vehicle Name (e.g., My Honda City)" required />
-            <select id="vehicle-type" required>
-              <option value="">Select Vehicle Type</option>
-              <option value="car">Car</option>
-              <option value="bike">Motorcycle</option>
-              <option value="truck">Truck</option>
-              <option value="other">Other</option>
-            </select>
-            <select id="primary-fuel-type" required>
-              <option value="">Primary Fuel Type</option>
-              <option value="petrol">Petrol</option>
-              <option value="diesel">Diesel</option>
-              <option value="cng">CNG</option>
-            </select>
-            <input type="text" id="vehicle-model" placeholder="Make & Model (e.g., Honda City 2020)" />
-            <input type="number" id="vehicle-year" placeholder="Year" min="1980" max="2030" />
-            <button type="submit">➕ Add Vehicle</button>
-          </div>
-        </form>
-      </div>
-
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Fuel</th>
-              <th>Model</th>
-              <th>Year</th>
-              <th>Total Spent</th>
-              <th>Avg Mileage</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="vehicles-table-body">
-            <tr>
-              <td>My Car</td>
-              <td>Car</td>
-              <td>Petrol</td>
-              <td>Default Vehicle</td>
-              <td>-</td>
-              <td id="default-vehicle-spent">₹ 0</td>
-              <td id="default-vehicle-mileage">0 km/L</td>
-              <td><span style="color: var(--medium-text); font-size: 0.8em;">Default</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- BUDGET PANEL -->
-    <div class="panel" id="budget-panel">
-      <h2 style="text-align: center; margin-bottom: 24px;">💰 Budget Management</h2>
-
-      <div class="form-container">
-        <h3>Set Monthly Budget</h3>
-        <div class="form-row">
-          <input type="number" id="monthly-budget-input" placeholder="Monthly Budget Amount (₹)" min="0" step="100" />
-          <button type="button" class="btn" id="save-budget-btn">💾 Save Budget</button>
-          <button type="button" class="btn btn-secondary" id="reset-budget-btn">🔄 Reset Budget</button>
-        </div>
-        <div style="margin-top: 16px; padding: 12px; background: var(--primary-yellow-light); border-radius: var(--border-radius-sm);">
-          <strong>💡 Budget Tips:</strong>
-          <ul style="margin: 8px 0; padding-left: 20px;">
-            <li>Set a realistic monthly fuel budget based on your usage</li>
-            <li>Get alerts when you reach 80% and 90% of your budget</li>
-            <li>Track your spending patterns to optimize fuel costs</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- REPORTS PANEL -->
-    <div class="panel" id="reports-panel">
-      <h2 style="text-align: center; margin-bottom: 24px;">📊 Reports & Analytics</h2>
-
-      <div class="form-container">
-        <h3>Export Reports</h3>
-        <div class="form-row">
-          <button type="button" class="btn btn-success" id="export-excel-btn">📊 Export to Excel</button>
-          <button type="button" class="btn btn-secondary" id="export-pdf-btn">📄 Generate PDF Report</button>
-          <button type="button" class="btn" id="export-csv-btn">📋 Export to CSV</button>
-        </div>
-      </div>
-
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-        <div class="card">
-          <div class="card-title">📈 Monthly Spending Trends</div>
-          <canvas id="monthlyChart" height="200"></canvas>
-        </div>
-        <div class="card">
-          <div class="card-title">⛽ Fuel Efficiency Over Time</div>
-          <canvas id="efficiencyChart" height="200"></canvas>
-        </div>
-        <div class="card">
-          <div class="card-title">🏪 Station Usage Analysis</div>
-          <canvas id="stationChart" height="200"></canvas>
-        </div>
-        <div class="card">
-          <div class="card-title">📊 Fuel Type Distribution</div>
-          <canvas id="fuelTypeChart" height="200"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- SETTINGS PANEL -->
-    <div class="panel" id="settings-panel">
-      <h2 style="text-align: center; margin-bottom: 24px;">⚙️ Settings</h2>
-
-      <div class="form-container">
-        <h3>🔔 Notifications</h3>
-        <div style="display: grid; gap: 12px;">
-          <label style="display: flex; align-items: center; gap: 8px;">
-            <input type="checkbox" id="price-alerts-setting" /> 
-            <span>Price Drop Alerts</span>
-          </label>
-          <label style="display: flex; align-items: center; gap: 8px;">
-            <input type="checkbox" id="budget-alerts-setting" checked /> 
-            <span>Budget Warning Alerts</span>
-          </label>
-          <label style="display: flex; align-items: center; gap: 8px;">
-            <input type="checkbox" id="maintenance-alerts-setting" /> 
-            <span>Maintenance Reminders</span>
-          </label>
-        </div>
-
-        <h3>📊 Data Management</h3>
-        <div class="form-row">
-          <input type="file" id="import-file" accept=".json" style="display: none;" />
-          <button type="button" class="btn" id="import-data-btn">📥 Import Data</button>
-          <button type="button" class="btn btn-warning" id="backup-all-btn">💾 Backup All Data</button>
-          <button type="button" class="btn btn-danger" id="clear-all-btn">🗑️ Clear All Data</button>
-        </div>
-
-        <h3>🎨 Preferences</h3>
-        <div class="form-row">
-          <select id="currency-setting">
-            <option value="INR">Indian Rupee (₹)</option>
-            <option value="USD">US Dollar ($)</option>
-            <option value="EUR">Euro (€)</option>
-          </select>
-          <select id="date-format-setting">
-            <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-            <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-            <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-          </select>
-        </div>
       </div>
     </div>
   </div>
 
 <script>
-// ===== FULLY FUNCTIONAL FUELTRACKER PRO - FIXED VERSION =====
+// ===== MODERN MOBILE FUELTRACKER PRO =====
 
 // Data Storage
 const FuelTrackerData = {
-  expenses: JSON.parse(localStorage.getItem('fuelTracker_expenses')) || [],
-  vehicles: JSON.parse(localStorage.getItem('fuelTracker_vehicles')) || [
-    { id: 'default', name: 'My Car', type: 'car', fuelType: 'petrol', model: 'Default Vehicle', year: null }
+  expenses: JSON.parse(localStorage.getItem('modernFuelTracker_expenses')) || [],
+  vehicles: JSON.parse(localStorage.getItem('modernFuelTracker_vehicles')) || [
+    { id: 'default', name: 'My Car', type: 'car', fuelType: 'petrol', model: 'Default Vehicle' }
   ],
-  budget: JSON.parse(localStorage.getItem('fuelTracker_budget')) || { monthly: 0, alerts: true },
-  settings: JSON.parse(localStorage.getItem('fuelTracker_settings')) || {
-    priceAlerts: false,
-    budgetAlerts: true,
-    maintenanceAlerts: false,
-    currency: 'INR',
-    dateFormat: 'DD/MM/YYYY'
-  },
-  currentVehicle: localStorage.getItem('fuelTracker_currentVehicle') || 'default'
+  currentVehicle: localStorage.getItem('modernFuelTracker_currentVehicle') || 'default'
 };
 
-// Current edit state
-let editingExpenseId = null;
+let charts = {};
 
-// Chart instances to track for destruction
-let dashboardCharts = {
-  lineChart: null,
-  pieChart: null,
-  monthlyChart: null,
-  efficiencyChart: null,
-  stationChart: null,
-  fuelTypeChart: null
-};
-
-// Fuel prices data
+// Chennai fuel prices
 const fuelPrices = {
-  'Chennai': { petrol: 100.79, diesel: 92.38, cng: 75.00 },
-  'Mumbai': { petrol: 104.19, diesel: 92.13, cng: 76.00 },
-  'Delhi': { petrol: 94.81, diesel: 87.71, cng: 76.59 },
-  'Kolkata': { petrol: 104.99, diesel: 91.81, cng: 90.00 },
-  'Bangalore': { petrol: 102.86, diesel: 88.87, cng: 78.00 }
+  'Chennai': { petrol: 100.79, diesel: 92.38, cng: 75.00 }
 };
 
-let currentLocation = 'Chennai';
-
-// Save data to localStorage
+// Save data
 function saveData() {
-  localStorage.setItem('fuelTracker_expenses', JSON.stringify(FuelTrackerData.expenses));
-  localStorage.setItem('fuelTracker_vehicles', JSON.stringify(FuelTrackerData.vehicles));
-  localStorage.setItem('fuelTracker_budget', JSON.stringify(FuelTrackerData.budget));
-  localStorage.setItem('fuelTracker_settings', JSON.stringify(FuelTrackerData.settings));
-  localStorage.setItem('fuelTracker_currentVehicle', FuelTrackerData.currentVehicle);
+  localStorage.setItem('modernFuelTracker_expenses', JSON.stringify(FuelTrackerData.expenses));
+  localStorage.setItem('modernFuelTracker_vehicles', JSON.stringify(FuelTrackerData.vehicles));
+  localStorage.setItem('modernFuelTracker_currentVehicle', FuelTrackerData.currentVehicle);
 }
 
-// Notification System
-function showNotification(message, type = 'info', duration = 3000) {
+// Modern notification system
+function showNotification(message, type = 'info', duration = 4000) {
   const notification = document.createElement('div');
   notification.className = `notification ${type}`;
-  notification.textContent = message;
+
+  const icons = {
+    success: '✅',
+    error: '❌',
+    warning: '⚠️',
+    info: 'ℹ️'
+  };
+
+  notification.innerHTML = `
+    <div class="notification-content">
+      <div class="notification-icon">${icons[type]}</div>
+      <div class="notification-text">${message}</div>
+    </div>
+  `;
+
   document.body.appendChild(notification);
 
+  // Trigger animation
+  setTimeout(() => notification.classList.add('show'), 50);
+
   setTimeout(() => {
-    if (notification.parentNode) {
-      notification.parentNode.removeChild(notification);
-    }
+    notification.classList.remove('show');
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 400);
   }, duration);
 }
 
 // Navigation System
-function initNavigation() {
-  const tabs = document.querySelectorAll('.nav-menu span');
+function initializeNavigation() {
+  const navItems = document.querySelectorAll('.nav-item');
   const panels = document.querySelectorAll('.panel');
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      panels.forEach(p => p.classList.remove('active'));
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const panelName = item.dataset.panel;
 
-      tab.classList.add('active');
+      // Update navigation
+      navItems.forEach(nav => nav.classList.remove('active'));
+      item.classList.add('active');
 
-      const panelId = tab.id.replace('tab-', '') + '-panel';
-      const targetPanel = document.getElementById(panelId);
-      if (targetPanel) {
-        targetPanel.classList.add('active');
+      // Update panels
+      panels.forEach(panel => panel.classList.remove('active'));
+      document.getElementById(`${panelName}-panel`).classList.add('active');
+
+      // Load panel data
+      loadPanelData(panelName);
+
+      // Haptic feedback
+      if (navigator.vibrate) {
+        navigator.vibrate(10);
       }
-
-      // Load specific data for panel
-      loadPanelData(panelId);
     });
   });
 }
 
-function loadPanelData(panelId) {
-  switch(panelId) {
-    case 'dashboard-panel':
+function loadPanelData(panelName) {
+  switch(panelName) {
+    case 'dashboard':
       updateDashboard();
+      setTimeout(() => updateDashboardCharts(), 100);
       break;
-    case 'expenses-panel':
-      renderExpensesTable();
+    case 'expenses':
+      renderExpensesList();
       break;
-    case 'vehicles-panel':
-      renderVehiclesTable();
+    case 'analytics':
+      setTimeout(() => updateAnalyticsCharts(), 100);
       break;
-    case 'reports-panel':
-      renderReportsCharts();
+    case 'vehicles':
+      updateVehiclesDisplay();
       break;
   }
 }
 
-// FIXED: Vehicle Management with proper switching
-function initVehicles() {
-  const vehicleSelector = document.getElementById('vehicle-selector');
+// FAB and Modal
+function initializeFAB() {
+  const fab = document.getElementById('fab');
+  const modal = document.getElementById('add-expense-modal');
+  const closeBtn = document.getElementById('close-modal');
 
-  // Populate vehicle selector
-  function populateVehicleSelector() {
-    vehicleSelector.innerHTML = '';
-    FuelTrackerData.vehicles.forEach(vehicle => {
-      const option = document.createElement('option');
-      option.value = vehicle.id;
-      option.textContent = vehicle.name;
-      vehicleSelector.appendChild(option);
-    });
+  fab.addEventListener('click', () => {
+    modal.classList.add('show');
+    document.getElementById('date').value = new Date().toISOString().slice(0, 10);
 
-    // Set current vehicle
-    vehicleSelector.value = FuelTrackerData.currentVehicle;
-    updateCurrentVehicleIndicator();
-  }
+    // Focus first input after animation
+    setTimeout(() => {
+      document.getElementById('amount').focus();
+    }, 300);
 
-  function updateCurrentVehicleIndicator() {
-    const currentVehicle = FuelTrackerData.vehicles.find(v => v.id === FuelTrackerData.currentVehicle);
-    const indicator = document.getElementById('current-vehicle-indicator');
-    if (currentVehicle) {
-      indicator.textContent = `${currentVehicle.name.toUpperCase()}`;
+    // Haptic feedback
+    if (navigator.vibrate) {
+      navigator.vibrate([10, 50, 10]);
     }
-  }
-
-  populateVehicleSelector();
-
-  // FIXED: Vehicle selector change event
-  vehicleSelector.addEventListener('change', (e) => {
-    console.log('Vehicle changed from', FuelTrackerData.currentVehicle, 'to', e.target.value);
-    FuelTrackerData.currentVehicle = e.target.value;
-    saveData();
-    updateCurrentVehicleIndicator();
-    updateDashboard();
-    renderExpensesTable();
-    showNotification(`Switched to: ${e.target.selectedOptions[0].text}`, 'success');
   });
 
-  // Add vehicle form
-  document.getElementById('vehicle-form').addEventListener('submit', (e) => {
-    e.preventDefault();
+  closeBtn.addEventListener('click', () => {
+    modal.classList.remove('show');
+  });
 
-    const name = document.getElementById('vehicle-name').value.trim();
-    const type = document.getElementById('vehicle-type').value;
-    const fuelType = document.getElementById('primary-fuel-type').value;
-    const model = document.getElementById('vehicle-model').value.trim();
-    const year = document.getElementById('vehicle-year').value;
-
-    if (!name || !type || !fuelType) {
-      showNotification('Please fill all required fields!', 'error');
-      return;
+  // Close on backdrop click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.remove('show');
     }
+  });
 
-    const newVehicle = {
-      id: Date.now().toString(),
-      name,
-      type,
-      fuelType,
-      model: model || 'Not specified',
-      year: year || null
-    };
-
-    FuelTrackerData.vehicles.push(newVehicle);
-    saveData();
-
-    populateVehicleSelector();
-    renderVehiclesTable();
-
-    // Clear form
-    document.getElementById('vehicle-form').reset();
-
-    showNotification(`Vehicle "${name}" added successfully!`, 'success');
+  // Prevent modal content clicks from closing modal
+  modal.querySelector('.modal-content').addEventListener('click', (e) => {
+    e.stopPropagation();
   });
 }
 
-function renderVehiclesTable() {
-  const tbody = document.getElementById('vehicles-table-body');
-  tbody.innerHTML = '';
-
-  FuelTrackerData.vehicles.forEach((vehicle, index) => {
-    const vehicleExpenses = getVehicleExpenses(vehicle.id);
-    const totalSpent = vehicleExpenses.reduce((sum, exp) => sum + Number(exp.amount), 0);
-    const avgMileage = calculateAverageMileage(vehicleExpenses);
-
-    const row = document.createElement('tr');
-    const isCurrentVehicle = vehicle.id === FuelTrackerData.currentVehicle;
-
-    row.innerHTML = `
-      <td>
-        <strong>${vehicle.name}</strong>
-        ${isCurrentVehicle ? '<span class="current-vehicle">CURRENT</span>' : ''}
-      </td>
-      <td>${vehicle.type}</td>
-      <td>${vehicle.fuelType}</td>
-      <td>${vehicle.model}</td>
-      <td>${vehicle.year || '-'}</td>
-      <td>₹ ${totalSpent.toLocaleString()}</td>
-      <td>${avgMileage} km/L</td>
-      <td>
-        ${vehicle.id === 'default' ? 
-          '<span style="color: var(--medium-text); font-size: 0.8em;">Default</span>' : 
-          `<button class="act-btn delete" onclick="deleteVehicle('${vehicle.id}')">Delete</button>`
-        }
-      </td>
-    `;
-    tbody.appendChild(row);
-  });
-}
-
-function deleteVehicle(vehicleId) {
-  if (confirm('Are you sure you want to delete this vehicle? Associated expenses will be moved to default vehicle.')) {
-    // Move expenses to default vehicle
-    FuelTrackerData.expenses.forEach(expense => {
-      if (expense.vehicleId === vehicleId) {
-        expense.vehicleId = 'default';
-      }
-    });
-
-    // Remove vehicle
-    FuelTrackerData.vehicles = FuelTrackerData.vehicles.filter(v => v.id !== vehicleId);
-
-    // Update current vehicle if needed
-    if (FuelTrackerData.currentVehicle === vehicleId) {
-      FuelTrackerData.currentVehicle = 'default';
-    }
-
-    saveData();
-    initVehicles(); // Reinitialize to update dropdown
-    updateDashboard();
-    renderVehiclesTable();
-
-    showNotification('Vehicle deleted successfully!', 'success');
-  }
-}
-
-window.deleteVehicle = deleteVehicle;
-
-// Expense Management (unchanged but working)
-function initExpenses() {
-  const expenseForm = document.getElementById('expense-form');
-  const addBtn = document.getElementById('add-expense-btn');
-  const updateBtn = document.getElementById('update-expense-btn');
-  const cancelBtn = document.getElementById('cancel-edit-btn');
-
-  // Auto calculations
+// Form handling
+function initializeForm() {
+  const form = document.getElementById('expense-form');
   const amountInput = document.getElementById('amount');
   const rateInput = document.getElementById('rate');
   const additivesInput = document.getElementById('additives');
   const startKmInput = document.getElementById('start-km');
   const endKmInput = document.getElementById('end-km');
   const litresInput = document.getElementById('litres');
-  const fuelCostInput = document.getElementById('fuel-cost');
-  const mileageInput = document.getElementById('calculated-mileage');
+  const mileageInput = document.getElementById('mileage');
 
   function calculateValues() {
     const amount = Number(amountInput.value) || 0;
@@ -1313,11 +1315,9 @@ function initExpenses() {
     const startKm = Number(startKmInput.value) || 0;
     const endKm = Number(endKmInput.value) || 0;
 
-    // Calculate fuel cost and litres
+    // Calculate litres
     const fuelCost = amount - additives;
     const litres = rate > 0 ? fuelCost / rate : 0;
-
-    fuelCostInput.value = fuelCost > 0 ? fuelCost.toFixed(2) : '';
     litresInput.value = litres > 0 ? litres.toFixed(2) : '';
 
     // Calculate mileage
@@ -1329,12 +1329,12 @@ function initExpenses() {
     }
   }
 
-  // Add calculation listeners
+  // Add listeners for auto-calculation
   [amountInput, rateInput, additivesInput, startKmInput, endKmInput].forEach(input => {
     input.addEventListener('input', calculateValues);
   });
 
-  // Use live rate button
+  // Live rate button
   document.getElementById('use-live-rate').addEventListener('click', () => {
     const fuelType = document.getElementById('fuel-type').value;
     if (!fuelType) {
@@ -1342,827 +1342,454 @@ function initExpenses() {
       return;
     }
 
-    const price = fuelPrices[currentLocation][fuelType];
+    const price = fuelPrices['Chennai'][fuelType];
     if (price) {
       rateInput.value = price.toFixed(2);
       calculateValues();
-      showNotification(`Live ${fuelType} rate filled: ₹${price}`, 'success');
+      showNotification(`Chennai ${fuelType} rate: ₹${price}`, 'success');
     }
   });
 
   // Form submission
-  expenseForm.addEventListener('submit', (e) => {
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
 
     const formData = {
-      id: editingExpenseId || Date.now().toString(),
+      id: Date.now().toString(),
       date: document.getElementById('date').value,
       fuelType: document.getElementById('fuel-type').value,
       amount: Number(document.getElementById('amount').value),
       rate: Number(document.getElementById('rate').value),
       litres: Number(document.getElementById('litres').value),
-      fuelCost: Number(document.getElementById('fuel-cost').value),
       additives: Number(document.getElementById('additives').value) || 0,
       startKm: Number(document.getElementById('start-km').value) || 0,
       endKm: Number(document.getElementById('end-km').value) || 0,
-      mileage: Number(document.getElementById('calculated-mileage').value) || 0,
-      station: document.getElementById('fuel-station').value.trim(),
+      mileage: Number(document.getElementById('mileage').value) || 0,
+      station: document.getElementById('station').value.trim(),
       vehicleId: FuelTrackerData.currentVehicle,
       timestamp: Date.now()
     };
 
-    if (editingExpenseId) {
-      // Update existing expense
-      const index = FuelTrackerData.expenses.findIndex(exp => exp.id === editingExpenseId);
-      if (index !== -1) {
-        FuelTrackerData.expenses[index] = formData;
-        showNotification('Expense updated successfully!', 'success');
-      }
-    } else {
-      // Add new expense
-      FuelTrackerData.expenses.push(formData);
-      showNotification('Expense added successfully!', 'success');
-    }
-
+    FuelTrackerData.expenses.push(formData);
     saveData();
-    expenseForm.reset();
-    resetEditMode();
-    renderExpensesTable();
+
+    // Close modal
+    document.getElementById('add-expense-modal').classList.remove('show');
+    form.reset();
+
+    // Update displays
     updateDashboard();
+    renderExpensesList();
+    setTimeout(() => {
+      updateDashboardCharts();
+      updateAnalyticsCharts();
+    }, 100);
+
+    showNotification('✅ Expense added successfully!', 'success');
+
+    // Haptic feedback
+    if (navigator.vibrate) {
+      navigator.vibrate([20, 100, 20]);
+    }
+  });
+}
+
+// Dashboard updates
+function updateDashboard() {
+  const expenses = getVehicleExpenses(FuelTrackerData.currentVehicle);
+
+  const totalSpent = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+  const avgMileage = calculateAverageMileage(expenses);
+  const totalDistance = expenses.reduce((sum, exp) => sum + (exp.endKm - exp.startKm), 0);
+  const costPerKm = totalDistance > 0 ? totalSpent / totalDistance : 0;
+
+  document.getElementById('stat-total').textContent = `₹ ${totalSpent.toLocaleString()}`;
+  document.getElementById('stat-mileage').textContent = `${avgMileage} km/L`;
+  document.getElementById('stat-cost').textContent = `₹ ${costPerKm.toFixed(2)}`;
+  document.getElementById('stat-trips').textContent = expenses.length;
+}
+
+function updateDashboardCharts() {
+  const expenses = getVehicleExpenses(FuelTrackerData.currentVehicle);
+
+  // Destroy existing charts
+  if (charts.monthly) charts.monthly.destroy();
+  if (charts.fuel) charts.fuel.destroy();
+
+  // Monthly spending chart
+  const monthlyData = {};
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+
+  const months = [];
+  const amounts = [];
+
+  for (let i = 5; i >= 0; i--) {
+    const date = new Date(currentYear, currentMonth - i, 1);
+    const monthKey = date.toISOString().slice(0, 7);
+    const monthName = date.toLocaleDateString('en-US', { month: 'short' });
+    months.push(monthName);
+
+    const monthExpenses = expenses.filter(exp => exp.date && exp.date.startsWith(monthKey));
+    const total = monthExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+    amounts.push(total);
+  }
+
+  const monthlyCtx = document.getElementById('monthlyChart');
+  if (monthlyCtx) {
+    charts.monthly = new Chart(monthlyCtx, {
+      type: 'line',
+      data: {
+        labels: months,
+        datasets: [{
+          data: amounts,
+          borderColor: '#6366f1',
+          backgroundColor: 'rgba(99, 102, 241, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { 
+            beginAtZero: true,
+            grid: { color: 'rgba(148, 163, 184, 0.1)' },
+            ticks: { font: { size: 10 } }
+          },
+          x: { 
+            grid: { display: false },
+            ticks: { font: { size: 10 } }
+          }
+        }
+      }
+    });
+  }
+
+  // Fuel type chart
+  const fuelTypes = {};
+  expenses.forEach(exp => {
+    const type = exp.fuelType || 'petrol';
+    fuelTypes[type] = (fuelTypes[type] || 0) + exp.amount;
   });
 
-  // Cancel edit
-  cancelBtn.addEventListener('click', () => {
-    expenseForm.reset();
-    resetEditMode();
-  });
+  const fuelCtx = document.getElementById('fuelChart');
+  if (fuelCtx) {
+    const labels = Object.keys(fuelTypes);
+    const data = Object.values(fuelTypes);
 
-  function resetEditMode() {
-    editingExpenseId = null;
-    addBtn.style.display = 'inline-flex';
-    updateBtn.style.display = 'none';
-    cancelBtn.style.display = 'none';
+    charts.fuel = new Chart(fuelCtx, {
+      type: 'doughnut',
+      data: {
+        labels: labels.length > 0 ? labels : ['No Data'],
+        datasets: [{
+          data: data.length > 0 ? data : [1],
+          backgroundColor: ['#6366f1', '#f59e0b', '#10b981'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { 
+            position: 'bottom',
+            labels: { font: { size: 10 } }
+          }
+        }
+      }
+    });
   }
 }
 
-function renderExpensesTable() {
-  const tbody = document.getElementById('expenses-table-body');
+function updateAnalyticsCharts() {
+  const expenses = getVehicleExpenses(FuelTrackerData.currentVehicle);
 
-  const vehicleExpenses = getVehicleExpenses(FuelTrackerData.currentVehicle);
+  // Destroy existing charts
+  if (charts.mileage) charts.mileage.destroy();
+  if (charts.stations) charts.stations.destroy();
 
-  if (vehicleExpenses.length === 0) {
-    tbody.innerHTML = `
-      <tr id="no-expenses-row">
-        <td colspan="8" style="text-align: center; padding: 40px; color: var(--medium-text);">
-          No expenses found for this vehicle. Add your first expense above! 🚗
-        </td>
-      </tr>
+  // Mileage chart
+  const recentExpenses = expenses.filter(exp => exp.mileage > 0).slice(-8);
+  const mileageData = recentExpenses.map(exp => exp.mileage);
+  const mileageLabels = recentExpenses.map((_, index) => `Fill ${index + 1}`);
+
+  const mileageCtx = document.getElementById('mileageChart');
+  if (mileageCtx) {
+    charts.mileage = new Chart(mileageCtx, {
+      type: 'bar',
+      data: {
+        labels: mileageLabels.length > 0 ? mileageLabels : ['No Data'],
+        datasets: [{
+          data: mileageData.length > 0 ? mileageData : [0],
+          backgroundColor: '#10b981',
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { 
+            beginAtZero: true,
+            grid: { color: 'rgba(148, 163, 184, 0.1)' },
+            ticks: { font: { size: 10 } }
+          },
+          x: { 
+            grid: { display: false },
+            ticks: { font: { size: 10 } }
+          }
+        }
+      }
+    });
+  }
+
+  // Stations chart
+  const stations = {};
+  expenses.forEach(exp => {
+    if (exp.station) {
+      stations[exp.station] = (stations[exp.station] || 0) + 1;
+    }
+  });
+
+  const stationEntries = Object.entries(stations).slice(0, 5);
+  const stationLabels = stationEntries.map(([station]) => station);
+  const stationData = stationEntries.map(([, count]) => count);
+
+  const stationsCtx = document.getElementById('stationsChart');
+  if (stationsCtx) {
+    charts.stations = new Chart(stationsCtx, {
+      type: 'horizontalBar',
+      data: {
+        labels: stationLabels.length > 0 ? stationLabels : ['No Data'],
+        datasets: [{
+          data: stationData.length > 0 ? stationData : [0],
+          backgroundColor: '#f59e0b'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { 
+            beginAtZero: true,
+            grid: { color: 'rgba(148, 163, 184, 0.1)' },
+            ticks: { font: { size: 10 } }
+          },
+          y: { 
+            grid: { display: false },
+            ticks: { font: { size: 10 } }
+          }
+        }
+      }
+    });
+  }
+}
+
+// Expenses list
+function renderExpensesList() {
+  const expenseList = document.getElementById('expense-list');
+  const expenses = getVehicleExpenses(FuelTrackerData.currentVehicle);
+
+  if (expenses.length === 0) {
+    expenseList.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">⛽</div>
+        <div class="empty-state-title">No expenses yet</div>
+        <div class="empty-state-text">Tap the + button to add your first fuel expense</div>
+      </div>
     `;
+    document.getElementById('expense-count').textContent = '0 entries';
     return;
   }
 
-  tbody.innerHTML = '';
+  document.getElementById('expense-count').textContent = `${expenses.length} entries`;
 
   // Sort by date, newest first
-  vehicleExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+  expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  vehicleExpenses.forEach(expense => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${formatDate(expense.date)}</td>
-      <td>${expense.fuelType || 'Petrol'}</td>
-      <td>₹ ${expense.amount.toLocaleString()}</td>
-      <td>₹ ${expense.rate.toFixed(2)}</td>
-      <td>${expense.litres.toFixed(2)} L</td>
-      <td class="mileage-cell">${expense.mileage ? expense.mileage.toFixed(2) + ' km/L' : '-'}</td>
-      <td>${expense.station || '-'}</td>
-      <td>
-        <button class="act-btn edit" onclick="editExpense('${expense.id}')">Edit</button>
-        <button class="act-btn delete" onclick="deleteExpense('${expense.id}')">Delete</button>
-      </td>
-    `;
-    tbody.appendChild(row);
+  expenseList.innerHTML = expenses.map(expense => `
+    <div class="expense-item" data-id="${expense.id}">
+      <div class="expense-header">
+        <div class="expense-amount">₹ ${expense.amount.toLocaleString()}</div>
+        <div class="expense-date">${formatDate(expense.date)}</div>
+      </div>
+      <div class="expense-details">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="expense-type">${expense.fuelType || 'petrol'}</span>
+          <span>${expense.litres.toFixed(1)}L</span>
+        </div>
+        <div>
+          ${expense.mileage ? `${expense.mileage.toFixed(1)} km/L` : 'No mileage'}
+        </div>
+      </div>
+      <div class="swipe-indicator">← Swipe</div>
+    </div>
+  `).join('');
+
+  // Add swipe gestures
+  initializeSwipeGestures();
+}
+
+function initializeSwipeGestures() {
+  const expenseItems = document.querySelectorAll('.expense-item');
+
+  expenseItems.forEach(item => {
+    const hammer = new Hammer(item);
+    hammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });
+
+    hammer.on('swipeleft', () => {
+      const expenseId = item.dataset.id;
+      showExpenseActions(expenseId);
+    });
+
+    hammer.on('swiperight', () => {
+      const expenseId = item.dataset.id;
+      editExpense(expenseId);
+    });
   });
 }
 
-function editExpense(expenseId) {
-  const expense = FuelTrackerData.expenses.find(exp => exp.id === expenseId);
-  if (!expense) return;
-
-  // Switch to expenses tab if not active
-  document.getElementById('tab-expenses').click();
-
-  // Fill form with expense data
-  document.getElementById('date').value = expense.date;
-  document.getElementById('fuel-type').value = expense.fuelType;
-  document.getElementById('amount').value = expense.amount;
-  document.getElementById('rate').value = expense.rate;
-  document.getElementById('additives').value = expense.additives || 0;
-  document.getElementById('start-km').value = expense.startKm || '';
-  document.getElementById('end-km').value = expense.endKm || '';
-  document.getElementById('fuel-station').value = expense.station || '';
-
-  // Calculate derived values
-  document.getElementById('litres').value = expense.litres.toFixed(2);
-  document.getElementById('fuel-cost').value = expense.fuelCost.toFixed(2);
-  document.getElementById('calculated-mileage').value = expense.mileage ? expense.mileage.toFixed(2) : '';
-
-  // Set edit mode
-  editingExpenseId = expenseId;
-  document.getElementById('add-expense-btn').style.display = 'none';
-  document.getElementById('update-expense-btn').style.display = 'inline-flex';
-  document.getElementById('cancel-edit-btn').style.display = 'inline-flex';
-
-  // Scroll to form
-  document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth' });
-
-  showNotification('Edit mode activated. Make changes and click Update.', 'info');
-}
-
-function deleteExpense(expenseId) {
-  if (confirm('Are you sure you want to delete this expense?')) {
+function showExpenseActions(expenseId) {
+  if (confirm('Delete this expense?')) {
     FuelTrackerData.expenses = FuelTrackerData.expenses.filter(exp => exp.id !== expenseId);
     saveData();
-    renderExpensesTable();
+    renderExpensesList();
     updateDashboard();
-    showNotification('Expense deleted successfully!', 'success');
+    setTimeout(() => {
+      updateDashboardCharts();
+      updateAnalyticsCharts();
+    }, 100);
+    showNotification('Expense deleted', 'success');
   }
 }
 
-// Make functions available globally
-window.editExpense = editExpense;
-window.deleteExpense = deleteExpense;
+function editExpense(expenseId) {
+  showNotification('Edit feature coming soon!', 'info');
+}
 
-// Helper Functions
+// Theme toggle
+function initializeTheme() {
+  const themeToggle = document.getElementById('theme-toggle');
+
+  themeToggle.addEventListener('click', () => {
+    const currentTheme = document.body.dataset.theme;
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+    document.body.dataset.theme = newTheme;
+    localStorage.setItem('theme', newTheme);
+
+    showNotification(`Switched to ${newTheme} mode`, 'success');
+  });
+
+  // Load saved theme
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  document.body.dataset.theme = savedTheme;
+}
+
+// Settings
+function initializeSettings() {
+  document.getElementById('export-data').addEventListener('click', () => {
+    const data = JSON.stringify(FuelTrackerData, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'fueltracker-data.json';
+    a.click();
+    showNotification('Data exported successfully!', 'success');
+  });
+
+  document.getElementById('clear-data').addEventListener('click', () => {
+    if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+      localStorage.clear();
+      location.reload();
+    }
+  });
+}
+
+function updateVehiclesDisplay() {
+  const expenses = getVehicleExpenses('default');
+  const totalSpent = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+  const avgMileage = calculateAverageMileage(expenses);
+
+  document.getElementById('default-vehicle-spent').textContent = `₹ ${totalSpent.toLocaleString()}`;
+  document.getElementById('default-vehicle-mileage').textContent = `${avgMileage} km/L`;
+}
+
+// Helper functions
 function getVehicleExpenses(vehicleId) {
   return FuelTrackerData.expenses.filter(exp => exp.vehicleId === vehicleId);
 }
 
 function calculateAverageMileage(expenses) {
-  const validMileages = expenses.filter(exp => exp.mileage > 0).map(exp => exp.mileage);
-  if (validMileages.length === 0) return 0;
-  return (validMileages.reduce((sum, mileage) => sum + mileage, 0) / validMileages.length).toFixed(1);
+  const validMileages = expenses.filter(exp => exp.mileage > 0);
+  if (validMileages.length === 0) return '0.0';
+  return (validMileages.reduce((sum, exp) => sum + exp.mileage, 0) / validMileages.length).toFixed(1);
 }
 
 function formatDate(dateStr) {
   if (!dateStr) return '-';
   const date = new Date(dateStr);
-  return date.toLocaleDateString('en-IN');
-}
-
-function getCurrentMonthExpenses() {
-  const currentMonth = new Date().toISOString().slice(0, 7);
-  return getVehicleExpenses(FuelTrackerData.currentVehicle)
-    .filter(exp => exp.date && exp.date.startsWith(currentMonth));
-}
-
-// Dashboard Updates
-function updateDashboard() {
-  const expenses = getVehicleExpenses(FuelTrackerData.currentVehicle);
-
-  // Calculate metrics
-  const totalSpent = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-  const avgMileage = calculateAverageMileage(expenses);
-  const totalDistance = expenses.reduce((sum, exp) => sum + (exp.endKm - exp.startKm), 0);
-  const costPerKm = totalDistance > 0 ? totalSpent / totalDistance : 0;
-  const efficiency = avgMileage > 0 ? Math.min(100, (avgMileage / 20) * 100) : 0;
-  const maxAmount = expenses.length > 0 ? Math.max(...expenses.map(exp => exp.amount)) : 0;
-  const maxDistance = expenses.length > 0 ? Math.max(...expenses.map(exp => exp.endKm - exp.startKm)) : 0;
-  const bestMileage = expenses.length > 0 ? Math.max(...expenses.map(exp => exp.mileage || 0)) : 0;
-
-  // Update dashboard cards
-  document.getElementById('dash-total').textContent = `₹ ${totalSpent.toLocaleString()}`;
-  document.getElementById('dash-mileage').textContent = `${avgMileage} km/L`;
-  document.getElementById('dash-cost-per-km').textContent = `₹ ${costPerKm.toFixed(2)}`;
-  document.getElementById('dash-efficiency').textContent = `${efficiency.toFixed(0)}%`;
-
-  // Update side cards
-  document.getElementById('dash-fuel-ups').textContent = expenses.length;
-  document.getElementById('dash-max-amount').textContent = `₹ ${maxAmount.toLocaleString()}`;
-  document.getElementById('dash-max-distance').textContent = `${maxDistance} km`;
-  document.getElementById('dash-best-mileage').textContent = `${bestMileage.toFixed(1)} km/L`;
-
-  // Update budget
-  updateBudgetDisplay();
-
-  // Update charts
-  updateDashboardCharts();
-}
-
-function updateBudgetDisplay() {
-  const currentMonthExpenses = getCurrentMonthExpenses();
-  const spent = currentMonthExpenses.reduce((sum, exp) => sum + exp.amount, 0);
-  const budget = FuelTrackerData.budget.monthly || 0;
-  const remaining = Math.max(0, budget - spent);
-  const percentage = budget > 0 ? (spent / budget) * 100 : 0;
-
-  // Calculate days left in month
-  const now = new Date();
-  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-  const daysLeft = lastDay - now.getDate();
-
-  // Update budget display
-  document.getElementById('budget-spent').textContent = `₹ ${spent.toLocaleString()}`;
-  document.getElementById('budget-remaining').textContent = `₹ ${remaining.toLocaleString()}`;
-  document.getElementById('budget-target').textContent = `₹ ${budget.toLocaleString()}`;
-  document.getElementById('budget-days').textContent = daysLeft;
-
-  // Update progress bar
-  const progressBar = document.getElementById('budget-progress-bar');
-  progressBar.style.width = `${Math.min(100, percentage)}%`;
-  progressBar.className = 'budget-progress-bar';
-
-  if (percentage > 100) {
-    progressBar.classList.add('danger');
-  } else if (percentage > 80) {
-    progressBar.classList.add('warning');
-  }
-
-  // Budget alerts
-  if (FuelTrackerData.settings.budgetAlerts && percentage > 90 && budget > 0) {
-    showNotification(`Budget Alert: You've used ${percentage.toFixed(0)}% of your monthly budget!`, 'warning', 5000);
-  }
-}
-
-// FIXED: Dashboard charts with proper cleanup
-function updateDashboardCharts() {
-  // Monthly spending chart
-  const monthlyData = {};
-  const expenses = getVehicleExpenses(FuelTrackerData.currentVehicle);
-
-  expenses.forEach(exp => {
-    if (!exp.date) return;
-    const month = exp.date.slice(0, 7);
-    monthlyData[month] = (monthlyData[month] || 0) + exp.amount;
-  });
-
-  const months = Object.keys(monthlyData).sort().slice(-6); // Last 6 months
-  const amounts = months.map(m => monthlyData[m]);
-
-  // Destroy existing charts if they exist
-  if (dashboardCharts.lineChart) {
-    dashboardCharts.lineChart.destroy();
-    dashboardCharts.lineChart = null;
-  }
-
-  if (dashboardCharts.pieChart) {
-    dashboardCharts.pieChart.destroy();
-    dashboardCharts.pieChart = null;
-  }
-
-  // Line chart
-  const lineCtx = document.getElementById('lineChart');
-  if (lineCtx) {
-    dashboardCharts.lineChart = new Chart(lineCtx.getContext('2d'), {
-      type: 'line',
-      data: {
-        labels: months.length ? months : ['No Data'],
-        datasets: [{
-          data: months.length ? amounts : [0],
-          borderColor: '#FFD600',
-          backgroundColor: 'rgba(255,214,0,0.1)',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.4
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
-          x: { grid: { display: false } }
-        }
-      }
-    });
-  }
-
-  // Pie chart - expense distribution
-  const ranges = { 'Small (₹0-1000)': 0, 'Medium (₹1001-2000)': 0, 'Large (₹2001+)': 0 };
-  expenses.forEach(exp => {
-    if (exp.amount <= 1000) ranges['Small (₹0-1000)']++;
-    else if (exp.amount <= 2000) ranges['Medium (₹1001-2000)']++;
-    else ranges['Large (₹2001+)']++;
-  });
-
-  const pieCtx = document.getElementById('pieChart');
-  if (pieCtx) {
-    dashboardCharts.pieChart = new Chart(pieCtx.getContext('2d'), {
-      type: 'doughnut',
-      data: {
-        labels: expenses.length ? Object.keys(ranges) : ['No Data'],
-        datasets: [{
-          data: expenses.length ? Object.values(ranges) : [1],
-          backgroundColor: expenses.length ? ['#FFD600', '#FFA000', '#FF8F00'] : ['#e0e0e0']
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { 
-          legend: { position: 'bottom', labels: { font: { size: 10 } } }
-        }
-      }
-    });
-  }
-}
-
-// Budget Management
-function initBudget() {
-  document.getElementById('save-budget-btn').addEventListener('click', () => {
-    const budgetAmount = Number(document.getElementById('monthly-budget-input').value);
-    if (budgetAmount <= 0) {
-      showNotification('Please enter a valid budget amount!', 'error');
-      return;
-    }
-
-    FuelTrackerData.budget.monthly = budgetAmount;
-    saveData();
-    updateBudgetDisplay();
-    showNotification(`Monthly budget set to ₹${budgetAmount.toLocaleString()}!`, 'success');
-  });
-
-  document.getElementById('reset-budget-btn').addEventListener('click', () => {
-    if (confirm('Are you sure you want to reset your budget?')) {
-      FuelTrackerData.budget.monthly = 0;
-      document.getElementById('monthly-budget-input').value = '';
-      saveData();
-      updateBudgetDisplay();
-      showNotification('Budget reset successfully!', 'info');
-    }
-  });
-
-  document.getElementById('set-budget-btn').addEventListener('click', () => {
-    document.getElementById('tab-budget').click();
+  return date.toLocaleDateString('en-IN', { 
+    day: 'numeric', 
+    month: 'short',
+    year: '2-digit'
   });
 }
 
-// FIXED: Reports with Real Data (not dummy data)
-function renderReportsCharts() {
-  console.log('Rendering reports with real data...');
-
-  const expenses = getVehicleExpenses(FuelTrackerData.currentVehicle);
-
-  // Destroy existing report charts if they exist
-  Object.keys(dashboardCharts).forEach(chartKey => {
-    if (chartKey.includes('Chart') && dashboardCharts[chartKey]) {
-      dashboardCharts[chartKey].destroy();
-      dashboardCharts[chartKey] = null;
-    }
-  });
-
-  // 1. Monthly Spending Trends - REAL DATA
-  const monthlyData = {};
-  expenses.forEach(exp => {
-    if (!exp.date) return;
-    const month = exp.date.slice(0, 7);
-    monthlyData[month] = (monthlyData[month] || 0) + exp.amount;
-  });
-
-  const months = Object.keys(monthlyData).sort();
-  const monthlyAmounts = months.map(m => monthlyData[m]);
-
-  const monthlyCtx = document.getElementById('monthlyChart');
-  if (monthlyCtx) {
-    dashboardCharts.monthlyChart = new Chart(monthlyCtx.getContext('2d'), {
-      type: 'bar',
-      data: {
-        labels: months.length ? months : ['No Data'],
-        datasets: [{
-          label: 'Monthly Spending',
-          data: months.length ? monthlyAmounts : [0],
-          backgroundColor: '#FFD600',
-          borderRadius: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { 
-          legend: { display: false },
-          title: { display: true, text: 'Real Monthly Spending Data' }
-        },
-        scales: { y: { beginAtZero: true } }
-      }
-    });
-  }
-
-  // 2. Fuel Efficiency Over Time - REAL DATA
-  const efficiencyData = {};
-  expenses.forEach(exp => {
-    if (!exp.date || !exp.mileage) return;
-    const month = exp.date.slice(0, 7);
-    if (!efficiencyData[month]) efficiencyData[month] = [];
-    efficiencyData[month].push(exp.mileage);
-  });
-
-  const efficiencyMonths = Object.keys(efficiencyData).sort();
-  const avgEfficiency = efficiencyMonths.map(month => {
-    const values = efficiencyData[month];
-    return values.reduce((sum, val) => sum + val, 0) / values.length;
-  });
-
-  const efficiencyCtx = document.getElementById('efficiencyChart');
-  if (efficiencyCtx) {
-    dashboardCharts.efficiencyChart = new Chart(efficiencyCtx.getContext('2d'), {
-      type: 'line',
-      data: {
-        labels: efficiencyMonths.length ? efficiencyMonths : ['No Data'],
-        datasets: [{
-          label: 'Fuel Efficiency',
-          data: efficiencyMonths.length ? avgEfficiency : [0],
-          borderColor: '#10b981',
-          backgroundColor: 'rgba(16, 185, 129, 0.1)',
-          fill: true,
-          tension: 0.4
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { 
-          legend: { display: false },
-          title: { display: true, text: 'Real Efficiency Data (km/L)' }
-        },
-        scales: { y: { beginAtZero: true } }
-      }
-    });
-  }
-
-  // 3. Station Usage Analysis - REAL DATA
-  const stationData = {};
-  expenses.forEach(exp => {
-    if (!exp.station) return;
-    stationData[exp.station] = (stationData[exp.station] || 0) + 1;
-  });
-
-  const topStations = Object.entries(stationData)
-    .sort(([,a], [,b]) => b - a)
-    .slice(0, 5);
-
-  const stationCtx = document.getElementById('stationChart');
-  if (stationCtx) {
-    dashboardCharts.stationChart = new Chart(stationCtx.getContext('2d'), {
-      type: 'doughnut',
-      data: {
-        labels: topStations.length ? topStations.map(([station]) => station) : ['No Station Data'],
-        datasets: [{
-          data: topStations.length ? topStations.map(([, count]) => count) : [1],
-          backgroundColor: topStations.length ? 
-            ['#FFD600', '#FFA000', '#FF8F00', '#FF6F00', '#E65100'] : 
-            ['#e0e0e0']
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { 
-          legend: { position: 'right' },
-          title: { display: true, text: 'Real Station Usage Data' }
-        }
-      }
-    });
-  }
-
-  // 4. Fuel Type Distribution - REAL DATA
-  const fuelTypeData = {};
-  expenses.forEach(exp => {
-    const type = exp.fuelType || 'petrol';
-    fuelTypeData[type] = (fuelTypeData[type] || 0) + 1;
-  });
-
-  const fuelTypeCtx = document.getElementById('fuelTypeChart');
-  if (fuelTypeCtx) {
-    dashboardCharts.fuelTypeChart = new Chart(fuelTypeCtx.getContext('2d'), {
-      type: 'pie',
-      data: {
-        labels: Object.keys(fuelTypeData).length ? Object.keys(fuelTypeData) : ['No Data'],
-        datasets: [{
-          data: Object.keys(fuelTypeData).length ? Object.values(fuelTypeData) : [1],
-          backgroundColor: Object.keys(fuelTypeData).length ? 
-            ['#FFD600', '#3b82f6', '#f59e0b'] : 
-            ['#e0e0e0']
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { 
-          legend: { position: 'bottom' },
-          title: { display: true, text: 'Real Fuel Type Usage' }
-        }
-      }
-    });
-  }
-
-  // Show notification about real data
-  if (expenses.length > 0) {
-    showNotification(`Reports updated with ${expenses.length} real expense records!`, 'success');
-  } else {
-    showNotification('No expense data found for current vehicle. Add some expenses to see reports.', 'info');
-  }
-}
-
-// Reports and Data Export
-function initReports() {
-  document.getElementById('export-excel-btn').addEventListener('click', exportToExcel);
-  document.getElementById('export-pdf-btn').addEventListener('click', exportToPDF);
-  document.getElementById('export-csv-btn').addEventListener('click', exportToCSV);
-  document.getElementById('export-data-btn').addEventListener('click', exportToJSON);
-}
-
-function exportToExcel() {
-  try {
-    const expenses = getVehicleExpenses(FuelTrackerData.currentVehicle);
-    if (expenses.length === 0) {
-      showNotification('No expenses to export!', 'warning');
-      return;
-    }
-
-    const workbook = XLSX.utils.book_new();
-    const wsData = expenses.map(exp => ({
-      Date: exp.date,
-      'Fuel Type': exp.fuelType,
-      Amount: exp.amount,
-      'Rate per Litre': exp.rate,
-      Litres: exp.litres,
-      'Fuel Cost': exp.fuelCost,
-      Additives: exp.additives,
-      'Start KM': exp.startKm,
-      'End KM': exp.endKm,
-      Mileage: exp.mileage,
-      Station: exp.station,
-      Vehicle: FuelTrackerData.vehicles.find(v => v.id === exp.vehicleId)?.name || 'Unknown'
-    }));
-
-    const worksheet = XLSX.utils.json_to_sheet(wsData);
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Expenses');
-    XLSX.writeFile(workbook, `fuel-expenses-${new Date().toISOString().slice(0, 10)}.xlsx`);
-
-    showNotification('Excel file exported successfully!', 'success');
-  } catch (error) {
-    console.error('Export error:', error);
-    showNotification('Export failed. Please try again.', 'error');
-  }
-}
-
-function exportToPDF() {
-  try {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-
-    // Header
-    doc.setFontSize(20);
-    doc.text('Fuel Expense Report', 20, 20);
-
-    // Summary
-    const expenses = getVehicleExpenses(FuelTrackerData.currentVehicle);
-    const totalSpent = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-    const avgMileage = calculateAverageMileage(expenses);
-
-    doc.setFontSize(12);
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 35);
-    doc.text(`Total Expenses: ${expenses.length}`, 20, 50);
-    doc.text(`Total Amount: ₹${totalSpent.toLocaleString()}`, 20, 65);
-    doc.text(`Average Mileage: ${avgMileage} km/L`, 20, 80);
-
-    // Recent expenses
-    doc.text('Recent Expenses:', 20, 100);
-    const recent = expenses.slice(-10);
-    let yPos = 110;
-
-    recent.forEach(exp => {
-      if (yPos > 270) {
-        doc.addPage();
-        yPos = 20;
-      }
-      doc.setFontSize(10);
-      doc.text(`${exp.date} - ${exp.fuelType} - ₹${exp.amount} - ${exp.mileage || 'N/A'} km/L`, 20, yPos);
-      yPos += 10;
-    });
-
-    doc.save(`fuel-report-${new Date().toISOString().slice(0, 10)}.pdf`);
-    showNotification('PDF report generated successfully!', 'success');
-  } catch (error) {
-    console.error('PDF export error:', error);
-    showNotification('PDF export failed. Please try again.', 'error');
-  }
-}
-
-function exportToCSV() {
-  const expenses = getVehicleExpenses(FuelTrackerData.currentVehicle);
-  if (expenses.length === 0) {
-    showNotification('No expenses to export!', 'warning');
-    return;
-  }
-
-  const headers = ['Date', 'Fuel Type', 'Amount', 'Rate per Litre', 'Litres', 'Fuel Cost', 'Additives', 'Start KM', 'End KM', 'Mileage', 'Station'];
-  const csvContent = [
-    headers.join(','),
-    ...expenses.map(exp => [
-      exp.date,
-      exp.fuelType,
-      exp.amount,
-      exp.rate,
-      exp.litres,
-      exp.fuelCost,
-      exp.additives,
-      exp.startKm,
-      exp.endKm,
-      exp.mileage,
-      exp.station || ''
-    ].join(','))
-  ].join('\n');
-
-  const blob = new Blob([csvContent], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `fuel-expenses-${new Date().toISOString().slice(0, 10)}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-
-  showNotification('CSV file exported successfully!', 'success');
-}
-
-function exportToJSON() {
-  const data = {
-    expenses: FuelTrackerData.expenses,
-    vehicles: FuelTrackerData.vehicles,
-    budget: FuelTrackerData.budget,
-    settings: FuelTrackerData.settings,
-    exportDate: new Date().toISOString()
-  };
-
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `fueltracker-backup-${new Date().toISOString().slice(0, 10)}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-
-  showNotification('Backup file created successfully!', 'success');
-}
-
-// Settings Management
-function initSettings() {
-  // Load current settings
-  document.getElementById('price-alerts-setting').checked = FuelTrackerData.settings.priceAlerts;
-  document.getElementById('budget-alerts-setting').checked = FuelTrackerData.settings.budgetAlerts;
-  document.getElementById('maintenance-alerts-setting').checked = FuelTrackerData.settings.maintenanceAlerts;
-  document.getElementById('currency-setting').value = FuelTrackerData.settings.currency;
-  document.getElementById('date-format-setting').value = FuelTrackerData.settings.dateFormat;
-
-  // Settings change handlers
-  ['price-alerts-setting', 'budget-alerts-setting', 'maintenance-alerts-setting'].forEach(id => {
-    document.getElementById(id).addEventListener('change', saveSettings);
-  });
-
-  ['currency-setting', 'date-format-setting'].forEach(id => {
-    document.getElementById(id).addEventListener('change', saveSettings);
-  });
-
-  // Data management buttons
-  document.getElementById('import-data-btn').addEventListener('click', () => {
-    document.getElementById('import-file').click();
-  });
-
-  document.getElementById('import-file').addEventListener('change', importData);
-
-  document.getElementById('backup-all-btn').addEventListener('click', () => {
-    exportToJSON();
-    showNotification('Full backup created!', 'success');
-  });
-
-  document.getElementById('clear-all-btn').addEventListener('click', () => {
-    if (confirm('⚠️ This will DELETE ALL DATA. Are you absolutely sure?\n\nThis action cannot be undone!')) {
-      if (confirm('Last warning: This will permanently delete all expenses, vehicles, and settings. Continue?')) {
-        localStorage.clear();
-        location.reload();
-      }
-    }
-  });
-
-  function saveSettings() {
-    FuelTrackerData.settings.priceAlerts = document.getElementById('price-alerts-setting').checked;
-    FuelTrackerData.settings.budgetAlerts = document.getElementById('budget-alerts-setting').checked;
-    FuelTrackerData.settings.maintenanceAlerts = document.getElementById('maintenance-alerts-setting').checked;
-    FuelTrackerData.settings.currency = document.getElementById('currency-setting').value;
-    FuelTrackerData.settings.dateFormat = document.getElementById('date-format-setting').value;
-
-    saveData();
-    showNotification('Settings saved successfully!', 'success');
-  }
-
-  function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const data = JSON.parse(e.target.result);
-
-        if (confirm('This will replace all current data. Continue?')) {
-          FuelTrackerData.expenses = data.expenses || [];
-          FuelTrackerData.vehicles = data.vehicles || FuelTrackerData.vehicles;
-          FuelTrackerData.budget = data.budget || FuelTrackerData.budget;
-          FuelTrackerData.settings = data.settings || FuelTrackerData.settings;
-
-          saveData();
-          showNotification('Data imported successfully! Refreshing page...', 'success');
-          setTimeout(() => location.reload(), 2000);
-        }
-      } catch (error) {
-        showNotification('Invalid backup file format!', 'error');
-      }
-    };
-    reader.readAsText(file);
-  }
-}
-
-// Price Management
-function initPrices() {
-  document.getElementById('detect-location').addEventListener('click', () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        () => {
-          showNotification('📍 Location detected: Chennai, Tamil Nadu', 'success');
-          updateFuelPrices();
-        },
-        () => {
-          showNotification('Could not detect location, using Chennai', 'warning');
-          updateFuelPrices();
-        }
-      );
-    } else {
-      showNotification('Geolocation not supported', 'error');
-    }
-  });
-
-  document.getElementById('refresh-prices').addEventListener('click', updateFuelPrices);
-
-  document.getElementById('price-alerts').addEventListener('click', () => {
-    const alertPrice = prompt('Set price alert for petrol (₹):', '95.00');
-    if (alertPrice && !isNaN(alertPrice)) {
-      showNotification(`Price alert set at ₹${alertPrice}`, 'success');
-    }
-  });
-
-  // Update prices on load
-  updateFuelPrices();
-}
-
-function updateFuelPrices() {
-  const prices = fuelPrices[currentLocation];
-
-  // Add small random variation
-  const petrolPrice = prices.petrol + (Math.random() - 0.5) * 0.5;
-  const dieselPrice = prices.diesel + (Math.random() - 0.5) * 0.5;
-  const cngPrice = prices.cng + (Math.random() - 0.5) * 0.5;
-
-  document.getElementById('petrol-price').textContent = `₹ ${petrolPrice.toFixed(2)}`;
-  document.getElementById('diesel-price').textContent = `₹ ${dieselPrice.toFixed(2)}`;
-  document.getElementById('cng-price').textContent = `₹ ${cngPrice.toFixed(2)}`;
-
+// Refresh prices
+function updatePrices() {
   document.getElementById('last-updated').textContent = 
-    `Last updated: ${new Date().toLocaleTimeString()} - ${currentLocation}, Tamil Nadu`;
+    `Last updated: ${new Date().toLocaleTimeString('en-IN', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    })}`;
 }
 
-// Initialize Everything
+// Initialize everything
 document.addEventListener('DOMContentLoaded', () => {
-  // Set today's date as default
+  console.log('🚀 Initializing Modern Mobile FuelTracker Pro...');
+
+  initializeNavigation();
+  initializeFAB();
+  initializeForm();
+  initializeTheme();
+  initializeSettings();
+
+  // Set today's date
   const today = new Date().toISOString().slice(0, 10);
-  const dateInput = document.getElementById('date');
-  if (dateInput) {
-    dateInput.value = today;
-  }
+  document.getElementById('date').value = today;
 
-  console.log('Initializing FuelTracker Pro...');
-  console.log('Current vehicle:', FuelTrackerData.currentVehicle);
-  console.log('Total expenses:', FuelTrackerData.expenses.length);
-
-  // Initialize all systems
-  initNavigation();
-  initVehicles();
-  initExpenses();
-  initBudget();
-  initReports();
-  initSettings();
-  initPrices();
-
-  // Initial dashboard update
+  // Load initial data
   updateDashboard();
-  renderExpensesTable();
+  renderExpensesList();
+  updateVehiclesDisplay();
+
+  // Load charts after delay for smooth performance
+  setTimeout(() => {
+    updateDashboardCharts();
+    updateAnalyticsCharts();
+    updatePrices();
+  }, 500);
+
+  // Refresh prices button
+  document.getElementById('refresh-prices').addEventListener('click', () => {
+    updatePrices();
+    showNotification('Prices updated!', 'success');
+  });
 
   // Welcome message
   setTimeout(() => {
-    showNotification('🎉 FuelTracker Pro Fixed Version Ready!', 'success', 4000);
+    showNotification('🎉 Welcome to Modern FuelTracker Pro!', 'success', 6000);
   }, 1000);
 
-  setTimeout(() => {
-    showNotification('✅ Vehicle switching and reports now work with real data!', 'info', 4000);
-  }, 3000);
+  console.log('✅ Modern Mobile FuelTracker Pro ready!');
 });
 </script>
 </body>
