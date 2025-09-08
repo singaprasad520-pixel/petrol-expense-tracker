@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>FuelTracker Pro - Modern Mobile</title>
+<title>Fuel Tracker - Enhanced Edition</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -13,8 +12,8 @@
 <meta name="theme-color" content="#6366f1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="FuelTracker Pro">
-<link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;FuelTracker Pro&quot;,&quot;short_name&quot;:&quot;FuelTracker&quot;,&quot;theme_color&quot;:&quot;%236366f1&quot;,&quot;background_color&quot;:&quot;%23ffffff&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;start_url&quot;:&quot;.&quot;}">
+<meta name="apple-mobile-web-app-title" content="Fuel Tracker">
+<link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;Fuel Tracker&quot;,&quot;short_name&quot;:&quot;FuelTracker&quot;,&quot;theme_color&quot;:&quot;%236366f1&quot;,&quot;background_color&quot;:&quot;%23ffffff&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;start_url&quot;:&quot;.&quot;}">
 <style>
   :root {
     --primary: #6366f1;
@@ -37,6 +36,8 @@
     --shadow-lg: rgba(15, 23, 42, 0.15);
     --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     --gradient-secondary: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+    --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     --radius: 16px;
     --radius-sm: 8px;
     --radius-lg: 24px;
@@ -145,6 +146,24 @@
     display: flex;
     align-items: center;
     gap: 4px;
+  }
+
+  /* NOTIFICATION BADGE */
+  .notification-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background: var(--error);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
   }
 
   /* MODERN BOTTOM NAVIGATION */
@@ -286,7 +305,7 @@
   .card-header {
     display: flex;
     align-items: center;
-    justify-content: between;
+    justify-content: space-between;
     margin-bottom: var(--spacing);
   }
 
@@ -304,6 +323,65 @@
     font-size: 12px;
     color: var(--text-muted);
     margin-top: 4px;
+  }
+
+  /* BUDGET CARD */
+  .budget-card {
+    background: var(--gradient-success);
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .budget-card.over-budget {
+    background: var(--gradient-warning);
+  }
+
+  .budget-card.danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  }
+
+  .budget-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    transition: var(--transition);
+  }
+
+  .budget-text {
+    position: relative;
+    z-index: 1;
+  }
+
+  .budget-settings {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--spacing);
+    align-items: center;
+    margin-bottom: var(--spacing);
+  }
+
+  .budget-amount {
+    font-size: 24px;
+    font-weight: 800;
+    color: white;
+  }
+
+  .budget-label {
+    font-size: 12px;
+    opacity: 0.9;
+  }
+
+  .budget-edit-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    cursor: pointer;
   }
 
   /* STATS CARDS */
@@ -423,6 +501,88 @@
   .form-input[readonly] {
     background: var(--border-light);
     color: var(--text-muted);
+  }
+
+  /* CAMERA INPUT */
+  .camera-input {
+    position: relative;
+    width: 100%;
+    height: 120px;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    overflow: hidden;
+  }
+
+  .camera-input:hover {
+    border-color: var(--primary);
+    background: var(--surface-2);
+  }
+
+  .camera-input.has-image {
+    border: none;
+    background: transparent;
+  }
+
+  .camera-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius);
+  }
+
+  .camera-placeholder {
+    text-align: center;
+    color: var(--text-muted);
+  }
+
+  .camera-placeholder-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+
+  /* FILTER BAR */
+  .filter-bar {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: var(--spacing);
+    margin-bottom: var(--spacing);
+    box-shadow: 0 1px 3px var(--shadow);
+  }
+
+  .filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: var(--spacing-sm);
+  }
+
+  .filter-input {
+    height: 40px;
+    font-size: 14px;
+    padding: 0 12px;
+  }
+
+  .filter-btn {
+    height: 40px;
+    padding: 0 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .filter-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
   }
 
   /* MODERN BUTTONS */
@@ -559,6 +719,61 @@
     to { transform: translateY(0); }
   }
 
+  /* CONFIRMATION MODAL */
+  .confirm-modal {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .confirm-content {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    width: 90%;
+    max-width: 400px;
+    padding: var(--spacing-lg);
+    animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  @keyframes scaleIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .confirm-header {
+    text-align: center;
+    margin-bottom: var(--spacing);
+  }
+
+  .confirm-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+  }
+
+  .confirm-icon.warning { color: var(--warning); }
+  .confirm-icon.error { color: var(--error); }
+  .confirm-icon.info { color: var(--info); }
+
+  .confirm-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+  }
+
+  .confirm-message {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .confirm-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing);
+    margin-top: var(--spacing-lg);
+  }
+
   /* MODERN TABLE */
   .table-wrapper {
     background: var(--surface);
@@ -575,7 +790,7 @@
     font-weight: 600;
     display: flex;
     align-items: center;
-    justify-content: between;
+    justify-content: space-between;
   }
 
   .expense-list {
@@ -588,6 +803,7 @@
     border-bottom: 1px solid var(--border-light);
     transition: var(--transition);
     cursor: pointer;
+    position: relative;
   }
 
   .expense-item:last-child {
@@ -596,6 +812,14 @@
 
   .expense-item:active {
     background: var(--surface-2);
+  }
+
+  .expense-item.has-receipt::after {
+    content: '📷';
+    position: absolute;
+    top: var(--spacing);
+    right: var(--spacing);
+    font-size: 16px;
   }
 
   .expense-header {
@@ -665,6 +889,7 @@
     box-shadow: 0 1px 3px var(--shadow);
     position: relative;
     overflow: hidden;
+    transition: var(--transition);
   }
 
   .price-card::before {
@@ -675,6 +900,15 @@
     right: 0;
     height: 3px;
     background: var(--gradient-secondary);
+  }
+
+  .price-card.alert {
+    animation: priceAlert 1s ease-in-out;
+  }
+
+  @keyframes priceAlert {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
   }
 
   .fuel-type {
@@ -845,7 +1079,7 @@
   <!-- MODERN TOP HEADER -->
   <div class="top-header">
     <div class="logo">
-      ⛽ FuelTracker Pro
+      ⛽ Fuel Tracker
     </div>
     <div class="header-actions">
       <div class="location-pill">
@@ -853,6 +1087,7 @@
       </div>
       <button class="header-btn" id="notifications-btn">
         🔔
+        <div class="notification-badge" id="notification-badge" style="display: none;"></div>
       </button>
       <button class="header-btn" id="profile-btn">
         👤
@@ -865,6 +1100,27 @@
     <div class="container">
       <!-- DASHBOARD PANEL -->
       <div class="panel active" id="dashboard-panel">
+        <!-- BUDGET CARD -->
+        <div class="card budget-card" id="budget-card">
+          <div class="budget-text">
+            <div class="budget-settings">
+              <div>
+                <div class="budget-amount" id="budget-display">₹ 5,000</div>
+                <div class="budget-label">Monthly Budget</div>
+              </div>
+              <button class="budget-edit-btn" id="edit-budget-btn">Edit</button>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+              <div>
+                <div style="font-size: 16px; font-weight: 600;" id="budget-spent">₹ 0 spent</div>
+                <div style="font-size: 12px; opacity: 0.9;" id="budget-remaining">₹ 5,000 remaining</div>
+              </div>
+              <div style="font-size: 24px;" id="budget-percentage">0%</div>
+            </div>
+          </div>
+          <div class="budget-progress" id="budget-progress" style="width: 0%;"></div>
+        </div>
+
         <!-- STATS GRID -->
         <div class="stats-grid">
           <div class="stat-card">
@@ -901,20 +1157,20 @@
             </button>
           </div>
           <div class="price-grid">
-            <div class="price-card">
+            <div class="price-card" id="petrol-price-card">
               <div class="fuel-type">Petrol</div>
-              <div class="fuel-price">₹ 100.79</div>
-              <div class="price-change up">+₹0.41 ▲</div>
+              <div class="fuel-price" id="petrol-price">₹ 100.79</div>
+              <div class="price-change up" id="petrol-change">+₹0.41 ▲</div>
             </div>
-            <div class="price-card">
+            <div class="price-card" id="diesel-price-card">
               <div class="fuel-type">Diesel</div>
-              <div class="fuel-price">₹ 92.38</div>
-              <div class="price-change up">+₹0.12 ▲</div>
+              <div class="fuel-price" id="diesel-price">₹ 92.38</div>
+              <div class="price-change up" id="diesel-change">+₹0.12 ▲</div>
             </div>
-            <div class="price-card">
+            <div class="price-card" id="cng-price-card">
               <div class="fuel-type">CNG</div>
-              <div class="fuel-price">₹ 75.00</div>
-              <div class="price-change down">-₹0.28 ▼</div>
+              <div class="fuel-price" id="cng-price">₹ 75.00</div>
+              <div class="price-change down" id="cng-change">-₹0.28 ▼</div>
             </div>
           </div>
           <div style="text-align: center; margin-top: 12px; font-size: 11px; color: var(--text-muted);" id="last-updated">
@@ -940,6 +1196,22 @@
 
       <!-- EXPENSES PANEL -->
       <div class="panel" id="expenses-panel">
+        <!-- FILTER BAR -->
+        <div class="filter-bar">
+          <div class="filter-grid">
+            <input type="date" class="form-input filter-input" id="filter-date-from" placeholder="From Date">
+            <input type="date" class="form-input filter-input" id="filter-date-to" placeholder="To Date">
+            <select class="form-input filter-input" id="filter-fuel-type">
+              <option value="">All Fuel Types</option>
+              <option value="petrol">Petrol</option>
+              <option value="diesel">Diesel</option>
+              <option value="cng">CNG</option>
+            </select>
+            <input type="text" class="form-input filter-input" id="filter-station" placeholder="Station">
+            <button class="filter-btn" id="clear-filters">Clear</button>
+          </div>
+        </div>
+
         <div class="table-wrapper">
           <div class="table-header">
             <h3 style="margin: 0;">💰 Recent Expenses</h3>
@@ -979,7 +1251,7 @@
           <div class="card-subtitle">Manage your vehicles and track expenses</div>
 
           <div style="margin-top: var(--spacing);">
-            <div style="display: flex; align-items: center; justify-content: between; padding: var(--spacing); background: var(--surface-2); border-radius: var(--radius-sm); margin-bottom: var(--spacing-sm);">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: var(--spacing); background: var(--surface-2); border-radius: var(--radius-sm); margin-bottom: var(--spacing-sm);">
               <div>
                 <div style="font-weight: 600; margin-bottom: 4px;">My Car</div>
                 <div style="font-size: 12px; color: var(--text-muted);">Petrol • Default Vehicle</div>
@@ -1004,14 +1276,22 @@
 
           <div style="margin-top: var(--spacing);">
             <div style="margin-bottom: var(--spacing);">
-              <div style="font-weight: 600; margin-bottom: var(--spacing-sm);">Notifications</div>
+              <div style="font-weight: 600; margin-bottom: var(--spacing-sm);">Budget & Alerts</div>
+              <label style="display: flex; align-items: center; gap: 12px; padding: 12px 0;">
+                <input type="checkbox" id="budget-alerts" checked style="width: 20px; height: 20px;">
+                <span>Budget warnings (80% threshold)</span>
+              </label>
               <label style="display: flex; align-items: center; gap: 12px; padding: 12px 0;">
                 <input type="checkbox" id="price-alerts" checked style="width: 20px; height: 20px;">
                 <span>Fuel price alerts</span>
               </label>
+            </div>
+
+            <div style="margin-bottom: var(--spacing);">
+              <div style="font-weight: 600; margin-bottom: var(--spacing-sm);">Notifications</div>
               <label style="display: flex; align-items: center; gap: 12px; padding: 12px 0;">
-                <input type="checkbox" id="budget-alerts" checked style="width: 20px; height: 20px;">
-                <span>Budget warnings</span>
+                <input type="checkbox" id="push-notifications" checked style="width: 20px; height: 20px;">
+                <span>Push notifications</span>
               </label>
             </div>
 
@@ -1143,6 +1423,20 @@
             </div>
           </div>
 
+          <!-- RECEIPT PHOTO -->
+          <div class="form-grid">
+            <div class="input-group">
+              <label class="input-label">Receipt Photo (Optional)</label>
+              <div class="camera-input" id="camera-input">
+                <div class="camera-placeholder">
+                  <div class="camera-placeholder-icon">📷</div>
+                  <div>Tap to capture receipt</div>
+                </div>
+              </div>
+              <input type="file" id="receipt-input" accept="image/*" capture="environment" style="display: none;">
+            </div>
+          </div>
+
           <div style="margin-top: var(--spacing-lg);">
             <button type="submit" class="btn btn-primary btn-full">
               ✅ Add Expense
@@ -1153,33 +1447,224 @@
     </div>
   </div>
 
-<script>
-// ===== MODERN MOBILE FUELTRACKER PRO =====
+  <!-- EDIT EXPENSE MODAL -->
+  <div class="modal" id="edit-expense-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">✏️ Edit Fuel Expense</h3>
+        <button class="modal-close" id="close-edit-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="edit-expense-form">
+          <div class="form-grid">
+            <div class="input-group">
+              <label class="input-label">Date</label>
+              <input type="date" class="form-input" id="edit-date" required />
+            </div>
 
-// Data Storage
+            <div class="input-group">
+              <label class="input-label">Fuel Type</label>
+              <select class="form-input" id="edit-fuel-type" required>
+                <option value="">Select type</option>
+                <option value="petrol">Petrol</option>
+                <option value="diesel">Diesel</option>
+                <option value="cng">CNG</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid two-col">
+            <div class="input-group">
+              <label class="input-label">Total Amount (₹)</label>
+              <input type="number" class="form-input" id="edit-amount" step="0.01" required />
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">Rate per Litre (₹)</label>
+              <input type="number" class="form-input" id="edit-rate" step="0.01" required />
+            </div>
+          </div>
+
+          <div class="form-grid two-col">
+            <div class="input-group">
+              <label class="input-label">Litres</label>
+              <input type="number" class="form-input" id="edit-litres" step="0.01" />
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">Additives (₹)</label>
+              <input type="number" class="form-input" id="edit-additives" step="0.01" />
+            </div>
+          </div>
+
+          <div class="form-grid two-col">
+            <div class="input-group">
+              <label class="input-label">Start KM</label>
+              <input type="number" class="form-input" id="edit-start-km" step="0.1" />
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">End KM</label>
+              <input type="number" class="form-input" id="edit-end-km" step="0.1" />
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="input-group">
+              <label class="input-label">Calculated Mileage (km/L)</label>
+              <input type="number" class="form-input" id="edit-mileage" step="0.01" />
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">Fuel Station</label>
+              <input type="text" class="form-input" id="edit-station" />
+            </div>
+          </div>
+
+          <div style="margin-top: var(--spacing-lg);">
+            <button type="submit" class="btn btn-primary btn-full">
+              ✅ Update Expense
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUDGET MODAL -->
+  <div class="modal" id="budget-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">💰 Set Monthly Budget</h3>
+        <button class="modal-close" id="close-budget-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="budget-form">
+          <div class="input-group">
+            <label class="input-label">Monthly Budget Amount (₹)</label>
+            <input type="number" class="form-input" id="budget-amount" placeholder="5000" step="100" required />
+          </div>
+          <div style="margin-top: var(--spacing-lg);">
+            <button type="submit" class="btn btn-primary btn-full">
+              ✅ Set Budget
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRMATION MODAL -->
+  <div class="modal confirm-modal" id="confirm-modal">
+    <div class="confirm-content">
+      <div class="confirm-header">
+        <div class="confirm-icon" id="confirm-icon">⚠️</div>
+        <div class="confirm-title" id="confirm-title">Confirm Action</div>
+        <div class="confirm-message" id="confirm-message">Are you sure you want to proceed?</div>
+      </div>
+      <div class="confirm-actions">
+        <button class="btn btn-secondary" id="confirm-cancel">Cancel</button>
+        <button class="btn btn-primary" id="confirm-ok">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+// ===== ENHANCED FUEL TRACKER WITH CONFIRMATION DIALOGS =====
+
+// Enhanced Data Storage
 const FuelTrackerData = {
   expenses: JSON.parse(localStorage.getItem('modernFuelTracker_expenses')) || [],
   vehicles: JSON.parse(localStorage.getItem('modernFuelTracker_vehicles')) || [
     { id: 'default', name: 'My Car', type: 'car', fuelType: 'petrol', model: 'Default Vehicle' }
   ],
-  currentVehicle: localStorage.getItem('modernFuelTracker_currentVehicle') || 'default'
+  currentVehicle: localStorage.getItem('modernFuelTracker_currentVehicle') || 'default',
+  budget: JSON.parse(localStorage.getItem('modernFuelTracker_budget')) || { monthly: 5000 },
+  settings: JSON.parse(localStorage.getItem('modernFuelTracker_settings')) || {
+    budgetAlerts: true,
+    priceAlerts: true,
+    pushNotifications: true
+  },
+  lastPrices: JSON.parse(localStorage.getItem('modernFuelTracker_lastPrices')) || {}
 };
 
 let charts = {};
+let currentFilters = {};
 
-// Chennai fuel prices
+// Enhanced Chennai fuel prices with price change tracking
 const fuelPrices = {
-  'Chennai': { petrol: 100.79, diesel: 92.38, cng: 75.00 }
+  'Chennai': { 
+    petrol: { current: 100.79, previous: 100.38, change: 0.41 },
+    diesel: { current: 92.38, previous: 92.26, change: 0.12 },
+    cng: { current: 75.00, previous: 75.28, change: -0.28 }
+  }
 };
 
-// Save data
+// Save data function
 function saveData() {
   localStorage.setItem('modernFuelTracker_expenses', JSON.stringify(FuelTrackerData.expenses));
   localStorage.setItem('modernFuelTracker_vehicles', JSON.stringify(FuelTrackerData.vehicles));
   localStorage.setItem('modernFuelTracker_currentVehicle', FuelTrackerData.currentVehicle);
+  localStorage.setItem('modernFuelTracker_budget', JSON.stringify(FuelTrackerData.budget));
+  localStorage.setItem('modernFuelTracker_settings', JSON.stringify(FuelTrackerData.settings));
+  localStorage.setItem('modernFuelTracker_lastPrices', JSON.stringify(FuelTrackerData.lastPrices));
 }
 
-// Modern notification system
+// CONFIRMATION DIALOG SYSTEM
+function showConfirmDialog(options) {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('confirm-modal');
+    const icon = document.getElementById('confirm-icon');
+    const title = document.getElementById('confirm-title');
+    const message = document.getElementById('confirm-message');
+    const cancelBtn = document.getElementById('confirm-cancel');
+    const okBtn = document.getElementById('confirm-ok');
+
+    // Set content
+    icon.textContent = options.icon || '⚠️';
+    icon.className = `confirm-icon ${options.type || 'warning'}`;
+    title.textContent = options.title || 'Confirm Action';
+    message.textContent = options.message || 'Are you sure you want to proceed?';
+    
+    // Update button text
+    cancelBtn.textContent = options.cancelText || 'Cancel';
+    okBtn.textContent = options.confirmText || 'Confirm';
+    okBtn.className = `btn ${options.confirmClass || 'btn-primary'}`;
+
+    // Show modal
+    modal.classList.add('show');
+
+    // Handle buttons
+    const handleCancel = () => {
+      modal.classList.remove('show');
+      cleanup();
+      resolve(false);
+    };
+
+    const handleConfirm = () => {
+      modal.classList.remove('show');
+      cleanup();
+      resolve(true);
+    };
+
+    const cleanup = () => {
+      cancelBtn.removeEventListener('click', handleCancel);
+      okBtn.removeEventListener('click', handleConfirm);
+    };
+
+    cancelBtn.addEventListener('click', handleCancel);
+    okBtn.addEventListener('click', handleConfirm);
+
+    // Close on backdrop click
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        handleCancel();
+      }
+    });
+  });
+}
+
+// Enhanced notification system
 function showNotification(message, type = 'info', duration = 4000) {
   const notification = document.createElement('div');
   notification.className = `notification ${type}`;
@@ -1199,8 +1684,6 @@ function showNotification(message, type = 'info', duration = 4000) {
   `;
 
   document.body.appendChild(notification);
-
-  // Trigger animation
   setTimeout(() => notification.classList.add('show'), 50);
 
   setTimeout(() => {
@@ -1211,6 +1694,156 @@ function showNotification(message, type = 'info', duration = 4000) {
       }
     }, 400);
   }, duration);
+
+  // Show notification badge
+  if (type === 'warning' || type === 'error') {
+    document.getElementById('notification-badge').style.display = 'block';
+  }
+}
+
+// Budget Management
+function updateBudgetDisplay() {
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const monthlyExpenses = FuelTrackerData.expenses.filter(exp => 
+    exp.date && exp.date.startsWith(currentMonth)
+  );
+  
+  const totalSpent = monthlyExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+  const budget = FuelTrackerData.budget.monthly;
+  const remaining = budget - totalSpent;
+  const percentage = Math.min((totalSpent / budget) * 100, 100);
+
+  document.getElementById('budget-display').textContent = `₹ ${budget.toLocaleString()}`;
+  document.getElementById('budget-spent').textContent = `₹ ${totalSpent.toLocaleString()} spent`;
+  document.getElementById('budget-remaining').textContent = `₹ ${Math.max(0, remaining).toLocaleString()} remaining`;
+  document.getElementById('budget-percentage').textContent = `${Math.round(percentage)}%`;
+  document.getElementById('budget-progress').style.width = `${percentage}%`;
+
+  // Update budget card style
+  const budgetCard = document.getElementById('budget-card');
+  if (percentage >= 100) {
+    budgetCard.className = 'card budget-card danger';
+  } else if (percentage >= 80) {
+    budgetCard.className = 'card budget-card over-budget';
+  } else {
+    budgetCard.className = 'card budget-card';
+  }
+
+  // Budget alerts
+  if (FuelTrackerData.settings.budgetAlerts) {
+    if (percentage >= 100 && !sessionStorage.getItem('budget-alert-100')) {
+      showNotification('🚨 Budget exceeded! You\'ve spent more than your monthly limit.', 'error');
+      sessionStorage.setItem('budget-alert-100', 'true');
+    } else if (percentage >= 80 && !sessionStorage.getItem('budget-alert-80')) {
+      showNotification('⚠️ Budget warning! You\'ve used 80% of your monthly budget.', 'warning');
+      sessionStorage.setItem('budget-alert-80', 'true');
+    }
+  }
+}
+
+// Price alerts system
+function checkPriceAlerts() {
+  if (!FuelTrackerData.settings.priceAlerts) return;
+
+  Object.entries(fuelPrices.Chennai).forEach(([fuel, data]) => {
+    const lastPrice = FuelTrackerData.lastPrices[fuel];
+    const currentPrice = data.current;
+    
+    if (lastPrice && Math.abs(currentPrice - lastPrice) >= 1) {
+      const change = currentPrice > lastPrice ? 'increased' : 'decreased';
+      const amount = Math.abs(currentPrice - lastPrice).toFixed(2);
+      
+      showNotification(
+        `🔔 ${fuel.charAt(0).toUpperCase() + fuel.slice(1)} price ${change} by ₹${amount}!`,
+        change === 'increased' ? 'warning' : 'success'
+      );
+
+      // Add visual alert to price card
+      document.getElementById(`${fuel}-price-card`).classList.add('alert');
+      setTimeout(() => {
+        document.getElementById(`${fuel}-price-card`).classList.remove('alert');
+      }, 1000);
+    }
+    
+    FuelTrackerData.lastPrices[fuel] = currentPrice;
+  });
+  
+  saveData();
+}
+
+// Camera/Receipt functionality
+function initializeCamera() {
+  const cameraInput = document.getElementById('camera-input');
+  const receiptInput = document.getElementById('receipt-input');
+  let currentReceiptData = null;
+
+  cameraInput.addEventListener('click', () => {
+    receiptInput.click();
+  });
+
+  receiptInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        currentReceiptData = e.target.result;
+        
+        // Show preview
+        cameraInput.innerHTML = `
+          <img src="${currentReceiptData}" class="camera-preview" alt="Receipt">
+        `;
+        cameraInput.classList.add('has-image');
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Store receipt data with expense
+  const originalFormSubmit = document.getElementById('expense-form').onsubmit;
+  document.getElementById('expense-form').addEventListener('submit', (e) => {
+    if (currentReceiptData) {
+      // Store receipt data (in real app, upload to cloud)
+      sessionStorage.setItem('pending-receipt', currentReceiptData);
+    }
+  });
+}
+
+// Advanced filtering
+function initializeFilters() {
+  const filters = ['filter-date-from', 'filter-date-to', 'filter-fuel-type', 'filter-station'];
+  
+  filters.forEach(filterId => {
+    document.getElementById(filterId).addEventListener('input', applyFilters);
+  });
+
+  document.getElementById('clear-filters').addEventListener('click', () => {
+    filters.forEach(filterId => {
+      document.getElementById(filterId).value = '';
+    });
+    currentFilters = {};
+    renderExpensesList();
+  });
+}
+
+function applyFilters() {
+  currentFilters = {
+    dateFrom: document.getElementById('filter-date-from').value,
+    dateTo: document.getElementById('filter-date-to').value,
+    fuelType: document.getElementById('filter-fuel-type').value,
+    station: document.getElementById('filter-station').value.toLowerCase()
+  };
+  
+  renderExpensesList();
+}
+
+function filterExpenses(expenses) {
+  return expenses.filter(expense => {
+    if (currentFilters.dateFrom && expense.date < currentFilters.dateFrom) return false;
+    if (currentFilters.dateTo && expense.date > currentFilters.dateTo) return false;
+    if (currentFilters.fuelType && expense.fuelType !== currentFilters.fuelType) return false;
+    if (currentFilters.station && !expense.station.toLowerCase().includes(currentFilters.station)) return false;
+    return true;
+  });
 }
 
 // Navigation System
@@ -1222,18 +1855,14 @@ function initializeNavigation() {
     item.addEventListener('click', () => {
       const panelName = item.dataset.panel;
 
-      // Update navigation
       navItems.forEach(nav => nav.classList.remove('active'));
       item.classList.add('active');
 
-      // Update panels
       panels.forEach(panel => panel.classList.remove('active'));
       document.getElementById(`${panelName}-panel`).classList.add('active');
 
-      // Load panel data
       loadPanelData(panelName);
 
-      // Haptic feedback
       if (navigator.vibrate) {
         navigator.vibrate(10);
       }
@@ -1245,6 +1874,7 @@ function loadPanelData(panelName) {
   switch(panelName) {
     case 'dashboard':
       updateDashboard();
+      updateBudgetDisplay();
       setTimeout(() => updateDashboardCharts(), 100);
       break;
     case 'expenses':
@@ -1269,12 +1899,10 @@ function initializeFAB() {
     modal.classList.add('show');
     document.getElementById('date').value = new Date().toISOString().slice(0, 10);
 
-    // Focus first input after animation
     setTimeout(() => {
       document.getElementById('amount').focus();
     }, 300);
 
-    // Haptic feedback
     if (navigator.vibrate) {
       navigator.vibrate([10, 50, 10]);
     }
@@ -1284,20 +1912,71 @@ function initializeFAB() {
     modal.classList.remove('show');
   });
 
-  // Close on backdrop click
   modal.addEventListener('click', (e) => {
     if (e.target === modal) {
       modal.classList.remove('show');
     }
   });
 
-  // Prevent modal content clicks from closing modal
   modal.querySelector('.modal-content').addEventListener('click', (e) => {
     e.stopPropagation();
   });
 }
 
-// Form handling
+// Budget modal with confirmation
+function initializeBudgetModal() {
+  const editBtn = document.getElementById('edit-budget-btn');
+  const modal = document.getElementById('budget-modal');
+  const closeBtn = document.getElementById('close-budget-modal');
+  const form = document.getElementById('budget-form');
+
+  editBtn.addEventListener('click', () => {
+    modal.classList.add('show');
+    document.getElementById('budget-amount').value = FuelTrackerData.budget.monthly;
+  });
+
+  closeBtn.addEventListener('click', () => {
+    modal.classList.remove('show');
+  });
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.remove('show');
+    }
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const newBudget = Number(document.getElementById('budget-amount').value);
+    const currentBudget = FuelTrackerData.budget.monthly;
+
+    // Show confirmation for budget updates
+    const confirmed = await showConfirmDialog({
+      icon: '💰',
+      type: 'warning',
+      title: 'Update Monthly Budget',
+      message: `Change budget from ₹${currentBudget.toLocaleString()} to ₹${newBudget.toLocaleString()}? This will affect your budget tracking.`,
+      confirmText: 'Update Budget',
+      confirmClass: 'btn-warning'
+    });
+
+    if (confirmed) {
+      FuelTrackerData.budget.monthly = newBudget;
+      saveData();
+      
+      updateBudgetDisplay();
+      modal.classList.remove('show');
+      showNotification('Budget updated successfully!', 'success');
+
+      // Reset monthly alerts
+      sessionStorage.removeItem('budget-alert-80');
+      sessionStorage.removeItem('budget-alert-100');
+    }
+  });
+}
+
+// Form handling with receipt support
 function initializeForm() {
   const form = document.getElementById('expense-form');
   const amountInput = document.getElementById('amount');
@@ -1315,12 +1994,10 @@ function initializeForm() {
     const startKm = Number(startKmInput.value) || 0;
     const endKm = Number(endKmInput.value) || 0;
 
-    // Calculate litres
     const fuelCost = amount - additives;
     const litres = rate > 0 ? fuelCost / rate : 0;
     litresInput.value = litres > 0 ? litres.toFixed(2) : '';
 
-    // Calculate mileage
     const distance = endKm - startKm;
     if (distance > 0 && litres > 0) {
       mileageInput.value = (distance / litres).toFixed(2);
@@ -1329,12 +2006,10 @@ function initializeForm() {
     }
   }
 
-  // Add listeners for auto-calculation
   [amountInput, rateInput, additivesInput, startKmInput, endKmInput].forEach(input => {
     input.addEventListener('input', calculateValues);
   });
 
-  // Live rate button
   document.getElementById('use-live-rate').addEventListener('click', () => {
     const fuelType = document.getElementById('fuel-type').value;
     if (!fuelType) {
@@ -1342,7 +2017,7 @@ function initializeForm() {
       return;
     }
 
-    const price = fuelPrices['Chennai'][fuelType];
+    const price = fuelPrices['Chennai'][fuelType].current;
     if (price) {
       rateInput.value = price.toFixed(2);
       calculateValues();
@@ -1350,10 +2025,11 @@ function initializeForm() {
     }
   });
 
-  // Form submission
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
+    const receiptData = sessionStorage.getItem('pending-receipt');
+    
     const formData = {
       id: Date.now().toString(),
       date: document.getElementById('date').value,
@@ -1367,18 +2043,30 @@ function initializeForm() {
       mileage: Number(document.getElementById('mileage').value) || 0,
       station: document.getElementById('station').value.trim(),
       vehicleId: FuelTrackerData.currentVehicle,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      hasReceipt: !!receiptData,
+      receiptData: receiptData || null
     };
 
     FuelTrackerData.expenses.push(formData);
     saveData();
 
-    // Close modal
     document.getElementById('add-expense-modal').classList.remove('show');
     form.reset();
+    
+    // Reset camera input
+    document.getElementById('camera-input').innerHTML = `
+      <div class="camera-placeholder">
+        <div class="camera-placeholder-icon">📷</div>
+        <div>Tap to capture receipt</div>
+      </div>
+    `;
+    document.getElementById('camera-input').classList.remove('has-image');
+    
+    sessionStorage.removeItem('pending-receipt');
 
-    // Update displays
     updateDashboard();
+    updateBudgetDisplay();
     renderExpensesList();
     setTimeout(() => {
       updateDashboardCharts();
@@ -1387,14 +2075,13 @@ function initializeForm() {
 
     showNotification('✅ Expense added successfully!', 'success');
 
-    // Haptic feedback
     if (navigator.vibrate) {
       navigator.vibrate([20, 100, 20]);
     }
   });
 }
 
-// Dashboard updates
+// Enhanced dashboard updates
 function updateDashboard() {
   const expenses = getVehicleExpenses(FuelTrackerData.currentVehicle);
 
@@ -1412,11 +2099,9 @@ function updateDashboard() {
 function updateDashboardCharts() {
   const expenses = getVehicleExpenses(FuelTrackerData.currentVehicle);
 
-  // Destroy existing charts
   if (charts.monthly) charts.monthly.destroy();
   if (charts.fuel) charts.fuel.destroy();
 
-  // Monthly spending chart
   const monthlyData = {};
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
@@ -1469,7 +2154,6 @@ function updateDashboardCharts() {
     });
   }
 
-  // Fuel type chart
   const fuelTypes = {};
   expenses.forEach(exp => {
     const type = exp.fuelType || 'petrol';
@@ -1508,11 +2192,9 @@ function updateDashboardCharts() {
 function updateAnalyticsCharts() {
   const expenses = getVehicleExpenses(FuelTrackerData.currentVehicle);
 
-  // Destroy existing charts
   if (charts.mileage) charts.mileage.destroy();
   if (charts.stations) charts.stations.destroy();
 
-  // Mileage chart
   const recentExpenses = expenses.filter(exp => exp.mileage > 0).slice(-8);
   const mileageData = recentExpenses.map(exp => exp.mileage);
   const mileageLabels = recentExpenses.map((_, index) => `Fill ${index + 1}`);
@@ -1548,7 +2230,6 @@ function updateAnalyticsCharts() {
     });
   }
 
-  // Stations chart
   const stations = {};
   expenses.forEach(exp => {
     if (exp.station) {
@@ -1591,17 +2272,20 @@ function updateAnalyticsCharts() {
   }
 }
 
-// Expenses list
+// Enhanced expenses list with filtering
 function renderExpensesList() {
   const expenseList = document.getElementById('expense-list');
-  const expenses = getVehicleExpenses(FuelTrackerData.currentVehicle);
+  let expenses = getVehicleExpenses(FuelTrackerData.currentVehicle);
+  
+  // Apply filters
+  expenses = filterExpenses(expenses);
 
   if (expenses.length === 0) {
     expenseList.innerHTML = `
       <div class="empty-state">
         <div class="empty-state-icon">⛽</div>
-        <div class="empty-state-title">No expenses yet</div>
-        <div class="empty-state-text">Tap the + button to add your first fuel expense</div>
+        <div class="empty-state-title">No expenses found</div>
+        <div class="empty-state-text">${Object.keys(currentFilters).length > 0 ? 'Try adjusting your filters' : 'Tap the + button to add your first fuel expense'}</div>
       </div>
     `;
     document.getElementById('expense-count').textContent = '0 entries';
@@ -1610,11 +2294,10 @@ function renderExpensesList() {
 
   document.getElementById('expense-count').textContent = `${expenses.length} entries`;
 
-  // Sort by date, newest first
   expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   expenseList.innerHTML = expenses.map(expense => `
-    <div class="expense-item" data-id="${expense.id}">
+    <div class="expense-item ${expense.hasReceipt ? 'has-receipt' : ''}" data-id="${expense.id}">
       <div class="expense-header">
         <div class="expense-amount">₹ ${expense.amount.toLocaleString()}</div>
         <div class="expense-date">${formatDate(expense.date)}</div>
@@ -1623,6 +2306,7 @@ function renderExpensesList() {
         <div style="display: flex; align-items: center; gap: 8px;">
           <span class="expense-type">${expense.fuelType || 'petrol'}</span>
           <span>${expense.litres.toFixed(1)}L</span>
+          ${expense.station ? `<span style="font-size: 10px; color: var(--text-muted);">@ ${expense.station}</span>` : ''}
         </div>
         <div>
           ${expense.mileage ? `${expense.mileage.toFixed(1)} km/L` : 'No mileage'}
@@ -1632,7 +2316,6 @@ function renderExpensesList() {
     </div>
   `).join('');
 
-  // Add swipe gestures
   initializeSwipeGestures();
 }
 
@@ -1655,22 +2338,104 @@ function initializeSwipeGestures() {
   });
 }
 
-function showExpenseActions(expenseId) {
-  if (confirm('Delete this expense?')) {
+// Enhanced delete with confirmation
+async function showExpenseActions(expenseId) {
+  const expense = FuelTrackerData.expenses.find(exp => exp.id === expenseId);
+  if (!expense) return;
+
+  const confirmed = await showConfirmDialog({
+    icon: '🗑️',
+    type: 'error',
+    title: 'Delete Expense',
+    message: `Are you sure you want to delete this ₹${expense.amount.toLocaleString()} ${expense.fuelType} expense from ${formatDate(expense.date)}? This action cannot be undone.`,
+    confirmText: 'Delete',
+    confirmClass: 'btn-error'
+  });
+
+  if (confirmed) {
     FuelTrackerData.expenses = FuelTrackerData.expenses.filter(exp => exp.id !== expenseId);
     saveData();
     renderExpensesList();
     updateDashboard();
+    updateBudgetDisplay();
     setTimeout(() => {
       updateDashboardCharts();
       updateAnalyticsCharts();
     }, 100);
-    showNotification('Expense deleted', 'success');
+    showNotification('Expense deleted successfully', 'success');
   }
 }
 
-function editExpense(expenseId) {
-  showNotification('Edit feature coming soon!', 'info');
+// Enhanced edit with confirmation
+async function editExpense(expenseId) {
+  const expense = FuelTrackerData.expenses.find(exp => exp.id === expenseId);
+  if (!expense) return showNotification('Expense not found!', 'error');
+
+  // Show warning before editing
+  const confirmed = await showConfirmDialog({
+    icon: '✏️',
+    type: 'warning',
+    title: 'Edit Expense',
+    message: `You are about to edit the ₹${expense.amount.toLocaleString()} ${expense.fuelType} expense from ${formatDate(expense.date)}. Make sure your changes are accurate.`,
+    confirmText: 'Continue Editing',
+    confirmClass: 'btn-warning'
+  });
+
+  if (!confirmed) return;
+
+  const modal = document.getElementById('edit-expense-modal');
+  modal.classList.add('show');
+
+  document.getElementById('edit-date').value = expense.date;
+  document.getElementById('edit-fuel-type').value = expense.fuelType;
+  document.getElementById('edit-amount').value = expense.amount;
+  document.getElementById('edit-rate').value = expense.rate;
+  document.getElementById('edit-litres').value = expense.litres;
+  document.getElementById('edit-additives').value = expense.additives;
+  document.getElementById('edit-start-km').value = expense.startKm;
+  document.getElementById('edit-end-km').value = expense.endKm;
+  document.getElementById('edit-mileage').value = expense.mileage;
+  document.getElementById('edit-station').value = expense.station;
+
+  document.getElementById('edit-expense-form').onsubmit = async function(e) {
+    e.preventDefault();
+
+    // Show final confirmation before saving
+    const saveConfirmed = await showConfirmDialog({
+      icon: '💾',
+      type: 'info',
+      title: 'Save Changes',
+      message: 'Save all changes to this expense? The original data will be overwritten.',
+      confirmText: 'Save Changes',
+      confirmClass: 'btn-primary'
+    });
+
+    if (!saveConfirmed) return;
+
+    expense.date = document.getElementById('edit-date').value;
+    expense.fuelType = document.getElementById('edit-fuel-type').value;
+    expense.amount = Number(document.getElementById('edit-amount').value);
+    expense.rate = Number(document.getElementById('edit-rate').value);
+    expense.litres = Number(document.getElementById('edit-litres').value);
+    expense.additives = Number(document.getElementById('edit-additives').value);
+    expense.startKm = Number(document.getElementById('edit-start-km').value);
+    expense.endKm = Number(document.getElementById('edit-end-km').value);
+    expense.mileage = Number(document.getElementById('edit-mileage').value);
+    expense.station = document.getElementById('edit-station').value.trim();
+
+    saveData();
+    renderExpensesList();
+    updateDashboard();
+    updateBudgetDisplay();
+    updateDashboardCharts();
+    updateAnalyticsCharts();
+    showNotification('Expense updated successfully!', 'success');
+    modal.classList.remove('show');
+  };
+
+  document.getElementById('close-edit-modal').onclick = () => modal.classList.remove('show');
+  modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('show'); };
+  modal.querySelector('.modal-content').onclick = (e) => e.stopPropagation();
 }
 
 // Theme toggle
@@ -1687,13 +2452,26 @@ function initializeTheme() {
     showNotification(`Switched to ${newTheme} mode`, 'success');
   });
 
-  // Load saved theme
   const savedTheme = localStorage.getItem('theme') || 'light';
   document.body.dataset.theme = savedTheme;
 }
 
-// Settings
+// Enhanced settings with confirmations
 function initializeSettings() {
+  // Settings checkboxes
+  document.getElementById('budget-alerts').checked = FuelTrackerData.settings.budgetAlerts;
+  document.getElementById('price-alerts').checked = FuelTrackerData.settings.priceAlerts;
+  document.getElementById('push-notifications').checked = FuelTrackerData.settings.pushNotifications;
+
+  ['budget-alerts', 'price-alerts', 'push-notifications'].forEach(id => {
+    document.getElementById(id).addEventListener('change', (e) => {
+      const setting = id.replace('-', '').replace('-', '');
+      FuelTrackerData.settings[setting] = e.target.checked;
+      saveData();
+      showNotification('Settings updated', 'success');
+    });
+  });
+
   document.getElementById('export-data').addEventListener('click', () => {
     const data = JSON.stringify(FuelTrackerData, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
@@ -1705,11 +2483,56 @@ function initializeSettings() {
     showNotification('Data exported successfully!', 'success');
   });
 
-  document.getElementById('clear-data').addEventListener('click', () => {
-    if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
-      localStorage.clear();
-      location.reload();
+  // Clear data with strong confirmation
+  document.getElementById('clear-data').addEventListener('click', async () => {
+    const confirmed = await showConfirmDialog({
+      icon: '💥',
+      type: 'error',
+      title: 'Clear All Data',
+      message: 'This will permanently delete ALL your fuel expenses, vehicles, and settings. This action cannot be undone! Are you absolutely sure?',
+      confirmText: 'DELETE ALL DATA',
+      confirmClass: 'btn-error'
+    });
+
+    if (confirmed) {
+      // Double confirmation for data deletion
+      const doubleConfirmed = await showConfirmDialog({
+        icon: '⚠️',
+        type: 'error',
+        title: 'Final Confirmation',
+        message: 'LAST WARNING: This will erase everything. Type "DELETE" in your mind and click confirm only if you really want to lose all your data forever.',
+        confirmText: 'YES, DELETE EVERYTHING',
+        confirmClass: 'btn-error'
+      });
+
+      if (doubleConfirmed) {
+        localStorage.clear();
+        showNotification('All data cleared successfully', 'success');
+        setTimeout(() => location.reload(), 1500);
+      }
     }
+  });
+
+  document.getElementById('add-vehicle-btn').addEventListener('click', () => {
+    const name = prompt('Vehicle name?');
+    if (!name) return;
+
+    const fuelType = prompt('Fuel type (petrol/diesel/cng)?', 'petrol');
+    if (!fuelType) return;
+
+    const newVehicle = {
+      id: Date.now().toString(),
+      name,
+      type: 'car',
+      fuelType,
+      model: fuelType + ' vehicle'
+    };
+
+    FuelTrackerData.vehicles.push(newVehicle);
+    FuelTrackerData.currentVehicle = newVehicle.id;
+    saveData();
+    updateVehiclesDisplay();
+    showNotification('Vehicle added!', 'success');
   });
 }
 
@@ -1743,8 +2566,22 @@ function formatDate(dateStr) {
   });
 }
 
-// Refresh prices
+// Update fuel prices with alerts
 function updatePrices() {
+  checkPriceAlerts();
+  
+  Object.entries(fuelPrices.Chennai).forEach(([fuel, data]) => {
+    document.getElementById(`${fuel}-price`).textContent = `₹ ${data.current}`;
+    
+    const changeElement = document.getElementById(`${fuel}-change`);
+    const changeAmount = Math.abs(data.change).toFixed(2);
+    const changeDirection = data.change > 0 ? '▲' : '▼';
+    const changeClass = data.change > 0 ? 'up' : 'down';
+    
+    changeElement.textContent = `${data.change > 0 ? '+' : '-'}₹${changeAmount} ${changeDirection}`;
+    changeElement.className = `price-change ${changeClass}`;
+  });
+
   document.getElementById('last-updated').textContent = 
     `Last updated: ${new Date().toLocaleTimeString('en-IN', { 
       hour: '2-digit', 
@@ -1752,44 +2589,57 @@ function updatePrices() {
     })}`;
 }
 
+// Clear notification badge
+document.getElementById('notifications-btn').addEventListener('click', () => {
+  document.getElementById('notification-badge').style.display = 'none';
+});
+
 // Initialize everything
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 Initializing Modern Mobile FuelTracker Pro...');
+  console.log('🚀 Initializing Enhanced Fuel Tracker with Confirmations...');
 
   initializeNavigation();
   initializeFAB();
   initializeForm();
+  initializeCamera();
+  initializeFilters();
+  initializeBudgetModal();
   initializeTheme();
   initializeSettings();
 
-  // Set today's date
   const today = new Date().toISOString().slice(0, 10);
   document.getElementById('date').value = today;
 
-  // Load initial data
   updateDashboard();
+  updateBudgetDisplay();
   renderExpensesList();
   updateVehiclesDisplay();
 
-  // Load charts after delay for smooth performance
   setTimeout(() => {
     updateDashboardCharts();
     updateAnalyticsCharts();
     updatePrices();
   }, 500);
 
-  // Refresh prices button
   document.getElementById('refresh-prices').addEventListener('click', () => {
+    // Simulate price changes for demo
+    const changes = [-0.5, -0.3, -0.1, 0.1, 0.3, 0.5];
+    Object.keys(fuelPrices.Chennai).forEach(fuel => {
+      const randomChange = changes[Math.floor(Math.random() * changes.length)];
+      fuelPrices.Chennai[fuel].previous = fuelPrices.Chennai[fuel].current;
+      fuelPrices.Chennai[fuel].current += randomChange;
+      fuelPrices.Chennai[fuel].change = randomChange;
+    });
+    
     updatePrices();
     showNotification('Prices updated!', 'success');
   });
 
-  // Welcome message
   setTimeout(() => {
-    showNotification('🎉 Welcome to Modern FuelTracker Pro!', 'success', 6000);
+    showNotification('🎉 Welcome to Fuel Tracker!', 'success', 6000);
   }, 1000);
 
-  console.log('✅ Modern Mobile FuelTracker Pro ready!');
+  console.log('✅ Enhanced Fuel Tracker ready with full confirmation system!');
 });
 </script>
 </body>
